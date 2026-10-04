@@ -6,9 +6,21 @@ A realistic 3D resistance runner about carrying evidence through a city that wan
 
 ## The direction
 
-Take the immediate readability of a lane-based runner, but replace the cartoon coin chase with a cinematic, nonviolent courier mission. Play a fictional student courier carrying an independently verified evidence packet to a public assembly. The emotional arc is isolation becoming solidarity: the city initially feels hostile, then ordinary people open routes, help the courier, and gather at the destination.
+Take the immediate readability of a lane-based runner, but replace the cartoon coin chase with a cinematic student-resistance story. Play a fictional student courier carrying an independently verified evidence packet through a protest and police crackdown. The emotional arc is isolation becoming solidarity, with fear, anger, confrontation, and disagreement inside the movement rather than an imposed pacifist lesson.
 
-The political position is explicit: pro-resistance, anti-authoritarian, anti-fascist, critical of government repression, and opposed to vote theft. The story champions free assembly, electoral accountability, and the dignity of people who dissent. Its protagonist does not fight civilians, attack officials, sabotage infrastructure, or use weapons.
+The political position is explicit: pro-resistance, anti-authoritarian, anti-fascist, critical of government repression, and opposed to vote theft. The story champions free assembly, electoral accountability, and the dignity of people who dissent. Police abuse and institutional power are central conflicts, not neutral scenery. Students' anger should not be dismissed or made morally equivalent to the conduct they are protesting.
+
+The game need not exclude fictional physical confrontation or environmental destruction. It can depict a fictional barrier collapsing during a clash, damaged police buses, shattered windows, and punctured tyres as part of a scene and its aftermath. These are proposed fictional elements, not claims that those specific acts occurred at the researched demonstrations. They must not become practical sabotage tutorials, calls to attack real people, or propaganda encouraging real-world violence. The story does not reward sexual abuse, harm to bystanders, or attacks on identifiable real officials.
+
+## Revised conflict and accountability
+
+The earlier mandatory “nonviolent” framing has been removed following the creator's clarification. The design should represent a movement reacting to coercion, intimidation, and alleged abuse, not imply that resistance is legitimate only when polite or passive.
+
+- **Fictional clash:** A scripted crowd-and-barricade set-piece can reshape the route, with animation, debris, sound, and consequences. Avoid real-world weak-point diagrams, tool selection, or sabotage procedures.
+- **Journalist-led account:** A fictional journalist has agency over her testimony and the use of recorded evidence. Do not recreate sexual assault as a playable act, voyeuristic spectacle, or titillating cutscene.
+- **Student perspective:** Characters can be angry, frightened, defiant, and divided about tactics. Do not use a simplistic “violence score” that treats property damage and abuse of a person as interchangeable.
+- **Accountability arc:** An independent investigation, survivor-controlled testimony, and institutional consequences provide the ending. Breaking a prop does not itself prove an allegation or deliver accountability.
+- **Player objectives:** Protect people and evidence, stay with companions, and complete the mission. Destruction may occur in the fictional drama, but there is no bonus for injuring police, journalists, or bystanders and no real-world call to action.
 
 ## What the references likely mean
 
@@ -22,6 +34,16 @@ The New Indian Express reported opposition allegations about electoral-system ca
 
 These reports establish that protests and allegations were reported, not that every allegation is proven. The game can take a strong political position without converting disputed accusations about identifiable people into established facts. This is a focused starting scan, not an exhaustive investigation or a reconstruction of all events.
 
+### Journalist complaints and student-treatment allegations
+
+India Today's October 4 report says three women journalists alleged sexual harassment during the October 3 protest, and Delhi Police said their complaints had been transferred to the Crime Branch for a fair and impartial inquiry. The report does not establish a completed investigation or a finding against an officer. [India Today on the complaints and inquiry](https://www.indiatoday.in/amp/india/story/delhi-police-misconduct-journalist-claim-rahul-gandhi-amit-shah-cjp-jantar-mantar-protest-gyanesh-kumar-resignation-ptag-3009066-2026-10-04)
+
+A PTI report published by ThePrint on October 3 describes around 150 detentions and AISA members' allegations that officers manhandled and abused Neha Bora; it explicitly says those allegations could not immediately be independently verified. [PTI reporting via ThePrint](https://theprint.in/india/aisa-activists-return-to-jantar-mantar-around-150-protesters-detained/3061032/?amp)
+
+Neither of these two reports documents punctured tyres, broken bus windows, or protesters breaking barricades. [India Today's account](https://www.indiatoday.in/amp/india/story/delhi-police-misconduct-journalist-claim-rahul-gandhi-amit-shah-cjp-jantar-mantar-protest-gyanesh-kumar-resignation-ptag-3009066-2026-10-04) [PTI's account](https://theprint.in/india/aisa-activists-return-to-jantar-mantar-around-150-protesters-detained/3061032/?amp)
+
+That limited source check does not establish that such damage never happened. Until further evidence is supplied or verified, any such game scene remains fictional rather than a reconstruction of a documented incident.
+
 ## Fictional story, factual context
 
 Recommended setting: a fictional city with Delhi-inspired streets and a Jantar Mantar-inspired assembly ground. Use fictional officials and institutions in the narrative. Keep an optional, separately sourced context archive for real-world reporting, with dates, attribution, and distinctions between allegation, official response, and independently established finding.
@@ -31,17 +53,17 @@ Do not import real voter records, activists' private details, or identifiable pr
 ## The playable loop
 
 - **Run:** Automatic forward movement, three readable lanes, responsive left/right movement, jump, and slide. Borrow the control grammar, not Subway Surfers' characters, art, UI, music, or code.
-- **Read the street:** Choose between a wider boulevard and a narrower market passage. Obstacles are construction barriers, delivery carts, roadworks, and fictional closure gates.
+- **Read the street:** Choose between a wider boulevard and a narrower market passage. A fictional crackdown, contested barricade, damaged vehicles, and moving crowds change the route.
 - **Protect the packet:** Collisions damage evidence integrity and break the run's rhythm. No gore, weapon combat, or real-world evasion instructions.
 - **Build solidarity:** Optional rescue and handoff beats trade route time for solidarity points. NPCs are people with agency, not collectible props.
-- **Finish the mission:** Deliver the packet to a fictional independent archive at a public assembly. Celebrate successful verification and public accountability, not revenge.
+- **Finish the mission:** Deliver the packet and survivor-authorised testimony to a fictional independent archive. The resolution centres investigation and consequences for abuse, not just arrival at a cheerful rally.
 - **Replay:** Route variations and optional objectives change each attempt. Unlock appearance customisation and story fragments, not pay-to-win upgrades.
 
 Suggested first slice: a 90–120 second mission, one playable courier, one environment kit, one handoff, one branch, and one finish sequence. These are scope targets, not implemented features.
 
 ### Example mission beat
 
-A courier leaves a printing shop as dusk settles. A road closure redirects the route into a market. A bookseller opens a short passage; taking it requires a tight jump and a slide under a shutter. The player can pause at a safe handoff point to help another courier duplicate the packet, gaining solidarity but losing time. The final boulevard opens onto an assembly ground where the packet's receipt is projected publicly.
+A courier leaves a printing shop as dusk settles. A fictional police crackdown scatters a student gathering. A contested barrier collapses in a scripted scene; the route passes damaged vehicles and shattered glass, without demonstrating how the damage was caused. A journalist asks the courier to preserve footage and her account on her terms. The player can stop at a safe handoff point to help another student duplicate the packet, losing time but keeping the group connected. The ending opens an accountability process rather than claiming that damage alone brought justice.
 
 The evidence itself is fictional. Gameplay should not teach someone how to evade real police, circumvent a real security system, or disseminate private personal information.
 
@@ -106,7 +128,7 @@ No other model was invoked to build or evaluate this concept. Researching demons
 - Choose fictionalised Delhi-inspired politics or a literal real-world setting.
 - Choose browser-first shareability or native-first maximum visual fidelity.
 
-Recommended default: fictionalised Delhi-inspired setting, browser-first vertical slice, and a nonviolent courier story. Strong political intent should be expressed through the player's purpose and the world, not just pasted slogans.
+Recommended default: fictionalised Delhi-inspired setting, browser-first vertical slice, and a confrontational student-resistance story with a journalist-accountability arc. Strong political intent should be expressed through the player's purpose and the world, not just pasted slogans. Fictional clashes and destruction are compatible with that story; practical real-world sabotage instruction or encouragement is not.
 
 ## Repository and publishing
 
