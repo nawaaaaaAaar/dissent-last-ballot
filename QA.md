@@ -14,6 +14,8 @@ Current limits: no persistent save, complex crowd/companion AI, authored mocap, 
 
 The supplied game client also exercised forward/right movement and jump in the new world; `qa/world-client/` records playing state and airborne height, with no emitted error report. The review captured a font-readiness timeout in software Chromium; screenshots now use the bounded capture path without waiting indefinitely for optional remote fonts.
 
+The final public GitHub Pages module (`world.js?v=0.5.4`, frontend commit `e8c7c77`) was exercised in cloud Chromium with high graphics through all five story encounters to `won`. Public mobile emulation used actual CDP touch input for start and joystick movement, then portrait/landscape captures. `qa/public-world-results.json` records the results; `world-public-final-*` images show the final public scene, including the corrected pavement and costume. This still does not certify iPhone/Android hardware or stable frame pacing.
+
 ## v0.4 real-time opening and visual pass
 
 The new opening is rendered live by Three.js, not a video. Tests cover the Resist input, glass-effect transition, companion-hand input, pause/resume and handoff to the three-pursuer run, on desktop and mobile emulation. `qa/opening-results.json` records those results and a forced human-asset-load failure with primitive-character fallback.

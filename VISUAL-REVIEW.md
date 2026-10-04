@@ -26,6 +26,8 @@ The closer aid-point view exposed ragged shirt topology left by extracting verti
 
 `qa/world-clothing-review.png` preserves the defective intermediate costume view, not the final art target. This additional check is why a wide screenshot alone is insufficient evidence of finished clothing.
 
+The ground material also read like timber boarding in the close courtyard view. Its diffuse was replaced with original staggered stone-slab texture code while retaining subtle scan-derived normal detail. The final public captures are `qa/world-public-final-*`; they supersede earlier local captures for judging the current appearance.
+
 ## Remaining gaps
 
 - **Characters:** Generic base anatomy and faces remain too simplified. Clothing lacks realistic fabric drape and detailed folds; the backpack and hair remain visibly simplified.

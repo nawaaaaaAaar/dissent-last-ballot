@@ -1,0 +1,32 @@
+{
+  "build": "e8c7c77",
+  "publicUrl": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=e8c7c77",
+  "moduleVersion": "0.5.4",
+  "desktop": {
+    "graphics": "high",
+    "inputs": "CDP keyboard down/up and native E interactions, fixed simulation stepping",
+    "storyTasks": {
+      "organiser": true,
+      "aid": true,
+      "witness": true,
+      "barrier": true,
+      "assembly": true
+    },
+    "finalMode": "won",
+    "finalPosition": {"x": -3, "z": -44.99},
+    "pressureActivated": true,
+    "humanAndTreeAssetsLoaded": true
+  },
+  "mobileEmulation": {
+    "viewports": [[390, 844], [844, 390]],
+    "graphics": "low",
+    "startAndJoystick": "Real CDP touchStart/touchMove/touchEnd input",
+    "positionBefore": {"x": 0, "z": 31},
+    "positionAfter": {"x": 0, "z": 27.52},
+    "finalMode": "playing",
+    "humanAndTreeAssetsLoaded": true
+  },
+  "physicalDeviceTested": false,
+  "performanceCertified": false,
+  "note": "QA stepping freezes rendering between inputs. FPS values after freezing are not benchmarks. Final screenshots are world-public-final-*."
+}
