@@ -1,17 +1,21 @@
 {
   "desktop": {
-    "inlinePlayback": true,
+    "realTimeOpening": true,
+    "riggedCharacter": true,
+    "twoContextualInputs": true,
     "pauseResume": true,
-    "naturalHandoff": true,
+    "chaseHandoff": true,
     "pursuers": 3,
     "errors": []
   },
   "mobile": {
-    "inlinePlayback": true,
+    "realTimeOpening": true,
+    "riggedCharacter": true,
+    "twoContextualInputs": true,
     "pauseResume": true,
-    "naturalHandoff": true,
+    "chaseHandoff": true,
     "pursuers": 3,
     "errors": []
   },
-  "forcedFailureFallback": true
+  "humanAssetFailureFallback": true
 }

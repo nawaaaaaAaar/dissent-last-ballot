@@ -1,5 +1,16 @@
 # DISSENT release notes
 
+## v0.4: Real-time Resistance
+
+- Replaced the default AI-video opening with an actual game-rendered 3D opening and two player-triggered story inputs.
+- Corrected v0.3's description: the previous opening was AI-generated video, not conventional CGI.
+- Imported a credited CC0 skeletal human mesh for the protagonist, companion and pursuing officers. Added original colours, fitted-surface offsets, accessories and bone-driven motion.
+- Rebuilt bus body proportions with rounded panels, interior seats, wheel rims, mirrors, wipers, grille and lights.
+- Replaced spherical tree canopies with alpha-tested foliage cards.
+- Added scanned CC0 asphalt diffuse/normal/roughness maps, procedural surface normals for other props, environment reflection lighting, stronger warm/cool contrast, a sky gradient and contact shadows.
+- Retained mobile controls, mission objectives, pursuit risk, checkpoints and primitive fallback characters if the human asset is unavailable.
+- Still not photorealistic or production-ready. Crowds, clothing, facial performance and exact route geometry remain unfinished.
+
 ## v0.3: Break Free
 
 - Added an opening cinematic player with mobile inline playback, skip, pause handling and a five-second in-engine fallback.

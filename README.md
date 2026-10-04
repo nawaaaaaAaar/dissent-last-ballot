@@ -2,11 +2,13 @@
 
 A Delhi-grounded 3D resistance runner about carrying evidence through a city that wants it silenced.
 
-**Status: playable browser build, v0.3 Break Free. Runtime graphics remain a stylised prototype, not production-ready or photorealistic.** The public entry page runs the game, while `docs/concept.html` preserves the design dossier.
+**Status: playable browser build, v0.4 Real-time Resistance. Still a prototype, not production-ready or photorealistic.** The public entry page runs the game, while `docs/concept.html` preserves the design dossier.
 
 ## Break Free opening and chase
 
-The opening is a fictional cinematic about a shattered bus window, a companion-assisted escape from custody, and pursuing officers. Skip it with the visible button or Enter. Playback failures use a labelled in-engine fallback. Three animated fictional officers pursue the player in the actual game; collisions increase capture risk, while clean running restores separation. Read [opening and chase design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/OPENING-AND-CHASE.md) for the depiction limits and controls.
+The opening is now rendered live by Three.js, not played as a video. Tap **Resist** (or E), then **Take your companion's hand**, to trigger the two fictional story beats and enter the police pursuit. Skip with the visible button or Enter. The student, companion and three pursuers use an imported CC0 skeletal human base with project-authored colours, accessories and procedural poses. Bus detail, foliage cards, material normals, lighting, environment reflections and contact shadows have been upgraded. Crowds and much of the architecture remain procedural prototype assets.
+
+The earlier v0.3 opening was AI-generated video, not conventional CGI rendered from authored 3D assets. That wording has been corrected. It remains in the repository as a historical asset but is no longer the game's opening. Read [opening and chase design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/OPENING-AND-CHASE.md) for the depiction limits and controls.
 
 ## Delhi reference pass
 

@@ -25,8 +25,8 @@ export async function mobileQA(p){
   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:235,y:435}]});
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   assert.equal((await read(p)).lane,1);result.realTouchSwipe=true;
-  await p.tap('#sound-btn');assert.equal((await read(p)).muted,false);
-  await p.tap('#sound-btn');assert.equal((await read(p)).muted,true);result.soundToggle=true;
+  await p.tap('#sound-btn');await p.waitForFunction(()=>!JSON.parse(render_game_to_text()).muted,null,{timeout:5000});assert.equal((await read(p)).muted,false);
+  await p.tap('#sound-btn');await p.waitForFunction(()=>JSON.parse(render_game_to_text()).muted,null,{timeout:5000});assert.equal((await read(p)).muted,true);result.soundToggle=true;
   const fit=await p.evaluate(()=>({w:innerWidth,h:innerHeight,scroll:document.documentElement.scrollWidth,
     controls:[...document.querySelectorAll('[data-action]')].map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};})}));
   assert.ok(fit.scroll<=fit.w);
@@ -44,7 +44,7 @@ export async function mobileQA(p){
 export async function desktopQA(p){
   const result={};
   let delhiCaptured=false,landmarkCaptured=false;
-  await p.reload();await p.waitForFunction(()=>window.render_game_to_text);
+  await p.reload({waitUntil:'domcontentloaded'});await p.waitForFunction(()=>window.render_game_to_text,null,{timeout:15000});
   await p.selectOption('#quality','low');assert.equal((await read(p)).quality,'low');
   await p.selectOption('#quality','high');assert.equal((await read(p)).quality,'high');
   await p.selectOption('#quality','low');result.graphicsCycle=true;

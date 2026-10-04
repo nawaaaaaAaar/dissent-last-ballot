@@ -8,7 +8,7 @@
 <title>DISSENT: The Last Ballot | Play</title>
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./style.css?v=0.3.1">
+<link rel="stylesheet" href="./style.css?v=0.4.2">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -16,7 +16,7 @@
 <div id="shade"></div>
 <div id="flash"></div>
 <header class="topbar">
-  <a class="brand" href="./concept.html" aria-label="Read the Dissent concept"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<span class="build">BREAK FREE / 0.3</span></span></a>
+  <a class="brand" href="./concept.html" aria-label="Read the Dissent concept"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<span class="build">REAL-TIME RESISTANCE / 0.4</span></span></a>
   <div class="top-actions"><button id="sound-btn" aria-label="Enable sound" title="Sound">Sound off</button><button id="pause-btn" aria-label="Pause game" hidden>Pause</button></div>
 </header>
 <main>
@@ -30,7 +30,7 @@
     <div id="loading-note" role="status">Loading the 3D engine</div>
     <div class="settings-line"><label>Graphics <select id="quality"><option value="auto">Auto</option><option value="low">Mobile / low</option><option value="high">High</option></select></label><label class="check"><input id="reduced-motion" type="checkbox">Reduced motion</label><label class="check"><input id="assist" type="checkbox">Assist mode</label></div>
     <details class="how"><summary>Controls &amp; mission</summary><p><strong>Phone:</strong> Swipe left/right to change lanes, up to jump, down to slide. Or use the large on-screen buttons. Tap the mission button during story moments.</p><p><strong>Keyboard:</strong> Arrow keys or A/D to move, Space/W to jump, S to slide. E to interact, P/Escape to pause.</p><p>Collect at least 3 evidence packets, preserve the journalist's footage, and reach the archive. Assist mode reduces collision damage. Nothing is saved when you close the page.</p></details>
-    <p class="disclosure">Fictional resistance story, not a reconstruction or official affiliation. Opening: AI-generated pre-rendered CGI. Gameplay: stylised prototype 3D. The 900 m Delhi route is compressed, not an exact map.</p>
+    <p class="disclosure">Fictional resistance story, not a reconstruction or official affiliation. The opening and gameplay are real-time 3D, with a skeletal human mesh. Still a prototype, not photorealistic or production-ready. The Delhi route is compressed.</p>
     <a class="quiet-link" href="./concept.html">Research &amp; design dossier</a>
   </div>
   <div class="scene-caption"><span>NEW DELHI / MISSION 01</span><strong>Patel Chowk → Jantar Mantar</strong><span>900 game metres / compressed route</span></div>
@@ -42,9 +42,9 @@
   <div class="pursuit"><span>STATE PURSUIT</span><strong id="pursuit-label">Keep moving</strong><div><i id="pursuit-bar"></i></div></div>
 </section>
 <section id="opening" hidden aria-label="Fictional opening cinematic">
-  <video id="opening-video" playsinline muted preload="none" src="./assets/opening.mp4"></video>
-  <div class="opening-top"><span>FICTIONAL CGI / NOT DOCUMENTARY FOOTAGE</span><button id="skip-opening">Skip to gameplay</button></div>
-  <div class="opening-copy"><p class="eyebrow">BREAK FREE</p><h2 id="opening-title">Custody is not consent.</h2><p id="opening-caption">A shattered window. A companion's hand. Refuse the crackdown.</p><small>Pre-rendered opening. Stylised 3D gameplay follows. Enter to skip.</small></div>
+  <video id="opening-video" hidden playsinline muted preload="none"></video>
+  <div class="opening-top"><span>REAL-TIME 3D / FICTIONAL SCENE</span><button id="skip-opening">Skip opening</button></div>
+  <div class="opening-copy"><p class="eyebrow">BREAK FREE</p><h2 id="opening-title">Custody is not consent.</h2><p id="opening-caption">A shattered window. A companion's hand. Refuse the crackdown.</p><button id="opening-action" class="primary">Resist</button><small>Rendered live by the game. Tap the action button or press E. Enter to skip.</small></div>
 </section>
 <div id="subtitle" role="status" aria-live="polite"></div>
 <section id="interaction" class="interaction" hidden>
@@ -63,6 +63,6 @@
 </div>
 </main>
 <div id="performance">3D loading</div>
-<script type="module" src="./game.js?v=0.3.1"></script>
+<script type="module" src="./game.js?v=0.4.2"></script>
 </body>
 </html>

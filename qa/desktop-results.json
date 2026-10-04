@@ -19,6 +19,10 @@
     "pursuitGap": 6,
     "pursuers": 0,
     "introFallback": false,
+    "opening": "real-time 3D, two contextual inputs",
+    "introTime": 0.72,
+    "introAct": 0,
+    "riggedCharacter": true,
     "barrier": true,
     "footage": true,
     "checkpoint": 572.0999999999673,
@@ -29,12 +33,12 @@
     "muted": true,
     "reducedMotion": false,
     "assist": false,
-    "fps": 6,
+    "fps": 1,
     "setting": "New Delhi, compressed dramatic route",
     "location": "Jantar Mantar Road",
     "rendering": {
-      "draws": 81,
-      "triangles": 59008
+      "draws": 64,
+      "triangles": 69722
     }
   },
   "replay": true,
