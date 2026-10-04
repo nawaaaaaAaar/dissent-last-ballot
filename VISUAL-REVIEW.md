@@ -16,7 +16,7 @@ Tree reduction was separated by material so leaf surfaces retained more geometry
 
 ## Iteration: composition and coverage
 
-The scattered cubes were replaced with an aid table's bottles, a first-aid case, slatted supply crates and record papers. Protesters were organised into smaller groups. Trouser coverage and shirt overlap were extended in the editable Blender model. The story chapter and touch inputs were exercised through actual controls, not teleported screenshots.
+The scattered cubes were replaced with an aid table's bottles, a first-aid case, slatted supply crates and record papers. Protesters were organised into smaller groups. Trouser coverage and shirt overlap were extended in the editable Blender model; underlying covered body triangles were removed from the clothed runtime to prevent skin/cloth intersections. The story chapter and touch inputs were exercised through actual controls, not teleported screenshots.
 
 Final captures include the street, aid point, barricade, ending and mobile layouts in `qa/world-final-*` and `qa/world-mobile-*`. These are actual Three.js gameplay captures. The generated limewash image is only a surface texture, not a promotional render substituted for game graphics.
 

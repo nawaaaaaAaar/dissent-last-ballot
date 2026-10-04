@@ -24,12 +24,13 @@ export function human(shirt='#b85a30',police=false,options={}){
       return;
     }
     const pos=n.geometry.attributes.position,norm=n.geometry.attributes.normal,idx=n.geometry.attributes.skinIndex,weights=n.geometry.attributes.skinWeight;
-    const colors=[];
+    const colors=[],covered=[];
     for(let i=0;i<pos.count;i++){
       let dominant=0;for(let j=1;j<4;j++)if(weights.getComponent(i,j)>weights.getComponent(i,dominant))dominant=j;
       const name=n.skeleton.bones[idx.getComponent(i,dominant)]?.name||'';
       let c=skin;
       const body=/pelvis|spine|clavicle|upperarm|lowerarm/.test(name),leg=/thigh|calf|foot|ball/.test(name);
+      covered.push(/pelvis|spine|clavicle|upperarm|lowerarm|thigh|calf/.test(name));
       if(body)c=cloth;if(leg)c=trousers;
       if(pos.getY(i)<.115)c=new THREE.Color('#171b20');
       if(n.name==='Eyes')c=new THREE.Color('#cec8bb');
@@ -42,6 +43,16 @@ export function human(shirt='#b85a30',police=false,options={}){
       }
     }
     n.geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
+    // A clothed model must not render the underlying torso/limb surface through
+    // the cloth shell. Keep exposed head, neck, hands and shoes at the cuffs.
+    if(source.getObjectByName('Shirt')&&n.name==='SuperHero_Male'){
+      const idx=n.geometry.index,visible=[];
+      for(let i=0;i<(idx?idx.count:pos.count);i+=3){
+        const a=idx?idx.getX(i):i,b=idx?idx.getX(i+1):i+1,c=idx?idx.getX(i+2):i+2;
+        if(!(covered[a]&&covered[b]&&covered[c]))visible.push(a,b,c);
+      }
+      n.geometry.setIndex(visible);
+    }
     n.geometry.computeVertexNormals();
     n.material=new THREE.MeshStandardMaterial({color:'#ffffff',vertexColors:true,roughness:.84,metalness:0});
   });

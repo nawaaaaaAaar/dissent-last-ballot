@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.1';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.1';
+import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.2';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.2';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.1';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.2';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -346,6 +346,7 @@ async function init(){
   try{
     scene=new THREE.Scene();scene.fog=new THREE.Fog('#b3b5aa',55,135);scene.background=new THREE.Color('#bcc5c7');
     renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;
+    renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();manual=true;toast('Graphics context interrupted. Reload the page to recover this development build.',60);});
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     $('viewport').appendChild(renderer.domElement);
     camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,180);

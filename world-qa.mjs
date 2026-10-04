@@ -1,6 +1,7 @@
 import {chromium} from 'playwright';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
+process.env.PW_TEST_SCREENSHOT_NO_FONTS_READY='1';
 const root=new URL('./qa/',import.meta.url);
 await mkdir(root,{recursive:true});
 const base=process.env.DISSENT_URL||'http://127.0.0.1:5173/';
