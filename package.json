@@ -1,0 +1,16 @@
+{
+  "name": "dissent-last-ballot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "First playable browser slice for a fictional student-resistance runner",
+  "scripts": {
+    "start": "python -m http.server 5173 --directory docs",
+    "test": "node run-qa.mjs"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "playwright": "1.59.0"
+  }
+}

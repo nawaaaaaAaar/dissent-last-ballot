@@ -1,0 +1,43 @@
+{
+  "graphicsCycle": true,
+  "accessibilityCycle": true,
+  "keyboard": true,
+  "pauseResume": true,
+  "completeMission": {
+    "mode": "won",
+    "coordinates": "Player at z=0; forward is -z; lanes -1 left, 0 centre, 1 right",
+    "distance": 900,
+    "goal": 900,
+    "lane": 0,
+    "x": 0,
+    "jump": 0,
+    "sliding": false,
+    "condition": 100,
+    "evidence": 11,
+    "solidarity": 15,
+    "barrier": true,
+    "footage": true,
+    "checkpoint": 572.0999999999673,
+    "dialogue": "journalist",
+    "obstacles": [],
+    "packets": [],
+    "quality": "low",
+    "muted": true,
+    "reducedMotion": false,
+    "assist": false,
+    "fps": 0,
+    "rendering": {
+      "draws": 93,
+      "triangles": 95288
+    }
+  },
+  "replay": true,
+  "collisionFailure": true,
+  "retry": true,
+  "checkpointRetry": {
+    "checkpoint": 244,
+    "distance": 244
+  },
+  "restart": true,
+  "returnToMenu": true
+}

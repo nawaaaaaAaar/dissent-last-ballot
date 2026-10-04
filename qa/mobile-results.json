@@ -1,0 +1,38 @@
+{
+  "pause": true,
+  "touchButtons": true,
+  "realTouchSwipe": true,
+  "soundToggle": true,
+  "portraitFit": {
+    "w": 390,
+    "h": 844,
+    "scroll": 390,
+    "controls": [
+      {
+        "x": 16,
+        "y": 760,
+        "w": 58,
+        "h": 60
+      },
+      {
+        "x": 82,
+        "y": 760,
+        "w": 58,
+        "h": 60
+      },
+      {
+        "x": 250,
+        "y": 760,
+        "w": 58,
+        "h": 60
+      },
+      {
+        "x": 316,
+        "y": 760,
+        "w": 58,
+        "h": 60
+      }
+    ]
+  },
+  "landscapeFit": true
+}

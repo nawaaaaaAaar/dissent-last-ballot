@@ -2,7 +2,20 @@
 
 A realistic 3D resistance runner about carrying evidence through a city that wants it silenced.
 
-**Status: research and concept only. No playable game, finished 3D assets, or production-ready build exists in this repository yet.** The working title, setting, and technical direction are proposals for review.
+**Status: first playable browser build, v0.1. Not production-ready or photorealistic.** The working title and setting remain proposals; the public entry page now runs the game, while `docs/concept.html` preserves the concept dossier.
+
+## Play the first build
+
+Open the [public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a browser with WebGL 2. It requires no account or installation. Desktop keyboard and phone touch controls are included; physical-device compatibility and frame-rate targets remain to be verified.
+
+- **Phone:** Swipe left/right to change lanes, up to jump, down to slide. Large touch buttons provide the same actions. Tap the story button during interactions.
+- **Keyboard:** Arrow keys or A/D move; Space/W jumps; down/S slides; E interacts; P/Escape pauses.
+- **Objective:** Collect at least three evidence packets, preserve the journalist's footage, and reach the archive at 900 metres.
+- **Settings:** Auto / low / high graphics, reduced camera motion, assist mode, and sound on/off.
+- **Failure:** Collisions reduce condition. Retry from the most recent story checkpoint, or restart from the beginning.
+- **Session only:** No save, login, tracking, or personal-data collection. Closing/reloading the page resets play.
+
+This slice uses original procedural architecture, an articulated procedural human, an AI-generated plaster texture, and original synthesised audio. It does not yet use production-quality scanned assets, mocap animation, voice acting, or photorealistic character models. All narrative incidents in gameplay are fictional.
 
 ## The direction
 
@@ -59,7 +72,7 @@ Do not import real voter records, activists' private details, or identifiable pr
 - **Finish the mission:** Deliver the packet and survivor-authorised testimony to a fictional independent archive. The resolution centres investigation and consequences for abuse, not just arrival at a cheerful rally.
 - **Replay:** Route variations and optional objectives change each attempt. Unlock appearance customisation and story fragments, not pay-to-win upgrades.
 
-Suggested first slice: a 90–120 second mission, one playable courier, one environment kit, one handoff, one branch, and one finish sequence. These are scope targets, not implemented features.
+The v0.1 slice implements a roughly two-minute, 900-metre route at its intended simulation rate: one courier, lane choices, obstacles, pickups, a scripted barrier collapse, a journalist handoff, condition, checkpoints, and a finish sequence. A freely explorable confrontation area, multiple route branches, and companion AI are not implemented; solidarity currently records packet collection and story interactions.
 
 ### Example mission beat
 
@@ -88,7 +101,7 @@ For a browser-first slice, evaluate a WebGL engine with glTF character and envir
 
 For a native-first production, evaluate Unreal Engine with a Blender asset pipeline. A native build would need separate packaging, distribution, and device QA; a public website would remain the landing page rather than magically run the native executable.
 
-Neither stack has been benchmarked for this project yet. Asset purchases, engine services, streaming services, and hosting with charges require separate approval.
+The first slice is implemented in Three.js/WebGL 2 with static geometry batching and low/high graphics modes. Performance on physical target phones has not been benchmarked. Asset purchases, engine services, streaming services, and hosting with charges require separate approval.
 
 ### Production acceptance gates
 
@@ -116,9 +129,9 @@ No other model was invoked to build or evaluate this concept. Researching demons
 
 ## Proposed milestones
 
-- **Pre-production, this repository:** Concept, sourced initial research, visual standards, and a public review page.
+- **Pre-production, completed initial pass:** Concept, sourced initial research, visual standards, and a public review page.
 - **Art-and-performance spike:** One street module, one rigged character, lighting options, and performance measurements.
-- **Playable vertical slice:** One complete mission with start, finish, failure, controls, audio, and basic accessibility.
+- **Playable vertical slice, v0.1:** Initial complete mission with start, finish, failure, controls, synthesised audio, touch input, and basic accessibility; final QA and physical-device validation remain separate gates.
 - **Production expansion:** More routes and story beats only after the vertical slice passes its acceptance gates.
 - **Release candidate:** Device matrix, asset audit, reproducible builds, public release and rollback plan.
 
@@ -132,6 +145,6 @@ Recommended default: fictionalised Delhi-inspired setting, browser-first vertica
 
 ## Repository and publishing
 
-The `docs/index.html` page presents the concept, not a playable game. It has no analytics, personal-data collection, voter data, or external service credentials. GitHub Pages serves `docs/` from `main`; the Markdown brief remains the canonical detailed design document.
+The `docs/index.html` page runs the playable slice; `docs/concept.html` preserves the concept dossier. Neither has analytics, personal-data collection, voter data, or external service credentials. GitHub Pages serves `docs/` from `main`; the Markdown brief remains the canonical detailed design document.
 
-To preview locally, serve `docs/` with a static HTTP server. There is no game build step yet.
+To preview locally: `python -m http.server 5173 --directory docs`, then open `http://localhost:5173`. The checked-in browser code and Three.js module are served directly; there is no build step. `package-lock.json` pins the library used for the vendored module. Read `ASSETS.md` for provenance.
