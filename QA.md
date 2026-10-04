@@ -1,5 +1,11 @@
 # QA and limitations
 
+## v0.3 opening and chase
+
+Full desktop mission, deliberate collision failure, checkpoint restoration, touch buttons, CDP touch swipe, portrait and landscape checks passed with the pursuit system enabled. Desktop and mobile runners skip the film explicitly before testing controls. Separate opening checks cover video playback, pause/resume, natural handoff and a forced video-failure fallback. Generated video frames were visually reviewed; the opening is pre-rendered CGI, not photorealistic runtime art.
+
+The supplied game client also exercised Enter-to-skip, lane movement and jump; output is retained in `qa/chase-client/`. Extra animated characters increase draw calls; performance on physical iPhone/Android hardware remains unverified. Prefer Mobile / low graphics where needed.
+
 The game is tested in Chromium with Playwright. Mobile checks emulate a 390 × 844 touch phone and 844 × 390 landscape viewport. These are browser-emulation results, not tests on a physical iPhone or Android device.
 
 ## Coverage
@@ -19,7 +25,7 @@ The first pass caught a portrait-camera clipping issue and a repeated jump colli
 
 ## Re-run
 
-Run `npm ci`, then `npx playwright install chromium`. In one terminal run `npm start`; in another run `npm test`. `DISSENT_URL` optionally targets a different deployment.
+Run `npm ci`, then `npx playwright install chromium`. In one terminal run `npm start`; in another run `npm test`. Run `node opening-qa.mjs` for the additional film and fallback checks. `DISSENT_URL` optionally targets a different deployment.
 
 For interactive state inspection, `window.render_game_to_text()` returns concise JSON. Calling `window.advanceTime(ms)` enters deterministic QA stepping and stops real-time simulation/rendering between steps; call `window.resumeRealTime()` to return to normal play.
 

@@ -53,6 +53,7 @@ export async function desktopQA(p){
   await p.check('#assist');assert.equal((await read(p)).assist,true);
   await p.uncheck('#assist');assert.equal((await read(p)).assist,false);result.accessibilityCycle=true;
   await p.click('#start-btn');
+  assert.equal((await read(p)).mode,'intro');await p.click('#skip-opening');result.openingSkip=true;
   await key(p,'ArrowLeft');await step(p,350);assert.equal((await read(p)).lane,-1);
   await key(p,'ArrowRight');await step(p,350);assert.equal((await read(p)).lane,0);
   await key(p,'Space');await step(p,180);assert.ok((await read(p)).jump>.2);

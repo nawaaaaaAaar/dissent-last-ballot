@@ -15,7 +15,7 @@ try{
   const m=await mobile.newPage();m.on('pageerror',e=>errors.push(e.message));
   await m.goto(process.env.DISSENT_URL||'http://127.0.0.1:5173');
   await m.waitForFunction(()=>window.render_game_to_text);
-  await m.tap('#start-btn');await m.tap('[data-action=left]');await m.tap('#pause-btn');
+  await m.tap('#start-btn');await m.tap('#skip-opening');await m.tap('[data-action=left]');await m.tap('#pause-btn');
   console.log('Mobile:',await mobileQA(m));
   if(errors.length)throw new Error(errors.join('\n'));
   console.log('No page errors.');

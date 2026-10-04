@@ -1,6 +1,7 @@
 {
   "graphicsCycle": true,
   "accessibilityCycle": true,
+  "openingSkip": true,
   "keyboard": true,
   "pauseResume": true,
   "completeMission": {
@@ -15,6 +16,9 @@
     "condition": 100,
     "evidence": 11,
     "solidarity": 15,
+    "pursuitGap": 6,
+    "pursuers": 0,
+    "introFallback": false,
     "barrier": true,
     "footage": true,
     "checkpoint": 572.0999999999673,
@@ -25,7 +29,7 @@
     "muted": true,
     "reducedMotion": false,
     "assist": false,
-    "fps": 3,
+    "fps": 6,
     "setting": "New Delhi, compressed dramatic route",
     "location": "Jantar Mantar Road",
     "rendering": {

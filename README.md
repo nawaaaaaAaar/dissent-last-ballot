@@ -2,7 +2,11 @@
 
 A Delhi-grounded 3D resistance runner about carrying evidence through a city that wants it silenced.
 
-**Status: playable browser build, v0.2 Delhi reference pass. Not production-ready or photorealistic.** The public entry page runs the game, while `docs/concept.html` preserves the design dossier.
+**Status: playable browser build, v0.3 Break Free. Runtime graphics remain a stylised prototype, not production-ready or photorealistic.** The public entry page runs the game, while `docs/concept.html` preserves the design dossier.
+
+## Break Free opening and chase
+
+The opening is a fictional cinematic about a shattered bus window, a companion-assisted escape from custody, and pursuing officers. Skip it with the visible button or Enter. Playback failures use a labelled in-engine fallback. Three animated fictional officers pursue the player in the actual game; collisions increase capture risk, while clean running restores separation. Read [opening and chase design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/OPENING-AND-CHASE.md) for the depiction limits and controls.
 
 ## Delhi reference pass
 

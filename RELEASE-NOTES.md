@@ -1,5 +1,14 @@
 # DISSENT release notes
 
+## v0.3: Break Free
+
+- Added an opening cinematic player with mobile inline playback, skip, pause handling and a five-second in-engine fallback.
+- Added three animated fictional police pursuers to actual gameplay, a state-pursuit HUD and recapture failure.
+- Collisions now close the pursuit gap. Clean running slowly increases separation; assist mode reduces the penalty.
+- Revised the opening and ending around resistance to a fictional oppressive state crackdown.
+- Preserved the 900-metre mission, mobile touch controls, evidence objective and checkpoint retry.
+- Runtime art is still stylised procedural 3D. A rendered opening is not evidence of photorealistic gameplay.
+
 ## v0.2: Delhi reference pass
 
 October 4, 2026. The playable route now uses Patel Chowk, Sansad Marg, and Jantar Mantar Road stage labels, with a clear “compressed route” disclosure.

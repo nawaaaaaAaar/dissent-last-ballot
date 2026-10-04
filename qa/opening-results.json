@@ -1,0 +1,17 @@
+{
+  "desktop": {
+    "inlinePlayback": true,
+    "pauseResume": true,
+    "naturalHandoff": true,
+    "pursuers": 3,
+    "errors": []
+  },
+  "mobile": {
+    "inlinePlayback": true,
+    "pauseResume": true,
+    "naturalHandoff": true,
+    "pursuers": 3,
+    "errors": []
+  },
+  "forcedFailureFallback": true
+}

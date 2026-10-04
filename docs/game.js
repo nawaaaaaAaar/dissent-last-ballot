@@ -9,12 +9,14 @@ const state = {
   evidence:0, solidarity:0, hitCooldown:0, elapsed:0, checkpoint:null,
   barrier:false, footage:false, dialogue:null, cutscene:0, subtitleTime:0,
   low:mobile, mute:true, reduced:matchMedia('(prefers-reduced-motion:reduce)').matches,
-  assist:false, collisions:0, packets:new Set(), hit:new Set(), fps:0,
+  assist:false, collisions:0, packets:new Set(), hit:new Set(), fps:0, pursuit:6, introTime:0, introFallback:false,
 };
 let renderer, scene, camera, clock, sun, player, parts, street=[], obstacles=[], pickups=[];
 let characterTime=0, lastFrame=0, frames=0, measureStart=performance.now(), manualStepping=false;
 let sound, musicStep=0, beatTime=0, dust, staticMaterials=[], camShake=0;
 let delhiSign, busSign, protestSigns=[], routeSigns=[], delhiLandmarks;
+let pursuers=[], escapeScene, escapeCompanion, shards=[];
+let introTimer;
 const root = $('viewport');
 const rng = seed => { let n=seed; return () => {n = (n*1664525+1013904223)>>>0; return n/4294967296;}; };
 const rand=rng(8104);
@@ -444,31 +446,74 @@ function showSubtitle(text,time=4){
 function setMode(mode){
   state.mode=mode;
   $('start-screen').hidden=mode!=='menu';
-  $('hud').hidden=['menu','loading','error'].includes(mode);
+  $('hud').hidden=['menu','loading','error','intro'].includes(mode);
+  $('opening').hidden=mode!=='intro';
   $('pause-screen').hidden=mode!=='paused';
   $('result-screen').hidden=!['won','lost'].includes(mode);
   $('interaction').hidden=mode!=='dialogue';
   $('touch-controls').hidden=mode!=='running';
-  $('pause-btn').hidden=!['running','dialogue','cutscene','paused'].includes(mode);
+  $('pause-btn').hidden=!['running','dialogue','cutscene','paused','intro'].includes(mode);
   $('pause-btn').textContent=mode==='paused'?'Resume':'Pause';
   document.body.classList.toggle('playing',mode!=='menu'&&mode!=='loading');
+  document.body.classList.toggle('cinematic',mode==='intro');
 }
 function checkpoint(){
   state.checkpoint={distance:state.distance,evidence:state.evidence,solidarity:state.solidarity,
     barrier:state.barrier,footage:state.footage,packets:[...state.packets],hit:[...state.hit]};
 }
 function reset(fromCheckpoint=false){
+  $('opening-video').pause();clearTimeout(introTimer);escapeScene.visible=false;
   const c=fromCheckpoint?state.checkpoint:null;
   Object.assign(state,{distance:c?.distance||0,lane:0,x:0,y:0,vy:0,slide:0,condition:100,
     evidence:c?.evidence||0,solidarity:c?.solidarity||0,hitCooldown:2,elapsed:0,
     barrier:c?.barrier||false,footage:c?.footage||false,dialogue:null,cutscene:0,collisions:0,
-    packets:new Set(c?.packets||[]),hit:new Set(c?.hit||[])});
+    packets:new Set(c?.packets||[]),hit:new Set(c?.hit||[]),pursuit:6});
   if(!c)state.checkpoint=null;
   for(const o of obstacles)o.done=o.d<state.distance;
   for(const p of pickups)p.collected=state.packets.has(p.id);
   scene.userData.gate.children.forEach(n=>n.rotation.x=state.barrier?Math.PI/2:0);
   player.visible=true;updateWorld();updateHUD();setMode('running');beginAudio();
   showSubtitle(c?'Checkpoint restored. Your account is still with you.':'Swipe or use the buttons. Follow the paper packets.',5);
+}
+function buildChase(){
+  const khaki=mat('#95836a');
+  for(let i=0;i<3;i++){
+    const p=createCharacter(khaki,.98);p.bag.visible=false;
+    p.group.traverse(n=>{if(n.material===M.blue)n.material=khaki;if(n.material===M.teal||n.material===M.paper)n.visible=false;});
+    mesh(G.cylinder,M.navy,0,2.12,0,.2,.09,.2,p.group);
+    scene.add(p.group);pursuers.push(p);
+  }
+  escapeScene=new THREE.Group();scene.add(escapeScene);escapeScene.visible=false;
+  const b=bus();b.position.set(-4,0,-3);escapeScene.add(b);
+  escapeCompanion=createCharacter(M.green);escapeCompanion.group.position.set(-1.6,0,-.8);escapeScene.add(escapeCompanion.group);
+  for(let i=0;i<22;i++){
+    const s=mesh(G.box,M.glass,-2.2,1.6,-1,.05+rand()*.09,.12,.03,escapeScene);
+    s.userData={dx:rand()*2,dy:rand()*2,dz:(rand()-.5)*2};shards.push(s);
+  }
+}
+function beginOpening(){
+  reset(false);state.introTime=0;state.introFallback=false;setMode('intro');
+  $('subtitle').style.opacity=0;
+  $('opening').classList.remove('fallback');$('opening-video').hidden=false;
+  $('opening-title').textContent='Custody is not consent.';
+  $('opening-caption').textContent="A shattered window. A companion's hand. Refuse the crackdown.";
+  const video=$('opening-video');video.currentTime=0;video.muted=state.mute;
+  video.onended=endOpening;video.onerror=openingFallback;
+  video.onplaying=()=>clearTimeout(introTimer);
+  introTimer=setTimeout(openingFallback,7000);
+  video.play().catch(openingFallback);
+}
+function openingFallback(){
+  if(state.mode!=='intro')return;
+  clearTimeout(introTimer);$('opening-video').pause();$('opening-video').hidden=true;
+  $('opening').classList.add('fallback');state.introFallback=true;state.introTime=0;escapeScene.visible=true;
+  $('opening-caption').textContent='Video unavailable. In-engine opening: the window gives way; your companion pulls you clear.';
+}
+function endOpening(){
+  if(state.mode!=='intro')return;
+  clearTimeout(introTimer);$('opening-video').pause();escapeScene.visible=false;
+  player.position.set(0,0,0);player.rotation.y=0;
+  setMode('running');showSubtitle('They want the account silenced. Run. Keep the evidence alive.',5);
 }
 function startDialog(kind){
   state.dialogue=kind;setMode('dialogue');
@@ -500,7 +545,7 @@ function finish(won){
   setMode(won?'won':'lost');player.visible=true;
   $('result-kicker').textContent=won?'MISSION COMPLETE':'ROUTE INTERRUPTED';
   $('result-title').textContent=won?'The account survives.':'Take another route.';
-  $('result-copy').textContent=won?'The footage reaches the independent archive. A public investigation begins. This fictional ending is a demand for accountability, not a claim about a real case.':state.condition<=0?'Too many collisions interrupted the run. Try a different lane, jump over low barriers, or slide beneath hanging boards.':"You reached the archive without enough evidence. Collect at least 3 paper packets on the route.";
+  $('result-copy').textContent=won?'You outran the crackdown. The footage reaches the independent archive; organised resistance demands accountability. This fictional ending is not a claim about a real case.':state.pursuit<=1?'The pursuing officers caught up. Collisions close the gap; clean running lets you pull ahead. Retry without losing your checkpoint.':state.condition<=0?'Too many collisions interrupted the run. Try a different lane, jump over low barriers, or slide beneath hanging boards.':"You reached the archive without enough evidence. Collect at least 3 paper packets on the route.";
   $('result-stats').textContent=`Evidence ${state.evidence} · Solidarity ${state.solidarity} · Condition ${Math.max(0,state.condition)}`;
   $('retry-btn').textContent=won?'Run again':state.checkpoint?'Retry from checkpoint':'Try again';
   $('restart-result').hidden=won||!state.checkpoint;
@@ -515,12 +560,15 @@ function action(a){
   if(a==='slide'&&state.y<=.1){state.slide=.95;sfx(170,.12,'triangle');}
 }
 function pause(){
-  if(state.mode==='paused'){setMode(state.beforePause||'running');return;}
-  if(['running','dialogue','cutscene'].includes(state.mode)){
+  if(state.mode==='paused'){setMode(state.beforePause||'running');if(state.mode==='intro'&&!state.introFallback)$('opening-video').play().catch(openingFallback);return;}
+  if(['running','dialogue','cutscene','intro'].includes(state.mode)){
+    if(state.mode==='intro'){$('opening-video').pause();clearTimeout(introTimer);}
     state.beforePause=state.mode;setMode('paused');$('resume-btn').focus({preventScroll:true});
   }
 }
 function updateHUD(){
+  $('pursuit-label').textContent=state.pursuit<2.8?'Closing in':'Keep moving';
+  $('pursuit-bar').style.width=`${Math.max(0,(7-state.pursuit)/6*100)}%`;
   $('distance').textContent=`${Math.floor(state.distance)} / ${LENGTH} m`;
   $('route-progress').style.width=`${state.distance/LENGTH*100}%`;
   $('condition').textContent=Math.max(0,state.condition);
@@ -531,10 +579,10 @@ function updateHUD(){
 }
 function collide(){
   if(state.hitCooldown>0)return;
-  state.condition-=state.assist?8:20;state.collisions++;state.hitCooldown=1.1;camShake=state.reduced?0:.2;
+  state.condition-=state.assist?8:20;state.pursuit-=state.assist?.6:1.75;state.collisions++;state.hitCooldown=1.1;camShake=state.reduced?0:.2;
   $('flash').style.opacity='.18';sfx(95,.16,'sawtooth');
   showSubtitle('Collision. Change lane, jump low barriers, slide under boards.',2.6);
-  if(state.condition<=0)finish(false);
+  if(state.condition<=0||state.pursuit<=1)finish(false);
 }
 function updateWorld(){
   const base=Math.floor(state.distance/SEGMENT)-1;
@@ -557,6 +605,10 @@ function updateWorld(){
   if(delhiLandmarks)delhiLandmarks.position.z=state.distance;
 }
 function update(dt){
+  for(let i=0;i<pursuers.length;i++){
+    const p=pursuers[i];p.group.visible=['running','dialogue','cutscene','paused','lost'].includes(state.mode);
+    if(state.mode==='running'){characterPose(p,characterTime+i*.9,true);p.group.position.set((i-1)*1.7+state.x*.25,0,1.3+state.pursuit*.36+i*.3);}
+  }
   if(state.mode==='loading'||state.mode==='error')return;
   if(state.mode==='menu'){
     characterTime+=dt;characterPose(parts,characterTime,false);
@@ -564,6 +616,17 @@ function update(dt){
     return;
   }
   if(state.mode==='paused'||state.mode==='won'||state.mode==='lost')return;
+  if(state.mode==='intro'){
+    if(state.introFallback){
+      state.introTime+=dt;const t=state.introTime;
+      player.visible=true;player.position.set(-1.4+Math.min(1.4,t*.35),0,0);player.rotation.y=0;
+      characterPose(parts,t*8,t>2.5);characterPose(escapeCompanion,t,false);
+      escapeCompanion.arms[1].rotation.z=-1.1;
+      shards.forEach(s=>{const u=Math.max(0,t-.6);s.position.set(-2.2+s.userData.dx*u,Math.max(.08,1.6+s.userData.dy*u-u*u),-1+s.userData.dz*u);s.rotation.x=u*3;});
+      $('opening-title').textContent=t<1.5?'The window gives way.':t<3?'No one gets left behind.':'Run. Refuse silence.';
+      if(t>=5)endOpening();
+    }return;
+  }
   if(state.subtitleTime>0){state.subtitleTime-=dt;if(state.subtitleTime<=0)$('subtitle').style.opacity=0;}
   if(state.mode==='dialogue'){characterPose(parts,0,false);return;}
   if(state.mode==='cutscene'){
@@ -573,6 +636,7 @@ function update(dt){
     updateWorld();updateHUD();return;
   }
   state.elapsed+=dt;state.distance=Math.min(LENGTH,state.distance+SPEED*dt);
+  state.pursuit=Math.min(6,state.pursuit+dt*.045);
   state.x+=(state.lane*LANE-state.x)*Math.min(1,dt*13);
   state.vy-=18*dt;state.y=Math.max(0,state.y+state.vy*dt);
   if(state.y===0)state.vy=0;
@@ -609,7 +673,7 @@ function render(){
   if(!renderer||!scene)return;
   const menu=state.mode==='menu',target=new THREE.Vector3();
   const follow=camera.aspect<.9?.78:.28;
-  const desired=new THREE.Vector3(menu?2.8:state.x*follow,menu?4.7:4.0,menu?11:8.0);
+  const desired=new THREE.Vector3(menu?2.8:state.x*follow,menu?4.7:4.8,menu?11:10.0);
   camera.position.lerp(desired,menu?.035:.12);
   if(camShake>0&&!state.reduced){camera.position.x+=(rand()-.5)*camShake*.15;}
   target.set(menu?0:state.x*(camera.aspect<.9?.65:.2),menu?1.2:1.4,menu?-18:-14);
@@ -656,12 +720,13 @@ function musicBeat(){
   musicStep++;
 }
 function inputBindings(){
-  $('start-btn').onclick=()=>{state.assist=$('assist').checked;state.reduced=$('reduced-motion').checked;reset(false);};
+  $('start-btn').onclick=()=>{state.assist=$('assist').checked;state.reduced=$('reduced-motion').checked;beginOpening();};
+  $('skip-opening').onclick=()=>{if(state.mode==='paused'&&state.beforePause==='intro')setMode('intro');endOpening();};
   $('pause-btn').onclick=pause;$('resume-btn').onclick=pause;
   $('restart-pause').onclick=()=>reset(false);
   $('retry-btn').onclick=()=>reset(state.mode==='lost'&&!!state.checkpoint);
   $('restart-result').onclick=()=>reset(false);
-  $('menu-btn').onclick=()=>{state.distance=0;state.y=0;state.slide=0;player.scale.setScalar(1);player.visible=true;updateWorld();setMode('menu');$('subtitle').style.opacity=0;};
+  $('menu-btn').onclick=()=>{clearTimeout(introTimer);$('opening-video').pause();escapeScene.visible=false;state.distance=0;state.y=0;state.slide=0;player.scale.setScalar(1);player.visible=true;updateWorld();setMode('menu');$('subtitle').style.opacity=0;};
   $('interact-btn').onclick=interact;
   $('reload-btn').onclick=()=>location.reload();
   $('quality').onchange=()=>applyQuality();
@@ -670,12 +735,14 @@ function inputBindings(){
   $('assist').onchange=()=>state.assist=$('assist').checked;
   $('sound-btn').onclick=()=>{
     state.mute=!state.mute;beginAudio();
+    $('opening-video').muted=state.mute;
     $('sound-btn').textContent=state.mute?'Sound off':'Sound on';
     $('sound-btn').setAttribute('aria-label',state.mute?'Enable sound':'Mute sound');
     if(!state.mute)sfx(440,.08);
   };
   document.addEventListener('keydown',e=>{
     if(e.target.matches('select,input,summary'))return;
+    if(state.mode==='intro'&&e.code==='Enter'){endOpening();e.preventDefault();return;}
     const keys={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',ArrowDown:'slide',KeyS:'slide',KeyE:'interact'};
     if(keys[e.code]){if(!e.repeat){action(keys[e.code]);}if(state.mode!=='menu')e.preventDefault();}
     if(['Escape','KeyP'].includes(e.code)){pause();e.preventDefault();}
@@ -692,7 +759,7 @@ function inputBindings(){
     origin=null;
   });
   root.addEventListener('pointercancel',()=>origin=null);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden&&['running','dialogue','cutscene'].includes(state.mode))pause();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&['running','dialogue','cutscene','intro'].includes(state.mode))pause();});
   window.addEventListener('resize',resize);
 }
 async function init(){
@@ -723,6 +790,7 @@ async function init(){
     image.src='./assets/plaster.webp';
     makeStreet();buildMission();buildDelhiLandmarks();dustParticles();
     parts=createCharacter();player=parts.group;scene.add(player);
+    buildChase();
     applyQuality();updateWorld();setMode('menu');
     $('start-btn').disabled=false;$('start-btn').textContent='Begin the witness route';
     $('loading-note').textContent='Ready · Keyboard, swipes, and touch buttons';
@@ -738,6 +806,7 @@ async function init(){
       mode:state.mode,coordinates:'Player at z=0; forward is -z; lanes -1 left, 0 centre, 1 right',
       distance:+state.distance.toFixed(2),goal:LENGTH,lane:state.lane,x:+state.x.toFixed(2),jump:+state.y.toFixed(2),
       sliding:state.slide>0,condition:state.condition,evidence:state.evidence,solidarity:state.solidarity,
+      pursuitGap:+state.pursuit.toFixed(2),pursuers:pursuers.filter(p=>p.group.visible).length,introFallback:state.introFallback,
       barrier:state.barrier,footage:state.footage,checkpoint:state.checkpoint?.distance||null,dialogue:state.dialogue,
       obstacles:obstacles.filter(o=>!o.done&&o.d-state.distance>-2&&o.d-state.distance<50).map(o=>({type:o.type,lane:o.lane,ahead:+(o.d-state.distance).toFixed(1)})),
       packets:pickups.filter(p=>!p.collected&&p.d-state.distance>0&&p.d-state.distance<50).map(p=>({lane:p.lane,ahead:+(p.d-state.distance).toFixed(1)})),
