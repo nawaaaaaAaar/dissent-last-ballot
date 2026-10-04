@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.6: The Account
+
+- Added named fictional characters and a personal story motive: Aman is looking for Kabir.
+- Replaced several dialogue-only confirmations with water collection/delivery and recorder recovery.
+- Added a short resistance-rhythm interaction, two actual handoff destinations/endings, optional story fragments and a following companion whose help changes the ending.
+- Added objective distance/inventory feedback, a reviewable journal, adjustable story assist and browser-local checkpoint continuation.
+- Replaced the student and non-police figures with textured MIT-licensed Rocketbox avatars and compatible idle/walk/run clips retargeted through Blender. Clip playback follows actual travel speed.
+- Added original synthesised footsteps and action tones. No promotional film stands in for game graphics.
+- Still a development build, not final photorealism or proof of enjoyment. Physical-device testing and novice human playtests remain outstanding.
+
 ## v0.5: The Street Is Still Ours
 
 - Replaced the default runner with an explorable third-person street and gathering courtyard. Preserved the previous runner at `runner.html`.

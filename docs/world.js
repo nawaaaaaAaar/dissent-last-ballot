@@ -1,15 +1,44 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.4';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.4';
+import {human,loadPeople,poseHuman} from './people.js?v=0.6.1';
+import {STORY,ITEMS} from './story.js?v=0.6.1';
+import {WorldAudio} from './world-audio.js?v=0.6.1';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.6.1';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.4';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.6.1';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
+Object.assign(s,{items:[],inventory:{water:0,recorder:false},choice:'public',companion:false,protestDone:false,assist:true,rallyTime:0,rallyHits:0,notes:[]});
+const audio=new WorldAudio();
+const SAVE_KEY='dissent-world-v06';
+function savedGame(){
+  try{const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return v?.version===6&&v.tasks&&Array.isArray(v.items)?v:null;}catch{return null;}
+}
+function saveProgress(){
+  try{
+    if(s.tasks.assembly){localStorage.removeItem(SAVE_KEY);$('continue').hidden=true;return;}
+    localStorage.setItem(SAVE_KEY,JSON.stringify({version:6,tasks:s.tasks,items:s.items,choice:s.choice,companion:s.companion,protestDone:s.protestDone,solidarity:s.solidarity,checkpoint:s.checkpoint||{x:s.x,z:s.z}}));
+  }catch{/* Private/opaque browsers may disable storage. The chapter still works. */}
+}
+function continueGame(){
+  const saved=savedGame();if(!saved)return;
+  begin();
+  for(const id of Object.keys(s.tasks))s.tasks[id]=saved.tasks[id]===true;
+  s.items=saved.items.filter(id=>ITEMS.some(i=>i.id===id));
+  s.inventory.water=s.items.filter(id=>id.startsWith('water')).length;s.inventory.recorder=s.items.includes('recorder');
+  s.notes=ITEMS.filter(i=>i.type==='note'&&s.items.includes(i.id));
+  s.choice=saved.choice==='archive'?'archive':'public';s.companion=!!saved.companion;s.protestDone=!!saved.protestDone;
+  s.solidarity=Math.min(12,Math.max(0,Number(saved.solidarity)||0));
+  const c=saved.checkpoint;if(c&&Number.isFinite(c.x)&&Number.isFinite(c.z)&&valid(c.x,c.z)){s.x=c.x;s.z=c.z;s.checkpoint={x:c.x,z:c.z};}
+  s.pressure=s.tasks.barrier?1:0;
+  events.filter(e=>e.item).forEach(e=>e.prop.visible=!s.items.includes(e.id));
+  if(s.companion)events.find(e=>e.id==='companion').a.p.group.position.set(s.x-.7,0,s.z+1);
+  hud();nearest();saveProgress();toast('Your last story checkpoint is restored. Progress stays on this browser.');
+}
 const keys=new Set(),joy={x:0,y:0},actors=[],police=[],trees=[],flags=[],colliders=[],events=[];
 let renderer,scene,camera,player,composer,ssao,sun,treeSource,barriers=[],clock,manual=false,last=0,anim=0,fps=0,frames=0,frameStart=performance.now(),toastTime=0,cameraDrag=null,ambient;
 const rng=seed=>()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},rand=rng(5108);
@@ -23,10 +52,13 @@ const objectives=[
 function toast(text,time=4){$('toast').textContent=text;toastTime=time;$('toast').classList.add('show');}
 function mode(m){
   s.mode=m;$('menu').hidden=m!=='menu';$('hud').hidden=['loading','menu','error'].includes(m);
+  if(m==='menu')$('continue').hidden=!savedGame();
   $('dialog').hidden=m!=='dialog';$('pause-screen').hidden=m!=='paused';$('ending').hidden=m!=='won'&&m!=='caught';
-  $('controls').hidden=m!=='playing';$('pause').hidden=!['playing','dialog','paused'].includes(m);
+  $('controls').hidden=m!=='playing';$('pause').hidden=!['playing','dialog','paused','rally','journal'].includes(m);
   $('pause').textContent=m==='paused'?'Resume':'Pause';$('interact').hidden=m!=='playing'||!s.near;
   $('retry').hidden=m!=='caught';
+  $('journal').hidden=!['playing','journal'].includes(m);
+  $('rally-screen').hidden=m!=='rally';$('journal-screen').hidden=m!=='journal';
   document.body.classList.toggle('playing',m!=='menu'&&m!=='loading');
 }
 async function tex(name,repeat=1,srgb=false){
@@ -115,8 +147,8 @@ function buildWorld(){
     cylinder(supplies,M.white,x,1.12,3,.077,.08);
   }
   box(supplies,M.white,-22.4,1.12,3,.52,.34,.35);
-  box(supplies,M.red,-22.4,1.13,3.18,.08,.22,.012);
-  box(supplies,M.red,-22.4,1.13,3.19,.22,.08,.012);
+  box(supplies,M.leaf,-22.4,1.13,3.18,.08,.22,.012);
+  box(supplies,M.leaf,-22.4,1.13,3.19,.22,.08,.012);
   for(let z of [1.6,2.4]){
     for(let x of [-24.3,-23.5]){
       box(supplies,M.wood,x,.36,z,.64,.48,.52);
@@ -135,29 +167,48 @@ function buildWorld(){
   }
   for(let z of [-12,10,27]){cylinder(scene,M.metal,-9.5,.55,z,.27,1.1);cylinder(scene,M.dark,-9.5,1.10,z,.29,.035);}
 }
-function addActor(x,z,color,pol=false){
-  const p=human(color,pol,{bag:false,detail:false,skin:['#986748','#a57553','#865b40'][Math.floor(rand()*3)]});
+function addActor(x,z,color,pol=false,options={}){
+  const p=human(color,pol,{bag:false,detail:false,...options,skin:['#986748','#a57553','#865b40'][Math.floor(rand()*3)]});
   p.group.position.set(x,0,z);p.group.rotation.y=rand()*6.28;scene.add(p.group);
   const a={p,x,z,phase:rand()*6.28,police:pol,walking:false,poseClock:0};actors.push(a);if(pol)police.push(a);return a;
 }
 function event(id,x,z,title,prompt,color){
-  const a=addActor(x,z,color),marker=new THREE.Group();
+  const a=addActor(x,z,color,false,{female:['organiser','witness','record'].includes(id)}),marker=new THREE.Group();
   const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.026,6,32),new THREE.MeshBasicMaterial({color:'#d9af71'}));ring.rotation.x=Math.PI/2;ring.position.y=.028;marker.add(ring);
   const dot=new THREE.Mesh(new THREE.SphereGeometry(.07,12,8),new THREE.MeshBasicMaterial({color:'#e6c486'}));dot.position.y=2.35;marker.add(dot);
   marker.position.set(x,.02,z);scene.add(marker);events.push({id,x,z,title,prompt,a,marker});return a;
 }
 function populate(){
-  event('organiser',-3,24,'THE ORGANISER','Talk to the organiser','#736b52');
-  event('aid',-23,5,'COMMUNITY FIRST AID','Help at the first-aid table','#c2ad84');
-  event('witness',-4,-20,'THE JOURNALIST','Speak to the journalist','#657387');
-  event('barrier',-3,-29.6,'THE CONFRONTATION','Confront the barricade','#a26e55');
-  event('assembly',-2,-45,'THE PUBLIC ASSEMBLY','Deliver the account','#677459');
+  event('organiser',-3,24,'MIRA / THE ORGANISER','Talk to Mira','#736b52');
+  event('aid',-23,5,'DEV / FIRST AID','Bring water to Dev','#c2ad84');
+  event('witness',-4,-20,'SANA / THE JOURNALIST','Speak with Sana','#657387');
+  event('barrier',-3,-29.6,'MIRA / THE CONFRONTATION','Join Mira at the line','#a26e55');
+  event('assembly',-2,-45,'IQBAL / THE ASSEMBLY','Deliver the statement to Iqbal','#677459');
   event('protest',-18,-7,'THE GATHERING','Join the protest','#906748');
+  event('companion',-6,-36,'KABIR / YOUR FRIEND','Help Kabir rejoin you','#7d7058');
+  event('record',-24,-7,'LEELA / THE RECORD DESK','Lodge the protected account','#647987');
+  for(const item of ITEMS){
+    const g=new THREE.Group();
+    if(item.type==='water'){
+      cylinder(g,M.glass,0,.28,0,.07,.4);cylinder(g,M.white,0,.50,0,.035,.035);cylinder(g,M.white,0,.28,0,.072,.09);
+      box(g,M.wood,0,.035,0,.65,.07,.55);
+    }else if(item.type==='recorder'){
+      box(g,M.dark,0,.065,0,.24,.10,.15);box(g,M.chrome,0,.125,0,.10,.025,.04);box(g,M.glass,.07,.13,0,.05,.015,.07);
+    }else{
+      box(g,M.wood,0,.35,0,.65,.055,.48);
+      for(let x of [-.25,.25])box(g,M.metal,x,.17,0,.035,.34,.4);
+      box(g,M.white,0,.389,0,.30,.008,.23);
+    }
+    g.position.set(item.x,.17,item.z);scene.add(g);
+    const marker=new THREE.Group(),ring=new THREE.Mesh(new THREE.TorusGeometry(.45,.025,6,24),new THREE.MeshBasicMaterial({color:item.type==='note'?'#90aaa3':'#e1b273'}));
+    ring.rotation.x=Math.PI/2;marker.add(ring);marker.position.set(item.x,.03,item.z);scene.add(marker);
+    events.push({...item,item:true,marker,prop:g});
+  }
   for(let i=0;i<15;i++){
     const clusters=[[-19,-6],[-24,8],[-16,15],[-5,22]];
     const c=clusters[Math.floor(i/4)];
     const x=c[0]+(i%4-1.5)*.9,z=c[1]+(i%2)*1.2+rand()*.5;
-    const a=addActor(x,z,['#816251','#85907c','#676b7f','#c4b395','#6b7271'][i%5]);a.p.group.scale.setScalar(.92+rand()*.13);
+    const a=addActor(x,z,['#816251','#85907c','#676b7f','#c4b395','#6b7271'][i%5],false,{female:i%4===0});a.p.group.scale.setScalar(.92+rand()*.13);
     if(i===10||i===11)a.walking=true;
     if(i%3===0){const placard=new THREE.Group();cylinder(placard,M.wood,0,1.9,.12,.014,.85);
       const words=['VOTE CHORI BAND KARO','LET JOURNALISTS REPORT','ACCOUNTABILITY NOW','SAVE DEMOCRACY','OUR VOICES REMAIN'][i%5];
@@ -181,41 +232,81 @@ function addTrees(){
   }
 }
 function nearest(){
-  let best=null,d=3.0;for(const e of events){const dist=Math.hypot(s.x-e.x,s.z-e.z);if(dist<d){best=e;d=dist;}}
+  let best=null,d=2.7;for(const e of events){
+    if(e.item&&s.items.includes(e.id))continue;
+    if(e.id==='companion'&&(!s.tasks.barrier||s.companion))continue;
+    if(e.id==='record'&&(!s.tasks.barrier||s.choice!=='archive'))continue;
+    if(e.id==='assembly'&&s.choice==='archive')continue;
+    if(e.id==='protest'&&s.protestDone)continue;
+    const dist=Math.hypot(s.x-e.x,s.z-e.z);if(dist<d){best=e;d=dist;}
+  }
   s.near=best;
   $('interact').hidden=s.mode!=='playing'||!best;
   if(best)$('interact').textContent=best.prompt+'  ·  E';
 }
 function dialog(e){
-  const content={
-    organiser:['The street is still ours.',"“They want this gathering to disappear. Look around. Help people hold together, protect the journalist's account, and bring it to the assembly beyond the barricade.”",'Stand with the gathering'],
-    aid:['People before spectacle.',"“The first-aid point needs water and room to work. Help us make space and get supplies onto the table.” Your support keeps the gathering together.",'Help organise the aid point'],
-    witness:['Let the account survive.',"“The crackdown must not erase what people witnessed. I choose to share this account with the assembly. Will you carry it intact?”",'Accept the account'],
-    barrier:['The street is contested.',"The fictional state crackdown has blocked the gathering. Protesters push back; the barrier gives way. Take the opening with the witness account. This is an authored game encounter, not a reconstruction.",'Stand with the resistance'],
-    assembly:['A gathering becomes a public record.',"People come together to hear the account and demand accountability. Refusing silence is collective work, not a solitary score.",'Share the account'],
-    protest:['Our voices remain.',"The gathering demands electoral accountability, the right to protest and the right of journalists to report. Add your voice and help the crowd hold its ground.",'Join the protest']
-  };
+  if(e.item){
+    s.items.push(e.id);e.prop.visible=e.marker.visible=false;
+    if(e.type==='water'){s.inventory.water++;toast(`Water secured: ${s.inventory.water} / 3. Bring it to Dev at first aid.`);}
+    else if(e.type==='recorder'){s.inventory.recorder=true;toast('Sana’s recorder is recovered. Let her decide how her account is shared.');}
+    else{s.notes.push({title:e.title,copy:e.copy});toast(e.title+' added to your journal. Press J to read it.');}
+    audio.tone(330,.16);hud();nearest();saveProgress();return;
+  }
   if(e.id==='aid'&&!s.tasks.organiser){toast('Meet the organiser first. The gathering needs a shared plan.');return;}
   if(e.id==='witness'&&!s.tasks.aid){toast('Help the first-aid point before taking the journalist’s account.');return;}
   if(e.id==='barrier'&&!s.tasks.witness){toast('The journalist’s account must be secured before this confrontation.');return;}
   if(e.id==='assembly'&&!s.tasks.barrier){toast('The main route is still blocked. Return to the gathering.');return;}
+  if(e.id==='aid'&&s.inventory.water<3){toast(`Dev still needs ${3-s.inventory.water} water bottle${s.inventory.water===2?'':'s'}. Follow the gold item markers in the courtyard.`);return;}
+  if(e.id==='witness'&&!s.inventory.recorder){toast('Sana’s recorder is on the street near the bus approach. Recover it before choosing a handoff.');return;}
   if(e.id!=='protest'&&s.tasks[e.id]){toast('You have already helped here. Keep exploring.');return;}
-  s.dialog=e.id;$('dialog-kicker').textContent=e.title;$('dialog-title').textContent=content[e.id][0];$('dialog-copy').textContent=content[e.id][1];$('dialog-confirm').textContent=content[e.id][2];mode('dialog');
+  const content=STORY[e.id];
+  s.dialog=e.id;$('dialog-kicker').textContent=content.name;$('dialog-title').textContent=content.title;$('dialog-copy').textContent=content.copy;$('dialog-confirm').textContent=content.action;
+  $('dialog-alt').hidden=!content.alternate;if(content.alternate)$('dialog-alt').textContent=content.alternate;mode('dialog');
 }
 function complete(){
   const id=s.dialog;if(!id)return;
-  if(id==='protest'){s.solidarity=Math.min(6,s.solidarity+1);toast('The gathering grows louder. Our voices remain.');}
+  if(id==='barrier'){s.dialog=null;s.rallyTime=0;s.rallyHits=0;mode('rally');document.querySelector('.rally-window').style.left=s.assist?'45%':'78%';$('rally-skip').hidden=!s.assist;return;}
+  if(id==='companion'){s.companion=true;s.solidarity++;s.dialog=null;mode('playing');saveProgress();toast('Kabir stays with you. The handoff will remember who made it together.');return;}
+  if(id==='protest'){s.protestDone=true;s.solidarity++;toast('A voice beside yours. The gathering holds together.');}
+  else if(id==='record'){s.tasks.assembly=true;s.solidarity++;}
   else{s.tasks[id]=true;s.solidarity++;s.checkpoint={x:s.x,z:s.z};toast('Solidarity is a practice. Keep the account alive.');}
-  if(id==='barrier'){s.pressure=1;s.capture=0;toast('The barrier falls. The state is moving to silence the account.',5);}
+  audio.tone(260,.18);
   s.dialog=null;mode('playing');hud();
-  if(id==='assembly'){mode('won');$('ending-title').textContent='The account becomes collective.';$('ending-copy').textContent='The witness account reaches the assembly. People remain together and demand accountability. This completes a fictional chapter, not a claim about an actual protest case.';}
+  saveProgress();
+  if(id==='assembly'||id==='record'){
+    mode('won');$('ending-title').textContent=id==='record'?'An account without exposed names.':'The account becomes collective.';
+    $('ending-copy').textContent=(id==='record'?'Sana’s account reaches the desk with identifying details protected.':'Sana’s authorised statement reaches the public assembly.')+
+      (s.companion?' Kabir is beside you. You came looking for a friend, and did not leave him behind.':' Kabir has not rejoined you. The account arrived, but the gathering still has someone to look for.')+
+      ` You discovered ${s.notes.length} optional story fragments. The demand for accountability continues beyond this fictional chapter.`;
+  }
+}
+function rallyHit(){
+  const phase=Math.abs(Math.sin(s.rallyTime*2));
+  if(phase>(s.assist?.45:.78)){s.rallyHits++;s.rallyTime=0;audio.tone(300+s.rallyHits*70,.16);$('rally-feedback').textContent=`Together: ${s.rallyHits} / 3`;if(s.rallyHits>=3)finishRally();}
+  else{$('rally-feedback').textContent='Wait for the gold window. There is no penalty for trying again.';audio.tone(150,.08,.01);}
+}
+function finishRally(){
+  s.tasks.barrier=true;s.solidarity++;s.pressure=1;s.capture=0;s.checkpoint={x:s.x,z:s.z};mode('playing');hud();saveProgress();toast('The barrier falls. Kabir is just beyond it. Run, or take time to stay with him.',6);
+}
+function journal(){
+  if(s.mode==='journal'){mode('playing');return;}
+  if(s.mode!=='playing')return;
+  keys.clear();joy.x=joy.y=0;
+  $('assist-game').checked=s.assist;
+  $('journal-copy').textContent=`AMAN’S JOURNAL\n\nI came to find Kabir. Mira asked me to make myself useful first.\n\nCURRENT TASK\n${$('objective').textContent}\n\nCOMPLETED\n${objectives.filter(([id])=>s.tasks[id]).map(([id])=>STORY[id].name).join(' • ')||'No story encounters completed yet.'}\n\nWater: ${s.inventory.water}/3 • Recorder: ${s.inventory.recorder?'recovered':'not recovered'}\nHandoff: ${s.choice==='archive'?'protected record desk':'public assembly'}\nKabir: ${s.companion?'staying with me':'still separated'}\n\n`+
+    (s.notes.map(n=>n.title+'\n'+n.copy).join('\n\n')||'Explore the benches and courtyard for optional story fragments.');
+  mode('journal');
 }
 function begin(){
+  try{localStorage.removeItem(SAVE_KEY);}catch{}
   keys.clear();joy.x=joy.y=0;$('sprint').classList.remove('active');
   Object.assign(s,{x:0,z:31,y:0,vy:0,capture:0,pressure:0,solidarity:0,yaw:0,dialog:null,checkpoint:null});
+  Object.assign(s,{items:[],inventory:{water:0,recorder:false},choice:'public',companion:false,protestDone:false,rallyHits:0,notes:[]});
+  events.filter(e=>e.item).forEach(e=>e.prop.visible=true);
+  const friend=events.find(e=>e.id==='companion');if(friend)friend.a.p.group.position.set(friend.x,0,friend.z);
   for(const k in s.tasks)s.tasks[k]=false;
   barriers.forEach(g=>g.rotation.x=0);police.forEach((a,i)=>{a.p.group.position.set(4+i*1.3,0,-37-i);});
-  mode('playing');toast('You are free to explore. Start with the organiser at the gathering.',6);hud();
+  mode('playing');toast(coarse?'Move with the left joystick. Mira waits by the gold ring ahead.':'WASD to move; drag to look. Meet Mira at the gold ring ahead.',6);hud();
 }
 function valid(x,z){
   const area=(x>=-10.4&&x<=10.4&&z>=-49&&z<=38)||(x>=-28&&x<=-10.4&&z>=-12&&z<=22);
@@ -229,6 +320,8 @@ function step(dt){
   if(['loading','error'].includes(s.mode))return;
   s.time+=dt;
   if(s.mode==='paused'||s.mode==='caught'||s.mode==='won')return;
+  if(s.mode==='journal')return;
+  if(s.mode==='rally'){s.rallyTime+=dt;const phase=Math.abs(Math.sin(s.rallyTime*2));$('rally-cursor').style.left=`${phase*100}%`;$('rally-count').textContent=`${s.rallyHits} / 3`;return;}
   if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
   if(s.mode==='menu'){anim+=dt;poseHuman(player,anim*.5,0);return;}
   if(s.mode==='dialog'){poseHuman(player,0,0);return;}
@@ -236,40 +329,58 @@ function step(dt){
   let iz=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
   const mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;}
   s.sprint=keys.has('ShiftLeft')||keys.has('ShiftRight')||$('sprint').classList.contains('active');
-  const speed=s.sprint?5.2:2.9;
+  const speed=s.sprint?4.6:1.8;
   const dx=(ix*Math.cos(s.yaw)-iz*Math.sin(s.yaw))*speed*dt;
   const dz=(-ix*Math.sin(s.yaw)-iz*Math.cos(s.yaw))*speed*dt;
+  const previousX=s.x,previousZ=s.z;
   if(valid(s.x+dx,s.z))s.x+=dx;if(valid(s.x,s.z+dz))s.z+=dz;
-  s.move=mag>.08?Math.min(1,mag):0;
+  const travelled=Math.hypot(s.x-previousX,s.z-previousZ);player.worldSpeed=travelled/Math.max(.0001,dt);
+  if(s.y<.1)audio.footstep(travelled);
+  s.move=mag>.08&&travelled>.0001?Math.min(1,mag):0;
   s.vy-=16*dt;s.y=Math.max(0,s.y+s.vy*dt);if(!s.y)s.vy=0;
   player.group.position.set(s.x,s.y,s.z);
   if(s.move){const heading=Math.atan2(dx,dz)+Math.PI;player.group.rotation.y+=Math.atan2(Math.sin(heading-player.group.rotation.y),Math.cos(heading-player.group.rotation.y))*Math.min(1,dt*12);}
-  anim+=dt*(s.sprint?10.5:7.5);poseHuman(player,anim,s.move?(s.sprint?1:.65):0);
+  anim+=dt*(s.move?(s.sprint?10.5:7.5):.75);poseHuman(player,anim,s.move?(s.sprint?1:.65):0);
   for(const a of actors){
     const dist=Math.hypot(a.p.group.position.x-s.x,a.p.group.position.z-s.z);
     a.p.group.visible=s.quality==='high'||dist<28;
     if(!a.p.group.visible)continue;
-    if(a.police&&s.pressure){
+    if(a===events.find(e=>e.id==='companion')?.a&&s.companion){
+      const p=a.p.group.position,d=Math.hypot(s.x-p.x,s.z-p.z);a.p.worldSpeed=d>1.6?4.1:0;
+      if(d>1.6){const x=p.x+(s.x-p.x)/d*4.1*dt,z=p.z+(s.z-p.z)/d*4.1*dt;if(valid(x,z)){p.x=x;p.z=z;}a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;}
+      poseHuman(a.p,s.time*7.5+a.phase,d>1.6?.65:0);
+    }else if(a.police&&s.pressure){
       const p=a.p.group.position,d=Math.max(.1,Math.hypot(s.x-p.x,s.z-p.z));
-      if(d>1.2){const x=p.x+(s.x-p.x)/d*1.7*dt,z=p.z+(s.z-p.z)/d*1.7*dt;if(valid(x,z)){p.x=x;p.z=z;}}
+      const speed=s.assist?1.3:1.7;
+      if(d>1.2){const x=p.x+(s.x-p.x)/d*speed*dt,z=p.z+(s.z-p.z)/d*speed*dt;if(valid(x,z)){p.x=x;p.z=z;}}
       a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;poseHuman(a.p,s.time*8+a.phase,.7);
       if(d<1.25)s.capture+=dt;
     }else if(a.walking){
-      const p=a.p.group.position;p.x=a.x+Math.sin(s.time*.18+a.phase)*2.5;p.z=a.z+Math.cos(s.time*.18+a.phase)*1.8;
+      const p=a.p.group.position,oldX=p.x,oldZ=p.z;p.x=a.x+Math.sin(s.time*.18+a.phase)*2.5;p.z=a.z+Math.cos(s.time*.18+a.phase)*1.8;
+      a.p.worldSpeed=Math.hypot(p.x-oldX,p.z-oldZ)/Math.max(.0001,dt);a.p.poseTimeDivisor=4.5;
       a.p.group.rotation.y=Math.atan2(Math.cos(s.time*.18+a.phase)*2.5,-Math.sin(s.time*.18+a.phase)*1.8)+Math.PI;
       poseHuman(a.p,s.time*4.5+a.phase,.4);
     }else{
       a.poseClock+=dt;if(a.poseClock>.18){a.poseClock=0;poseHuman(a.p,s.time*.75+a.phase,0,(s.solidarity>2&&a.placard)?.3*Math.sin(s.time*.6+a.phase):0);}
     }
   }
-  if(s.capture>1.8){mode('caught');$('ending-title').textContent='The account is interrupted.';$('ending-copy').textContent='The fictional crackdown caught up with you. Return to your last completed story point; the people you helped and the account you secured remain remembered for this play session.';}
+  if(s.capture>(s.assist?3.4:1.8)){mode('caught');$('ending-title').textContent='The account is interrupted.';$('ending-copy').textContent='The fictional crackdown caught up with you. Return to your last completed story point; supplies, recovered items and story choices remain remembered for this play session.';}
   barriers.forEach((g,i)=>{if(s.tasks.barrier)g.rotation.x=Math.min(Math.PI/2,g.rotation.x+dt*(1+i*.12));});
   if(!s.reduced)flags.forEach((f,i)=>{const p=f.geometry.attributes.position;for(let j=0;j<p.count;j++)p.setZ(j,Math.sin(s.time*2+p.getX(j)*4+i)*.055*(p.getX(j)+.6));p.needsUpdate=true;});
-  events.forEach(e=>{e.marker.visible=!s.tasks[e.id]&&Math.hypot(s.x-e.x,s.z-e.z)<25;});
+  events.forEach(e=>{e.marker.visible=!(e.item?s.items.includes(e.id):s.tasks[e.id])&&Math.hypot(s.x-e.x,s.z-e.z)<25;if(e.id==='companion')e.marker.visible=s.tasks.barrier&&!s.companion;if(e.id==='record')e.marker.visible=s.tasks.barrier&&s.choice==='archive'&&!s.tasks.assembly;});
   nearest();hud();map();
+  events.forEach(e=>e.marker.scale.setScalar(e.id===s.target?1.5:1));
 }
 function hud(){
-  const obj=objectives.find(([id])=>!s.tasks[id]);$('objective').textContent=obj?obj[1]:'Chapter complete';
+  let id='organiser',text='Meet Mira. Find out where Kabir went.';
+  if(s.tasks.organiser){id=ITEMS.find(i=>i.type==='water'&&!s.items.includes(i.id))?.id||'aid';text=s.inventory.water<3?`Find water for first aid (${s.inventory.water} / 3)`:'Deliver the water to Dev';}
+  if(s.tasks.aid){id=s.inventory.recorder?'witness':'recorder';text=s.inventory.recorder?'Let Sana choose how her account is shared':'Recover Sana’s dropped recorder';}
+  if(s.tasks.witness){id='barrier';text='Stand with Mira at the barricade';}
+  if(s.tasks.barrier){id=s.choice==='archive'?'record':'assembly';text=s.choice==='archive'?'Reach Leela at the protected record desk':'Bring Sana’s statement to Iqbal at the assembly';}
+  if(s.tasks.assembly)text='Chapter complete';
+  s.target=id;const target=events.find(e=>e.id===id);$('objective').textContent=text;
+  $('objective-distance').textContent=target&&!s.tasks.assembly?`${Math.round(Math.hypot(s.x-target.x,s.z-target.z))} m • ${s.tasks.barrier&&!s.companion?'Kabir can still be helped near the line':'Gold markers guide the main story'}`:'';
+  $('inventory').textContent=`WATER ${s.inventory.water}/3 • RECORDER ${s.inventory.recorder?'SECURED':'MISSING'}`;
   $('story-count').textContent=`${objectives.filter(([id])=>s.tasks[id]).length} / 5`;
   $('solidarity').textContent=s.solidarity;
   $('pressure').textContent=s.pressure?'CRACKDOWN ACTIVE':'THE GATHERING';
@@ -281,7 +392,7 @@ function map(){
   c.fillStyle='#596463';const a=xy(-10,-49),b=xy(10,38);c.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);
   const d=xy(-28,-12),e=xy(-10,22);c.fillRect(d[0],d[1],e[0]-d[0],e[1]-d[1]);
   c.fillStyle='#51614d';const f=xy(12,-50);c.fillRect(f[0],f[1],144-f[0],144);
-  for(const ev of events){const p=xy(ev.x,ev.z);c.fillStyle=s.tasks[ev.id]?'#647567':'#d4b079';c.beginPath();c.arc(...p,3,0,6.28);c.fill();}
+  for(const ev of events){if(ev.item&&s.items.includes(ev.id))continue;const p=xy(ev.x,ev.z);c.fillStyle=ev.item&&ev.type==='note'?'#91b0a7':s.tasks[ev.id]?'#647567':'#d4b079';c.beginPath();c.arc(...p,ev.id===s.target?4.5:ev.item?2:3,0,6.28);c.fill();if(ev.id===s.target){c.strokeStyle='#f6e8c9';c.lineWidth=1;c.stroke();}}
   const p=xy(s.x,s.z);c.fillStyle='#faf0d6';c.beginPath();c.arc(...p,3.5,0,6.28);c.fill();
   c.strokeStyle='#faf0d6';c.beginPath();c.moveTo(...p);c.lineTo(p[0]-Math.sin(s.yaw)*8,p[1]-Math.cos(s.yaw)*8);c.stroke();
 }
@@ -290,7 +401,7 @@ function render(){
   renderer.info.reset();
   const menu=s.mode==='menu';
   const target=new THREE.Vector3(s.x,s.y+1.45,s.z);
-  const distance=coarse?6.5:7.0;
+  const distance=coarse?5.8:6.2;
   if(menu){camera.position.set(-3.3,3.0,29.5);camera.lookAt(22,5,-13);}
   else {
     const desired=new THREE.Vector3(s.x+Math.sin(s.yaw)*distance,2.2+s.pitch*4+s.y,s.z+Math.cos(s.yaw)*distance);
@@ -312,7 +423,7 @@ function quality(){
 }
 function pause(){
   if(s.mode==='paused'){mode(s.beforePause||'playing');return;}
-  if(['playing','dialog'].includes(s.mode)){keys.clear();joy.x=joy.y=0;s.beforePause=s.mode;mode('paused');}
+  if(['playing','dialog','rally','journal'].includes(s.mode)){keys.clear();joy.x=joy.y=0;s.beforePause=s.mode;mode('paused');}
 }
 function bindings(){
   let lastTouch=-1000;
@@ -323,19 +434,24 @@ function bindings(){
   button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;police.forEach((a,i)=>a.p.group.position.set(7+i*.5,0,-37-i));mode('playing');toast('Your completed acts of solidarity remain. Continue the chapter.');});
   button('title',()=>{mode('menu');keys.clear();joy.x=joy.y=0;});
   button('dialog-confirm',complete);button('dialog-back',()=>{s.dialog=null;mode('playing');});
+  button('dialog-alt',()=>{s.choice='archive';complete();});
+  button('continue',continueGame);
+  button('rally-input',rallyHit);button('rally-skip',finishRally);button('journal',journal);button('journal-close',journal);
+  $('storymode').onchange=()=>s.assist=$('storymode').checked;
+  $('assist-game').onchange=()=>{s.assist=$('assist-game').checked;$('storymode').checked=s.assist;};
   button('interact',()=>{if(s.near)dialog(s.near);});
   button('jump',()=>{if(s.mode==='playing'&&!s.y)s.vy=5.3;});
   button('sprint',()=>{$('sprint').classList.toggle('active');});
   button('sound',()=>{
-    s.sound=!s.sound;$('sound').textContent=s.sound?'Sound on':'Sound off';
-    if(s.sound){try{ambient??=new (window.AudioContext||window.webkitAudioContext)();ambient.resume();const o=ambient.createOscillator(),g=ambient.createGain();o.type='sine';o.frequency.value=190;g.gain.value=.015;o.connect(g).connect(ambient.destination);o.start();o.stop(ambient.currentTime+.18);}catch(e){s.sound=false;$('sound').textContent='Sound unavailable';}}
+    try{s.sound=audio.toggle();$('sound').textContent=s.sound?'Sound on':'Sound off';audio.tone();}catch(e){s.sound=false;$('sound').textContent='Sound unavailable';}
   });
   $('quality').onchange=quality;$('reduced').onchange=()=>s.reduced=$('reduced').checked;
   document.addEventListener('keydown',e=>{
     if(e.target.matches('input,select,summary'))return;
     if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowLeft','ArrowDown','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){keys.add(e.code);if(s.mode!=='menu')e.preventDefault();}
     if(e.code==='Space'&&s.mode==='playing'){if(!s.y)s.vy=5.3;e.preventDefault();}
-    if(e.code==='KeyE'&&!e.repeat){if(s.mode==='playing'&&s.near)dialog(s.near);else if(s.mode==='dialog')complete();}
+    if(e.code==='KeyE'&&!e.repeat){if(s.mode==='playing'&&s.near)dialog(s.near);else if(s.mode==='dialog')complete();else if(s.mode==='rally')rallyHit();}
+    if(e.code==='KeyJ'&&!e.repeat)journal();
     if(['Escape','KeyP'].includes(e.code)){pause();e.preventDefault();}
   });
   document.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',()=>{keys.clear();joy.x=joy.y=0;});
@@ -350,7 +466,7 @@ function bindings(){
   $('viewport').addEventListener('pointerdown',e=>{if(s.mode==='playing'){cameraDrag={id:e.pointerId,x:e.clientX,y:e.clientY};$('viewport').setPointerCapture(e.pointerId);}});
   $('viewport').addEventListener('pointermove',e=>{if(cameraDrag?.id===e.pointerId){s.yaw-=(e.clientX-cameraDrag.x)*.007;s.pitch=Math.max(.15,Math.min(.85,s.pitch+(e.clientY-cameraDrag.y)*.004));cameraDrag.x=e.clientX;cameraDrag.y=e.clientY;}});
   for(const type of ['pointerup','pointercancel'])$('viewport').addEventListener(type,()=>cameraDrag=null);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden&&['playing','dialog'].includes(s.mode))pause();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&['playing','dialog','rally','journal'].includes(s.mode))pause();});
   window.addEventListener('resize',resize);
 }
 async function init(){
@@ -367,7 +483,7 @@ async function init(){
     scene.add(new THREE.HemisphereLight('#d7e4ed','#716f56',.65));
     $('loading').textContent='Loading clothing, trees and material scans…';
     const preference=new URLSearchParams(location.search).get('quality');if(['low','high'].includes(preference))$('quality').value=preference;
-    const tasks=await Promise.allSettled([loadHuman(asset('courier-clothed.glb')),new GLTFLoader().loadAsync(asset(coarse||preference==='low'?'tree-delhi.glb':'tree-delhi-high.glb')),materials(),new RGBELoader().loadAsync(asset('delhi-sky.hdr'))]);
+    const tasks=await Promise.allSettled([loadPeople(asset),new GLTFLoader().loadAsync(asset(coarse||preference==='low'?'tree-delhi.glb':'tree-delhi-high.glb')),materials(),new RGBELoader().loadAsync(asset('delhi-sky.hdr'))]);
     if(tasks[0].status==='rejected')throw new Error('The human model could not load. Please retry with a working connection.');
     if(tasks[1].status==='fulfilled')treeSource=tasks[1].value.scene;
     if(tasks[2].status==='rejected')throw new Error('The surface textures could not load. Please reload.');
@@ -380,10 +496,11 @@ async function init(){
     composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));ssao=new SSAOPass(scene,camera,innerWidth,innerHeight);
     ssao.kernelRadius=.5;ssao.minDistance=.002;ssao.maxDistance=.08;composer.addPass(ssao);composer.addPass(new OutputPass());
     quality();mode('menu');$('start').disabled=false;$('start').textContent='Enter the gathering';$('loading').textContent='Ready • Desktop and touch controls';
-    window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,riggedClothing:true,treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.5`;};
+    $('continue').hidden=!savedGame();
+    window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.6`;};
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
-    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.5`;}}
+    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.6`;}}
     requestAnimationFrame(frame);
   }catch(e){console.error(e);s.mode='error';$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }

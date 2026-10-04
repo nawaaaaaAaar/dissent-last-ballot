@@ -1,0 +1,44 @@
+
+> dissent-last-ballot@0.6.0 test
+> node world-qa.mjs
+
+Completed encounter: organiser
+Completed encounter: aid
+Completed encounter: witness
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('#pause')
+    - locator resolved to <button id="pause">Pause</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <section id="rally-screen" class="modal rally-modal">…</section> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <section id="rally-screen" class="modal rally-modal">…</section> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    25 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <section id="rally-screen" class="modal rally-modal">…</section> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+    at interact (/home/user/workspace/dissent-last-ballot/world-qa.mjs:36:31)
+    at async file:///home/user/workspace/dissent-last-ballot/world-qa.mjs:82:68 {
+  name: 'TimeoutError'
+}
+
+Node.js v20.20.1

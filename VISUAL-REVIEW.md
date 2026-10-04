@@ -1,8 +1,18 @@
 # DISSENT visual review
 
+## v0.6 character and motion pass
+
+Textured MIT-licensed Rocketbox adults replace the student and non-police participants. Compatible idle/walk/run FBXs were retargeted onto each avatar's rest skeleton, root XY movement removed, and 1K WebP textures embedded in the GLBs. The source files, converter, editable Blender scenes and copyright notice are retained. [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox).
+
+`qa/v06-character-review.png`, `v06-walk-review.png` and `v06-run-review.png` show an intermediate actual-engine check, not a generated film. It found the first animation playback lagged behind world travel. Source root displacement was measured, walking reduced to 1.8 game metres/second and running to 4.6, and clip speed tied to actual travel. Final capture names and QA distinguish this tuning from the earlier screenshots.
+
+The new costumes and faces are materially more detailed than the earlier handcrafted shells. The avatar set is small and visibly reused; it is not a representation of actual Delhi participants, and there is no facial acting, jump clip, cloth simulation or foot-contact IK. Police retain the simplified khaki model. These remain production gaps.
+
 This review responds to the creator's assessment that v0.4 looked roughly 4–5/10. No new numerical quality score is assigned. The acceptance target remains a convincing real-world-looking game in motion, not merely a better screenshot.
 
-## Iteration: rebuild the world
+Final v0.6 local captures are `qa/world-final-*`, `qa/world-archive-ending.png` and `qa/world-mobile-*`. The aid-point view shows much stronger clothing and face detail, but also makes the repeated male avatar obvious. The mobile landscape capture keeps controls and task text readable; sparse crowds, repeated architecture and oversized road space still prevent a convincing busy protest setting.
+
+## v0.5 iteration: rebuild the world (historical)
 
 The runner corridor was replaced with a road and adjoining gathering courtyard. Separate shirt and trouser meshes were authored in Blender and attached to the existing skeleton. CC0 photographic tree assets, scanned surface textures and HDR illumination replaced several procedural approximations.
 
@@ -28,7 +38,7 @@ The closer aid-point view exposed ragged shirt topology left by extracting verti
 
 The ground material also read like timber boarding in the close courtyard view. Its diffuse was replaced with original staggered stone-slab texture code while retaining subtle scan-derived normal detail. The final public captures are `qa/world-public-final-*`; they supersede earlier local captures for judging the current appearance.
 
-## Remaining gaps
+## v0.5 remaining gaps (historical)
 
 - **Characters:** Generic base anatomy and faces remain too simplified. Clothing lacks realistic fabric drape and detailed folds; the backpack and hair remain visibly simplified.
 - **Animation:** Bone-driven procedural walking lacks authored transitions, convincing foot contact and character performance.

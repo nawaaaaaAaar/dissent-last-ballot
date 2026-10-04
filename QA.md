@@ -1,6 +1,20 @@
 # QA and limitations
 
-## v0.5 explorable world
+## v0.6 The Account
+
+`npm test` passed after the character, story and animation overhaul. `qa/world-results.json` records v0.6 with no page errors. Actual keyboard/click inputs cover supply collection, the recorder, optional story fragments, journal review and difficulty changes, local checkpoint restoration after reload, the protest event, rhythm misses and three successful inputs, capture/retry, companion help, both handoff endings, restart and orbit controls.
+
+The first final run found that the rhythm overlay intercepted the visible Pause button. Header stacking and panel spacing were corrected; the rerun pauses and resumes during that encounter. `qa/v06-first-test-failure.log` and `qa/v06-test-run.log` retain the failure and successful rerun. Movement timings were updated after tuning walking to 1.8 and running to 4.6 game metres per second; the mobile movement assertion was also corrected for the slower walk.
+
+Mobile Chromium emulation covers actual touch joystick movement and camera drag, jumping, running, sound activation after touch movement, pause/resume and portrait/landscape fit. The supplied game client separately exercised movement and jumping; `qa/v06-client/` retains its state and actual-render capture. This does not establish physical-phone performance, Safari support or human enjoyment.
+
+Current local captures are `world-final-*`, `world-archive-ending.png` and `world-mobile-*`. Earlier `v06-*-review.png` images are intermediate character/animation checks. Final public captures, when present, use `v06-public-*`; older `world-public-final-*` images belong to v0.5.
+
+Source-compatible idle, walk and run clips are retargeted to textured licensed avatars. Jumping still lacks its own authored clip. Foot-contact IK, facial performance, cloth simulation, detailed police models, reactive crowds and spatial protest ambience remain unfinished. Local saves are browser-specific and can be cleared by browser storage settings.
+
+No novice playtest has been conducted. [GAME-DESIGN.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/GAME-DESIGN.md) defines a five-player first-run evaluation before claiming that ordinary players find the chapter clear or enjoyable. Automated coverage establishes implemented behaviour, not that acceptance result.
+
+## v0.5 explorable world (historical)
 
 `world-qa.mjs` tests the current default world. `qa/world-results.json` records the full five-act chapter, optional protest, jump, pause/resume, police capture, checkpoint recovery, restart and orbit camera through actual keyboard/click input with deterministic stepping.
 
@@ -32,7 +46,7 @@ The supplied game client also exercised Enter-to-skip, lane movement and jump; o
 
 The game is tested in Chromium with Playwright. Mobile checks emulate a 390 × 844 touch phone and 844 × 390 landscape viewport. These are browser-emulation results, not tests on a physical iPhone or Android device.
 
-## Coverage
+## Earlier runner coverage (historical)
 
 - Keyboard movement, jump, slide, and pause/resume.
 - Touch buttons, a real CDP-dispatched touch swipe, portrait viewport fit, and landscape resize.
@@ -58,7 +72,7 @@ For interactive state inspection, `window.render_game_to_text()` returns concise
 - Hardware frame-rate targets are not certified. Headless software-renderer FPS does not establish mobile GPU performance.
 - Safari/iOS and physical Android hardware have not been exercised here.
 - WebGL context-loss and tab-background recovery have implementation handlers but are not yet covered by a physical-device interruption test.
-- There is no claim of production-readiness, photorealistic art, a simulated protest crowd, companion AI, or a freely explorable confrontation system.
+- There is no claim of production-readiness, photorealistic art or a simulated protest crowd. v0.6 adds free exploration and basic companion following, not sophisticated crowd or companion AI.
 - Fonts are the only optional remote display dependency; the engine and game texture are checked into the project.
 
 The immediate next quality gate is a real-phone playtest, followed by an art-and-animation pass toward the original realistic visual target.

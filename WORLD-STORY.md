@@ -1,32 +1,54 @@
-# The Street Is Still Ours
+# DISSENT: The Account
 
-The v0.5 chapter replaces the runner with a compact explorable third-person world. The gathering courtyard, road, police transport, barricades and assembly approach form one connected playable area. Observatory forms sit inside a fenced compound as geographical context rather than destructible targets.
+Chapter one is an explorable fictional resistance story in a compressed Jantar Mantar setting. Aman arrives looking for Kabir and discovers that finding a friend means becoming useful to a gathering under state pressure. The journalist's account becomes a responsibility, not a collectible trophy.
 
-## Story progression
+## Characters
 
-- **The organiser:** Introduces the gathering's purpose and sends the student to help people hold together.
-- **Community first aid:** The player organises room and supplies through a contextual interaction. This is an authored story confirmation, not a medical-treatment simulator or a fully animated rescue sequence.
-- **The journalist:** Chooses to share an account of the fictional crackdown. The player accepts responsibility for bringing it to the assembly; the game does not reenact sexual assault.
-- **The confrontation:** A collective resistance interaction animates the yellow barricades falling. The route opens and three fictional officers pursue the player. This is a simplified game event, not practical instructions for breaking real equipment.
-- **The assembly:** The account reaches a gathering that demands accountability. This closes chapter one; it does not magically prove an actual allegation or depict a completed real investigation.
-- **The optional protest:** A separate gathering interaction adds solidarity without being mandatory for story completion.
+- **Aman:** An adult student who came because a friend asked. He begins as an outsider to the gathering's work, not an invulnerable revolutionary hero.
+- **Kabir:** Aman's friend, separated near the police line. Their ordinary unfinished messages make the stakes personal.
+- **Mira:** A student organiser who understands that food, water, relationships and public defiance keep a gathering together.
+- **Dev:** A first-aid volunteer. His practical requests teach the player how exploration and action can matter.
+- **Sana:** A journalist who controls the use of her account. She refuses to let testimony become spectacle.
+- **Leela:** Keeps a protected public record without exposing vulnerable witnesses.
+- **Iqbal:** Helps the assembly receive Sana's authorised public statement.
 
-## Mechanics and consequences
+All are fictional adults, not portraits of actual protesters, officers or journalists. Licensed generic avatars are reused across roles; their appearances are not reconstructions of these fictional characters' biographies.
 
-Walking, running, jumping and camera-relative exploration are available from the beginning. Rings and the approximate minimap identify nearby story encounters; objectives guide the main chapter. Completed encounters are remembered for the current play session.
+## The playable chapter
 
-Pursuit begins only after the barrier encounter. Officers approach the character, and sustained proximity causes capture. Checkpoint retry preserves completed story tasks. This abstract chase is a dramatic game mechanic, not a model of real police tactics or an evasion guide.
+### Arrival and belonging
 
-There is no bonus for harming people. The fiction can be confrontational without turning injuries or sexual abuse into entertainment objectives. Destruction changes access and activates a consequence rather than awarding arbitrary destruction points.
+Mira recognises Aman's name because Kabir mentioned him. She points him toward a useful task before the police line: three water bottles need to reach Dev. The player finds them in the courtyard and can discover Kabir's unfinished message or a card on an empty chair.
 
-## Setting and political framing
+The objects establish ordinary relationships and unresolved absence. The game does not require a history lecture before the player can help.
 
-The game takes a pro-resistance, anti-authoritarian perspective. Fictional state repression is the antagonist; electoral accountability, journalism, public assembly and collective solidarity organise the story. Characters should eventually express disagreement and personality rather than merely reciting slogans.
+### An account on its author's terms
 
-Real Delhi context is kept separately sourced in [Delhi references](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DELHI-REFERENCES.md). The current layout is a compressed original level, not surveyed GPS geometry, actual protest footage or a verified reconstruction.
+After the delivery, Dev directs Aman toward Sana's dropped recorder. Recovering it leads to a choice Sana has authorised: carry a statement to the public assembly, or lodge a protected account at Leela's desk.
 
-## What is not implemented yet
+The choice changes the final destination and ending. Neither is labelled cowardice or moral superiority. Public defiance and protecting vulnerable people can both be resistance.
 
-Multiple branching chapters, persistent saves, companion rescue AI, simulated crowds, facial performance, recorded dialogue, authored motion-capture transitions and physics-driven destruction are not present. First aid and testimony are currently dialogue/action encounters. The world is compact, not a seamless open Delhi city.
+### The line gives way
 
-The next meaningful art gate is convincing clothing, faces and locomotion in actual gameplay, followed by an environment-reference accuracy pass and measured physical-phone performance. Those require asset and engine work, not another AI-generated opening film.
+Mira brings the gathering together at the barricade. A short rhythm activity asks for three shared beats; the authored barricades fall and pursuit begins. It is an abstract fictional crowd interaction, not a tutorial for damaging actual equipment.
+
+Kabir is just beyond the line. The player can stop to help him rejoin Aman or continue directly with the account. Helping activates simplified follow behaviour and changes the ending; danger does not disappear while the player travels.
+
+### The handoff
+
+At the assembly, Iqbal receives Sana's public statement. At the record desk, Leela lodges the protected account. The ending separately acknowledges whether Kabir was helped and how many optional fragments were found.
+
+The chapter completes a handoff, not the overthrow of a government or a completed real investigation. Collective accountability remains an unfinished demand.
+
+## Planned continuation, not yet implemented
+
+- **The Missing List:** A later chapter could follow families trying to establish what happened to separated participants. Contradictory fictional accounts and institutional obstruction would deepen the conflict; consent would govern what can be shared.
+- **Who Gets Heard:** A later chapter could explore attempts to discredit the gathering and the collective work of corroboration, journalism and public memory. Ending branches would depend on the network and accounts preserved, not a simple destruction tally.
+
+These are campaign directions, not playable chapters in v0.6.
+
+## Implementation limits
+
+Story actions now include collectible supplies, recorder recovery, a rhythm interaction, branching handoffs, optional fragments, local checkpoints and a simple following companion. There is no simulated custody rescue, physical crowd system, procedural legal investigation, branching city-scale campaign or face/lip-synchronised acting.
+
+Real-world context and allegation/response distinctions remain in [Delhi references](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DELHI-REFERENCES.md). The setting and equipment are reference-based approximations; events are fictional.

@@ -1,5 +1,13 @@
 # Asset provenance
 
+## v0.6 textured humans and locomotion
+
+- **Source library:** [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox), MIT licence. Selected Male Adult 02 and Female Adult 04 clothed avatars, diffuse/normal/opacity textures, and compatible `m_idle_breathe_01`, `m_walk_neutral_01`, `m_run_neutral_01` animation FBXs. Original selected files are in `art/rocketbox-source/`; copyright and permission notice are retained at `docs/assets/ROCKETBOX-LICENSE.txt`.
+- **Conversion:** `tools/convert-rocketbox.py` imports the selected FBXs, retargets global bone orientation onto each avatar's rest rig, removes root XY travel, preserves vertical motion, creates Idle/Walk/Run clips and exports 1K WebP-textured GLBs. Editable `art/male-animated.blend` and `art/female-animated.blend` are included.
+- **Runtime:** `docs/people.js` blends clips and scales playback to measured source travel speed. The avatars are licensed generic assets, not scans of actual Delhi protesters or the user; role names and dialogue are fictional. No actor identity or ethnicity is inferred from an avatar.
+- **Limits:** The police still use the earlier CC0 khaki adaptation. No jump clip, foot-contact IK, cloth simulation, voice acting or custom facial performance is included.
+- **Original additions:** Story text, small retrieval props, rhythm UI, journal, branching handoffs, local checkpoint logic and synthesised footsteps/tones are project-authored.
+
 ## v0.5 world assets
 
 - **Separate clothing:** `docs/assets/courier-clothed.glb` adapts the credited Quaternius CC0 base below. A continuous project-authored shirt, adapted trouser shell, collar, placket and buttons use skeleton weights. Covered base-body triangles are hidden to avoid intersections. Editable source: `art/courier-clothed.blend`; reproducible script: `tools/build-art.py`. Generic fictional adults, not real-person likenesses.

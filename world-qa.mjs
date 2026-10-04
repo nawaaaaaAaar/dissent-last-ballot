@@ -23,7 +23,7 @@ async function walk(p,x,z){
     if(Math.hypot(dx,dz)<.5)return;
     const k=Math.abs(dx)>.28?(dx>0?'d':'a'):(dz>0?'s':'w');
     const distance=Math.abs(dx)>.28?Math.abs(dx):Math.abs(dz);
-    await p.keyboard.down(k);await tick(p,Math.min(9000,distance/2.9*1000));await p.keyboard.up(k);
+    await p.keyboard.down(k);await tick(p,Math.min(14000,distance/1.8*1000));await p.keyboard.up(k);
   }
   throw Error(`Could not walk to ${x},${z}: ${JSON.stringify(await state(p))}`);
 }
@@ -31,7 +31,26 @@ async function interact(p,id){
   await tick(p,0);assert.equal((await state(p)).near,id);
   await p.keyboard.press('e');assert.equal((await state(p)).dialog,id);
   await p.locator('#dialog-confirm').click();await tick(p,16);
-  assert.equal((await state(p)).tasks[id],true);
+  if(id==='barrier'){
+    assert.equal((await state(p)).mode,'rally');
+    await p.locator('#pause').click();assert.equal((await state(p)).mode,'paused');
+    await tick(p,700);await p.locator('#resume').click();assert.equal((await state(p)).mode,'rally');
+    await p.keyboard.press('e');assert.equal((await state(p)).rally.hits,0);
+    for(let i=0;i<3;i++){await tick(p,500);await p.keyboard.press('e');}
+    await tick(p,16);
+  }
+  if(id==='companion')assert.equal((await state(p)).companion,true);
+  else assert.equal((await state(p)).tasks[id],true);
+  console.log('Completed encounter:',id);
+}
+async function pickup(p,id){
+  await tick(p,0);assert.equal((await state(p)).near,id);
+  await p.keyboard.press('e');await tick(p,0);assert((await state(p)).items.includes(id));
+}
+async function supplies(p){
+  await walk(p,-8,18);await walk(p,-25,18);await pickup(p,'water1');
+  await walk(p,-16,18);await walk(p,-16,15);await pickup(p,'water0');
+  await walk(p,-15,15);await walk(p,-15,-3);await pickup(p,'water2');
 }
 try{
   const ctx=await browser.newContext({viewport:{width:1280,height:800}});
@@ -43,23 +62,47 @@ try{
   assert.deepEqual((await state(p)).position,paused);await p.locator('#resume').click();
   checks.push('jump and pause/resume preserve position');
   await walk(p,-3,24);await interact(p,'organiser');
-  await walk(p,-8,18);await walk(p,-23,18);await walk(p,-23,5);
+  await walk(p,-9,24);await walk(p,-9,13);await pickup(p,'note0');
+  await p.keyboard.press('j');assert.equal((await state(p)).mode,'journal');
+  await p.locator('#assist-game').uncheck();assert.equal(await p.locator('#storymode').isChecked(),false);
+  await p.locator('#assist-game').check();await p.locator('#journal-close').click();
+  assert.equal((await state(p)).notes,1);
+  await p.reload({waitUntil:'domcontentloaded'});await p.waitForFunction(()=>typeof render_game_to_text==='function',{timeout:90000});await tick(p,0);
+  await p.locator('#continue').click();await tick(p,0);
+  assert.equal((await state(p)).tasks.organiser,true);assert.equal((await state(p)).notes,1);
+  checks.push('optional fragment, journal assist adjustment and local checkpoint after reload');
+  await supplies(p);assert.equal((await state(p)).inventory.water,3);
+  await walk(p,-23,5);
   await shot(p,'world-final-aid.png');await interact(p,'aid');
   await walk(p,-18,5);await walk(p,-18,-7);
   await p.keyboard.press('e');await p.locator('#dialog-confirm').click();await tick(p,0);
   assert.equal((await state(p)).solidarity,3);checks.push('optional protest event');
-  await walk(p,-8,-7);await walk(p,-4,-7);await walk(p,-4,-20);await interact(p,'witness');
+  await walk(p,-8,-7);await walk(p,3,-7);await walk(p,3,-14);await pickup(p,'recorder');
+  await walk(p,-4,-14);await walk(p,-4,-20);await interact(p,'witness');
   await walk(p,-3,-29.6);await shot(p,'world-final-barricade.png');await interact(p,'barrier');
   await tick(p,20000);assert.equal((await state(p)).mode,'caught');
   await p.locator('#retry').click();await tick(p,0);
   assert.equal((await state(p)).tasks.barrier,true);checks.push('capture and story checkpoint recovery');
-  await p.keyboard.down('Shift');await p.keyboard.down('w');await tick(p,2900);await p.keyboard.up('w');await p.keyboard.up('Shift');
+  await walk(p,-6,-29.6);await walk(p,-6,-36);await interact(p,'companion');
+  await walk(p,-2,-36);
+  await p.keyboard.down('Shift');await p.keyboard.down('w');await tick(p,1957);await p.keyboard.up('w');await p.keyboard.up('Shift');
   assert.equal((await state(p)).near,'assembly');await interact(p,'assembly');
   assert.equal((await state(p)).mode,'won');await shot(p,'world-final-ending.png');
-  checks.push('complete five-act chapter through actual keyboard and click input');
+  checks.push('supplies, recorder recovery, rhythm misses/hits, companion help and public-story ending');
   await p.locator('#again').click();await tick(p,0);assert.equal((await state(p)).tasks.organiser,false);
   await p.mouse.move(900,450);await p.mouse.down();await p.mouse.move(1000,450,{steps:3});await p.mouse.up();assert.notEqual((await state(p)).cameraYaw,0);
   checks.push('restart clears story; orbit camera changes heading');
+  await p.locator('#pause').click();await p.locator('#restart').click();await tick(p,0);
+  await walk(p,-3,24);await interact(p,'organiser');await supplies(p);await walk(p,-23,5);await interact(p,'aid');
+  await walk(p,-8,5);await walk(p,3,5);await walk(p,3,-14);await pickup(p,'recorder');
+  await walk(p,-4,-14);await walk(p,-4,-20);await p.keyboard.press('e');await p.locator('#dialog-alt').click();assert.equal((await state(p)).choice,'archive');
+  await walk(p,-3,-29.6);await p.keyboard.press('e');await p.locator('#dialog-confirm').click();await p.locator('#rally-skip').click();await tick(p,0);
+  await p.keyboard.down('Shift');await p.keyboard.down('s');await tick(p,4913);await p.keyboard.up('s');await p.keyboard.down('a');await tick(p,4565);await p.keyboard.up('a');await p.keyboard.up('Shift');
+  assert.equal((await state(p)).near,'record');await p.keyboard.press('e');await p.locator('#dialog-confirm').click();await tick(p,0);
+  assert.equal((await state(p)).mode,'won');await shot(p,'world-archive-ending.png');
+  assert.equal((await state(p)).companion,false);checks.push('protected-record branch, assist rhythm skip and companion-absent ending');
+  await p.locator('#again').click();await tick(p,0);await p.keyboard.press('j');assert.equal((await state(p)).mode,'journal');await p.keyboard.press('j');assert.equal((await state(p)).mode,'playing');
+  checks.push('journal open/close');
   const desktop=await state(p);await ctx.close();
   const mobileCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
   const m=await ready(mobileCtx);await shot(m,'world-mobile-title.png');await m.locator('#start').tap();await tick(m,0);
@@ -68,7 +111,7 @@ try{
   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy,id:1}]});
   await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:cx,y:cy-38,id:1}]});
   await tick(m,1200);await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  assert((await state(m)).position.z<28);
+  assert((await state(m)).position.z<30);
   await m.locator('#sound').tap();assert.equal((await state(m)).sound,true);
   await m.locator('#jump').tap();await tick(m,180);assert((await state(m)).position.y>0);await tick(m,700);
   await m.locator('#sprint').tap();assert(await m.locator('#sprint').evaluate(e=>e.classList.contains('active')));
@@ -82,6 +125,6 @@ try{
   assert(await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   checks.push('real touch joystick, camera drag, jump, run, sound after swipe, pause/resume; portrait and landscape fit');
   const mobile=await state(m);assert.deepEqual(errors,[]);
-  await writeFile(new URL('world-results.json',root),JSON.stringify({pass:true,checks,errors,desktop,mobile,physicalDeviceTested:false},null,2));
+  await writeFile(new URL('world-results.json',root),JSON.stringify({version:'0.6',pass:true,checks,errors,desktop,mobile,physicalDeviceTested:false,humanEnjoymentTested:false},null,2));
   console.log(JSON.stringify({pass:true,checks,errors}));
 }finally{await browser.close();}
