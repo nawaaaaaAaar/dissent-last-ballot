@@ -25,10 +25,12 @@
     "muted": true,
     "reducedMotion": false,
     "assist": false,
-    "fps": 0,
+    "fps": 3,
+    "setting": "New Delhi, compressed dramatic route",
+    "location": "Jantar Mantar Road",
     "rendering": {
-      "draws": 93,
-      "triangles": 95288
+      "draws": 81,
+      "triangles": 59008
     }
   },
   "replay": true,

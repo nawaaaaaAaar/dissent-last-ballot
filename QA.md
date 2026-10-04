@@ -1,4 +1,4 @@
-# v0.1 QA and limitations
+# QA and limitations
 
 The game is tested in Chromium with Playwright. Mobile checks emulate a 390 × 844 touch phone and 844 × 390 landscape viewport. These are browser-emulation results, not tests on a physical iPhone or Android device.
 
@@ -32,3 +32,9 @@ For interactive state inspection, `window.render_game_to_text()` returns concise
 - Fonts are the only optional remote display dependency; the engine and game texture are checked into the project.
 
 The immediate next quality gate is a real-phone playtest, followed by an art-and-animation pass toward the original realistic visual target.
+
+## v0.2 Delhi pass
+
+The Delhi pass preserves mission logic and input controls, but changes architecture, signage, barricade and bus props, and adds a protest tableau and landmark. Additional visual checks cover the Delhi title, protest/bus scene, observatory silhouette, and mobile layout. Existing full-mission and checkpoint checks are re-run against this version; result JSON and screenshots are retained in `qa/`.
+
+The “actual Delhi” claim is limited to sourced place names, public visual references, and reported protest context. This is not exact map geometry or a verified reconstruction.

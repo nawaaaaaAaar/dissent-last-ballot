@@ -1,5 +1,14 @@
 Original prompt: Build DISSENT: The Last Ballot as a playable 3D student-resistance runner and make it playable on mobile phones. Push work to GitHub and the public link.
 
+Latest revision request: Use actual Delhi Police barricades, protest context, Delhi route, buses, and related recognisable setting details.
+
+## Delhi revision
+
+- v0.2 uses sourced public references for Patel Chowk / Sansad Marg / Jantar Mantar Road, yellow red-lettered metal barricades, and guarded-window transport-bus appearance.
+- Added fictional protest participants, original placards and wayfinding, a park boundary and civic facades, and a scaled observatory silhouette.
+- Distinguish public reference details from illustrative branding, compressed distances, fiction, and exact scans.
+- Full regression and mobile/visual QA run before GitHub/public publishing.
+
 ## Current build plan
 
 - Browser-first vertical slice with an auto-runner and a fictional barrier-collapse interaction.

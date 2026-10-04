@@ -14,6 +14,7 @@ const state = {
 let renderer, scene, camera, clock, sun, player, parts, street=[], obstacles=[], pickups=[];
 let characterTime=0, lastFrame=0, frames=0, measureStart=performance.now(), manualStepping=false;
 let sound, musicStep=0, beatTime=0, dust, staticMaterials=[], camShake=0;
+let delhiSign, busSign, protestSigns=[], routeSigns=[], delhiLandmarks;
 const root = $('viewport');
 const rng = seed => { let n=seed; return () => {n = (n*1664525+1013904223)>>>0; return n/4294967296;}; };
 const rand=rng(8104);
@@ -29,6 +30,9 @@ const M={
   light:mat('#edc68d',.55,{emissive:'#edb975',emissiveIntensity:.5}),
   stripe:mat('#cab169'), yellow:mat('#e3a765'),
   paper:mat('#f5e7c7',.6,{emissive:'#b68a4a',emissiveIntensity:.18}),
+  policeYellow:mat('#e8be19',.58,{metalness:.22}),
+  busBody:mat('#394146',.48,{metalness:.3}), chrome:mat('#a4aca9',.35,{metalness:.8}),
+  park:mat('#65755a'), monument:mat('#b2573a'), civic:mat('#d8d3bd'),
 };
 const G = {
   box:new THREE.BoxGeometry(1,1,1), cylinder:new THREE.CylinderGeometry(1,1,1,10),
@@ -92,16 +96,35 @@ function createMaterials(){
     for(let i=0;i<2000;i++){c.fillStyle='rgba(50,60,50,.12)';c.fillRect(rand()*w,rand()*h,2,rand()*16);}
   });
   M.teal.map=shutter;M.navy.map=shutter;
-  const names=['AZADI BOOKS','PEOPLE’S PRESS','CHAI & CONVERSATION','REPAIR WORKS','CITY CO-OP','PUBLIC ARCHIVE','WITNESS / RECORD','OUR VOICES REMAIN'];
+  const names=['PATEL CHOWK','SANSAD MARG','JANTAR MANTAR ROAD','PARLIAMENT STREET','PUBLIC RECORD','INDEPENDENT ARCHIVE','WITNESS / RECORD','OUR VOICES REMAIN'];
   for(let i=0;i<names.length;i++){
     const tex=canvasTexture((c,w,h)=>{
       c.fillStyle=i%2?'#d4c6a1':'#2c4848';c.fillRect(0,0,w,h);
       c.strokeStyle=i%2?'#625746':'#c2b395';c.lineWidth=5;c.strokeRect(10,10,w-20,h-20);
       c.fillStyle=i%2?'#39453b':'#eee1bf';c.font='bold 32px sans-serif';c.textAlign='center';
-      c.fillText(names[i],w/2,68);c.font='16px sans-serif';c.fillText('FICTIONAL CITY · PUBLIC SQUARE',w/2,98);
+      c.fillText(names[i],w/2,68);c.font='16px sans-serif';c.fillText('NEW DELHI · DRAMATISED GAME ROUTE',w/2,98);
     },512,128);
     staticMaterials.push(new THREE.MeshStandardMaterial({map:tex,roughness:.8}));
   }
+  delhiSign=labelMaterial('DELHI POLICE','#e3bd19','#b92524','दिल्ली पुलिस · NEW DELHI');
+  busSign=labelMaterial('DELHI POLICE','#deddd0','#b92524','TRANSPORT · DRAMATISED VEHICLE');
+  const slogans=['VOTE CHORI BAND KARO','SAVE DEMOCRACY','LET JOURNALISTS REPORT','ACCOUNTABILITY NOW','OUR VOICES REMAIN'];
+  protestSigns=slogans.map((s,i)=>labelMaterial(s,i%2?'#d6c6a2':'#e8e5d7','#892c27','PROTEST SCENE · FICTIONAL PARTICIPANTS'));
+  routeSigns=[
+    labelMaterial('PATEL CHOWK','#174d42','#f2ead8','SANSAD MARG · JANTAR MANTAR'),
+    labelMaterial('SANSAD MARG','#174d42','#f2ead8','PARLIAMENT STREET · NEW DELHI'),
+    labelMaterial('JANTAR MANTAR ROAD','#174d42','#f2ead8','OBSERVATORY PRECINCT · NEW DELHI'),
+  ];
+}
+function labelMaterial(text,bg,ink,subtitle=''){
+  const tex=canvasTexture((c,w,h)=>{
+    c.fillStyle=bg;c.fillRect(0,0,w,h);
+    c.strokeStyle=ink;c.lineWidth=4;c.strokeRect(9,9,w-18,h-18);
+    c.fillStyle=ink;c.textAlign='center';c.font='bold 40px sans-serif';
+    c.fillText(text,w/2,subtitle?76:89,w-35);
+    if(subtitle){c.font='18px sans-serif';c.fillText(subtitle,w/2,117,w-30);}
+  },640,160);
+  return new THREE.MeshStandardMaterial({map:tex,roughness:.72});
 }
 
 // Original articulated human, built from smooth geometry. No downloaded likeness.
@@ -152,22 +175,107 @@ function characterPose(p,t,running=true){
 }
 function bus(){
   const g=new THREE.Group();
-  box(M.cream,0,1.36,0,2.3,1.6,6.4,g);box(M.navy,0,.67,0,2.4,.5,6.5,g);
-  box(M.white,0,2.18,0,2.32,.12,6.45,g);
-  for(let z=-2.5;z<=2.5;z+=1){
-    box(M.glass,-1.17,1.7,z,.025,.72,.85,g);
-    box(M.glass,1.17,1.7,z,.025,.72,.85,g);
+  // Dark body and guarded windows referenced to protest reporting photographs.
+  // Original geometry, illustrative branding, no exact vehicle-model claim.
+  box(M.busBody,0,1.50,0,2.45,1.95,8.0,g);
+  box(M.chrome,0,2.52,0,2.48,.10,8.05,g);
+  for(let s of [-1,1]){
+    box(M.ochre,s*1.239,.93,0,.025,.10,7.9,g);
+    box(M.chrome,s*1.24,1.1,0,.025,.04,7.9,g);
+    for(let z=-3;z<=3;z+=1){
+      box(M.glass,s*1.24,1.89,z,.025,.95,.87,g);
+      box(M.chrome,s*1.27,1.91,z+.45,.03,1.04,.028,g);
+    }
+    for(let y=1.45;y<2.45;y+=.22)box(M.chrome,s*1.285,y,0,.04,.025,7.8,g);
+    const placard=mesh(G.plane,busSign,s*1.255,.77,-1.4,2.3,.50,1,g);
+    placard.rotation.y=s*Math.PI/2;
   }
-  box(M.glass,0,1.65,-3.21,1.95,.73,.025,g);
-  // One missing window and an abstract damage patch, not a method of attack.
-  box(M.dark,-1.19,1.7,-.5,.035,.7,.72,g);
-  for(let s of [-1,1])for(let z of [-2,2]){
-    const wheel=mesh(G.cylinder,M.dark,s*1.16,.5,z,.45,.16,.45,g);wheel.rotation.z=Math.PI/2;
-    const hub=mesh(G.cylinder,M.metal,s*1.26,.5,z,.2,.03,.2,g);hub.rotation.z=Math.PI/2;
+  box(M.glass,0,1.95,-4.02,2.2,.94,.025,g);
+  box(M.chrome,0,1.96,-4.04,.04,.98,.03,g);
+  box(M.chrome,0,1.48,-4.04,2.18,.035,.025,g);
+  box(M.chrome,0,2.48,-4.04,2.18,.035,.025,g);
+  for(let s of [-1,1])for(let z of [-2.55,2.55]){
+    const wheel=mesh(G.cylinder,M.dark,s*1.22,.48,z,.46,.20,.46,g);wheel.rotation.z=Math.PI/2;
+    const hub=mesh(G.cylinder,M.chrome,s*1.34,.48,z,.23,.03,.23,g);hub.rotation.z=Math.PI/2;
   }
-  for(let s of [-1,1])box(M.light,s*.75,.85,-3.28,.25,.18,.05,g);
-  box(M.metal,0,.55,-3.28,2.25,.15,.12,g);
+  for(let s of [-1,1])box(M.light,s*.83,.95,-4.06,.30,.18,.04,g);
+  box(M.chrome,0,.63,-4.08,2.42,.15,.12,g);
+  box(M.dark,0,1.15,-4.05,1.15,.25,.03,g);
   return g;
+}
+function delhiBarricade(){
+  const g=new THREE.Group();
+  // Public-facing visual design, not a construction or sabotage guide.
+  for(let x of [-1.4,1.4])box(M.policeYellow,x,1.2,0,.09,2.15,.10,g);
+  for(let y of [.21,2.26])box(M.policeYellow,0,y,0,2.9,.09,.10,g);
+  box(M.policeYellow,0,1.2,0,2.82,.58,.10,g);
+  for(let x=-1.26;x<=1.3;x+=.18)box(M.policeYellow,x,1.2,0,.015,2.02,.018,g);
+  for(let y=.36;y<2.17;y+=.18)box(M.policeYellow,0,y,0,2.75,.015,.018,g);
+  for(let x of [-1.1,1.1]){
+    box(M.policeYellow,x,.22,.38,.08,.08,.87,g);
+    for(let z of [0,.7]){
+      const wheel=mesh(G.cylinder,M.dark,x,.13,z,.12,.065,.12,g);wheel.rotation.z=Math.PI/2;
+    }
+  }
+  const front=mesh(G.plane,delhiSign,0,1.22,-.061,2.77,.6,1,g);
+  front.rotation.y=Math.PI;
+  mesh(G.plane,delhiSign,0,1.22,.061,2.77,.6,1,g);
+  const batch=batchBuilder();batch.add(g);return batch.finish();
+}
+function protester(shirt,index){
+  const p=createCharacter(shirt,.94);characterPose(p,index*.7,false);
+  p.arms[0].rotation.x=-2.2;p.forearms[0].rotation.x=-.25;
+  box(M.wood,-.24,2.20,-.2,.035,.9,.035,p.group);
+  const front=mesh(G.plane,protestSigns[index%protestSigns.length],-.24,2.66,-.22,1.12,.42,1,p.group);
+  front.rotation.y=Math.PI;
+  mesh(G.plane,protestSigns[index%protestSigns.length],-.24,2.66,-.20,1.12,.42,1,p.group);
+  return p.group;
+}
+function landmarkModel(){
+  const b=batchBuilder();
+  const B=(m,x,y,z,w,h,d)=>b.add(box(m,x,y,z,w,h,d));
+  // Simplified Samrat-Yantra silhouette, behind a fence and outside gameplay.
+  const shape=new THREE.Shape();shape.moveTo(0,0);shape.lineTo(11,0);shape.lineTo(11,9);shape.closePath();
+  const ramp=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:1.3,bevelEnabled:false}),M.monument);
+  ramp.position.set(-1,0,0);ramp.rotation.y=Math.PI/2;b.add(ramp);
+  for(let i=0;i<22;i++)B(M.cream,.14,i*.39+.15,-i*.49-.2,.5,.08,.45);
+  for(let s of [-1,1]){
+    const curve=new THREE.Mesh(new THREE.TorusGeometry(5,.45,6,40,Math.PI),M.monument);
+    curve.rotation.y=Math.PI/2;curve.rotation.z=Math.PI;curve.position.set(s*4.5,5,-10);b.add(curve);
+    for(let j=0;j<5;j++)B(M.monument,s*4.5,1.3,-6-j*1.3,.65,2.6,.65);
+  }
+  B(M.monument,0,.25,-7,13,.5,15);
+  return b.finish();
+}
+function buildDelhiLandmarks(){
+  delhiLandmarks=new THREE.Group();scene.add(delhiLandmarks);
+  const observatory=landmarkModel();observatory.position.set(-14,.12,-735);delhiLandmarks.add(observatory);
+  const b=batchBuilder();
+  const colours=[M.green,M.orange,M.blue,M.ochre,M.navy,M.white];
+  // Fictional participants, no portraits or imported protest photographs.
+  for(let i=0;i<24;i++){
+    const side=i%2===0?-1:1,g=protester(colours[i%colours.length],i);
+    g.position.set(side*(5.6+(i%3)*.43),.12,-660-Math.floor(i/2)*2.7);
+    g.rotation.y=side<0?.3:-.3;b.add(g);
+  }
+  for(let i=0;i<7;i++){
+    const g=delhiBarricade();g.position.set(-5.8,.12,-628-i*4.1);g.rotation.y=Math.PI/2;b.add(g);
+  }
+  for(let i=0;i<3;i++){
+    const g=delhiBarricade();g.position.set(-5.8,.12,-28-i*4);g.rotation.y=Math.PI/2;b.add(g);
+  }
+  const transport=bus();transport.position.set(5.8,0,-650);b.add(transport);
+  for(let i=0;i<3;i++){
+    const g=new THREE.Group(),sign=mesh(G.plane,routeSigns[i],0,3.2,0,3.5,.88,1,g);
+    box(M.metal,-1.4,1.65,.07,.08,3.3,.08,g);box(M.metal,1.4,1.65,.07,.08,3.3,.08,g);
+    g.position.set(-6.1,0,-[70,360,625][i]);g.rotation.y=-.35;b.add(g);
+  }
+  const subway=new THREE.Group();
+  box(M.civic,0,.55,0,2.1,1.1,3.6,subway);
+  for(let s of [-1,1])box(M.chrome,s*1,1.18,0,.04,.06,3.7,subway);
+  mesh(G.plane,routeSigns[0],0,2.35,1.9,2.6,.7,1,subway);
+  subway.position.set(6.1,0,-36);b.add(subway);
+  delhiLandmarks.add(b.finish());
 }
 function makeStreet(){
   const b=batchBuilder();
@@ -181,9 +289,16 @@ function makeStreet(){
     }
   }
   for(let z=6;z<120;z+=8)B(M.stripe,0,.015,-z,.1,.015,3);
+  B(M.park,-18,-.04,-60,24,.12,120);
   for(let z=9;z<120;z+=19){
     for(let s of [-1,1]){
-      const height=6+rand()*6, facade=rand()>.35?M.plaster:M.brick;
+      if(s<0){
+        B(M.civic,-7,.48,-z,.30,.96,18.9);
+        for(let k=-9;k<9;k+=.8)B(M.metal,-7,1.35,-z+k,.045,1.25,.035);
+        B(M.metal,-7,1.95,-z,.04,.04,18.9);
+        continue;
+      }
+      const height=6+(Math.floor(rand()*2)*2.25), facade=M.civic;
       const width=14+rand()*3, x=s*(7+width/2);
       B(facade,x,height/2,-z,width,height,18.7);
       B(M.stone,x,height+.1,-z,width+.2,.28,19);
@@ -192,12 +307,15 @@ function makeStreet(){
       for(let j of [-5,0,5]){
         const Z=-z+j;
         B(M.dark,s*6.96,1.3,Z,.10,2.5,3.75);
-        B(s<0?M.teal:M.navy,s*6.88,1.2,Z,.09,2.2,3.5);
+        B(M.glass,s*6.88,1.2,Z,.09,2.2,3.5);
         B(M.stone,s*6.8,2.5,Z,.17,.2,3.8);
-        const sign=mesh(G.box,staticMaterials[Math.floor(rand()*6)],s*6.74,2.96,Z,.10,.72,4);
+        const sign=mesh(G.box,staticMaterials[4],s*6.74,2.96,Z,.10,.45,3.2);
         b.add(sign);
-        const awning=box(j===0?M.terracotta:M.green,s*6.25,2.68,Z,1.35,.12,3.65);
-        awning.rotation.z=s*.12;b.add(awning);
+        const awning=box(M.civic,s*6.2,2.9,Z,1.8,.16,4.5);b.add(awning);
+        for(let k of [-1.85,1.85]){
+          const column=mesh(G.cylinder,M.civic,s*5.55,1.4,Z+k,.13,2.8,.13);
+          b.add(column);B(M.stone,s*5.55,.16,Z+k,.4,.3,.4);
+        }
         for(let y=4.4;y<height-.5;y+=2.25){
           B(M.cream,s*6.9,y,Z,.15,1.7,1.65);
           B(M.glass,s*6.79,y,Z,.11,1.37,1.36);
@@ -228,9 +346,9 @@ function makeStreet(){
       B(M.wood,s*6.15,1,-z+4,.78,.12,.85);
       B(M.dark,s*5.8,.25,-z+9,.09,.5,.09);
       B(M.ochre,s*5.8,.45,-z+9,.1,.12,.1);
-      B(M.wood,s*6.3,1.4,-z+12,.2,2.8,.2);
-      b.add(sphere(M.leaf,s*6.3,3,-z+12,.95,1.05,1.3));
-      b.add(sphere(M.leaf,s*6.5,3.6,-z+12,.75,.8,1));
+      B(M.wood,s*6.3,1.8,-z+12,.25,3.6,.25);
+      b.add(sphere(M.leaf,s*6.3,4.2,-z+12,1.45,1.5,1.6));
+      b.add(sphere(M.leaf,s*6.5,5.2,-z+12,1.25,1.2,1.3));
       const poster=box(staticMaterials[7],s*6.8,1.6,-z+6,.04,1,1.8);b.add(poster);
     }
   }
@@ -240,7 +358,6 @@ function makeStreet(){
       const cable=box(M.dark,x,7.5-.9*(1-(x/7)**2),-z,.72,.018,.018);b.add(cable);
     }
   }
-  const vehicle=bus();vehicle.position.set(6.4,0,-57);vehicle.rotation.y=.04;b.add(vehicle);
   const g=b.finish();
   for(let i=0;i<3;i++){const chunk=g.clone();scene.add(chunk);street.push(chunk);}
 }
@@ -273,7 +390,7 @@ function buildMission(){
   for(let d=40,i=0;d<875;d+=18,i++){
     if(Math.abs(d-240)<28||Math.abs(d-575)<30)continue;
     const lane=Math.floor(random()*3)-1,type=i%5===2?'slide':i%4===0?'jump':'avoid';
-    const model=type==='slide'?overheadModel():type==='jump'?barrierModel():cartModel();
+    const model=type==='slide'?overheadModel():type==='jump'?barrierModel():i%3===1?delhiBarricade():cartModel();
     model.position.set(lane*LANE,0,-d);scene.add(model);
     obstacles.push({id:i,d,lane,type,model,done:false});
     if(i%6===3){
@@ -410,7 +527,7 @@ function updateHUD(){
   $('health-bar').style.width=`${Math.max(0,state.condition)}%`;
   $('evidence').innerHTML=`${state.evidence} <small>/ 3</small>`;
   $('solidarity').textContent=state.solidarity;
-  $('chapter').textContent=state.distance<240?'THE GATHERING':state.distance<575?'THE CONFRONTATION':'THE WITNESS ROUTE';
+  $('chapter').textContent=state.distance<240?'PATEL CHOWK':state.distance<575?'SANSAD MARG':'JANTAR MANTAR ROAD';
 }
 function collide(){
   if(state.hitCooldown>0)return;
@@ -437,6 +554,7 @@ function updateWorld(){
   scene.userData.journalist.visible=Math.abs(state.distance-575)<100;
   scene.userData.archive.position.z=state.distance-905;
   scene.userData.archive.visible=state.distance>800;
+  if(delhiLandmarks)delhiLandmarks.position.z=state.distance;
 }
 function update(dt){
   if(state.mode==='loading'||state.mode==='error')return;
@@ -603,7 +721,7 @@ async function init(){
     image.onload=()=>{const tex=new THREE.Texture(image);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(3,2);tex.needsUpdate=true;M.plaster.map=tex;M.plaster.needsUpdate=true;};
     image.onerror=()=>{$('loading-note').textContent='Texture unavailable; using the built-in material.';};
     image.src='./assets/plaster.webp';
-    makeStreet();buildMission();dustParticles();
+    makeStreet();buildMission();buildDelhiLandmarks();dustParticles();
     parts=createCharacter();player=parts.group;scene.add(player);
     applyQuality();updateWorld();setMode('menu');
     $('start-btn').disabled=false;$('start-btn').textContent='Begin the witness route';
@@ -624,6 +742,7 @@ async function init(){
       obstacles:obstacles.filter(o=>!o.done&&o.d-state.distance>-2&&o.d-state.distance<50).map(o=>({type:o.type,lane:o.lane,ahead:+(o.d-state.distance).toFixed(1)})),
       packets:pickups.filter(p=>!p.collected&&p.d-state.distance>0&&p.d-state.distance<50).map(p=>({lane:p.lane,ahead:+(p.d-state.distance).toFixed(1)})),
       quality:state.low?'low':'high',muted:state.mute,reducedMotion:state.reduced,assist:state.assist,fps:state.fps,
+      setting:'New Delhi, compressed dramatic route',location:state.distance<240?'Patel Chowk':state.distance<575?'Sansad Marg':'Jantar Mantar Road',
       rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},
     });
     requestAnimationFrame(frame);

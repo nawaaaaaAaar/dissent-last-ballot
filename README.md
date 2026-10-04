@@ -1,8 +1,14 @@
 # DISSENT: The Last Ballot
 
-A realistic 3D resistance runner about carrying evidence through a city that wants it silenced.
+A Delhi-grounded 3D resistance runner about carrying evidence through a city that wants it silenced.
 
-**Status: first playable browser build, v0.1. Not production-ready or photorealistic.** The working title and setting remain proposals; the public entry page now runs the game, while `docs/concept.html` preserves the concept dossier.
+**Status: playable browser build, v0.2 Delhi reference pass. Not production-ready or photorealistic.** The public entry page runs the game, while `docs/concept.html` preserves the design dossier.
+
+## Delhi reference pass
+
+The setting now uses real Delhi place names: Patel Chowk, Sansad Marg, and Jantar Mantar Road. Yellow, red-lettered Delhi Police-style barricades, a guarded-window transport bus, a protest tableau, metro/road wayfinding, and an observatory-inspired landmark replace generic-city cues. Read the [Delhi reference notes](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DELHI-REFERENCES.md) for sources and modelling limits.
+
+The route is still a compressed game layout, not surveyed geography. Models are source-referenced approximations, not actual scans; participants, building layouts, clashes, and the archive are fictionalised. No copyrighted news footage or real-person likeness is included.
 
 ## Play the first build
 
@@ -15,7 +21,7 @@ Open the [public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a
 - **Failure:** Collisions reduce condition. Retry from the most recent story checkpoint, or restart from the beginning.
 - **Session only:** No save, login, tracking, or personal-data collection. Closing/reloading the page resets play.
 
-This slice uses original procedural architecture, an articulated procedural human, an AI-generated plaster texture, and original synthesised audio. It does not yet use production-quality scanned assets, mocap animation, voice acting, or photorealistic character models. All narrative incidents in gameplay are fictional.
+This slice uses original procedural architecture, an articulated procedural human, and original synthesised audio; the AI-generated plaster asset from v0.1 is retained in the project. It does not yet use production-quality scanned assets, mocap animation, voice acting, or photorealistic character models. All narrative incidents in gameplay are fictional.
 
 ## The direction
 
@@ -59,7 +65,7 @@ That limited source check does not establish that such damage never happened. Un
 
 ## Fictional story, factual context
 
-Recommended setting: a fictional city with Delhi-inspired streets and a Jantar Mantar-inspired assembly ground. Use fictional officials and institutions in the narrative. Keep an optional, separately sourced context archive for real-world reporting, with dates, attribution, and distinctions between allegation, official response, and independently established finding.
+Current setting: a compressed, dramatised route through real Delhi place names, informed by public streets and protest reporting. Keep officials, participants, and the independent archive fictional; the police institution and public setting can be represented without inventing findings about named individuals. Maintain sourced context with dates and distinctions between allegation, official response, and independently established finding.
 
 Do not import real voter records, activists' private details, or identifiable protest photographs as game assets. Research links are not licenses to reuse photos, speeches, music, or footage. Any real-location reconstruction, real-person likeness, or copyrighted asset needs a separate rights review.
 
@@ -141,7 +147,7 @@ No other model was invoked to build or evaluate this concept. Researching demons
 - Choose fictionalised Delhi-inspired politics or a literal real-world setting.
 - Choose browser-first shareability or native-first maximum visual fidelity.
 
-Recommended default: fictionalised Delhi-inspired setting, browser-first vertical slice, and a confrontational student-resistance story with a journalist-accountability arc. Strong political intent should be expressed through the player's purpose and the world, not just pasted slogans. Fictional clashes and destruction are compatible with that story; practical real-world sabotage instruction or encouragement is not.
+Current direction: Delhi-grounded, browser-first vertical slice with fictional participants and a journalist-accountability arc. Strong political intent should be expressed through the player's purpose and the world, not just pasted slogans. Fictional clashes and destruction are compatible with that story; practical real-world sabotage instruction or encouragement is not.
 
 ## Repository and publishing
 

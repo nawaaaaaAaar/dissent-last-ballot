@@ -1,8 +1,23 @@
-# DISSENT v0.1: The witness route
+# DISSENT release notes
+
+## v0.2: Delhi reference pass
+
+October 4, 2026. The playable route now uses Patel Chowk, Sansad Marg, and Jantar Mantar Road stage labels, with a clear “compressed route” disclosure.
+
+- Replaced the generic market architecture with a tree-lined public verge, boundary fence, and pale colonnaded civic facades.
+- Added yellow metal Delhi Police-style barricades with red labelling, using public references.
+- Replaced the generic damaged bus with an original guarded-window, dark-body transport-bus model; added branding is explicitly illustrative.
+- Added 24 fictional protesters with original placards and a scaled observatory-inspired landmark behind the park fence.
+- Added road and metro wayfinding. These are original signs, not reproductions of actual signs.
+- Kept existing mobile controls, gameplay objectives, settings, checkpoint logic, and fictional story.
+
+The sourced elements and limits are detailed in `DELHI-REFERENCES.md`. This is not photogrammetry, exact GPS geometry, real protest footage, a verified reconstruction, or a production-ready art release.
+
+## v0.1: The witness route
 
 First playable browser slice, October 4, 2026. This replaces the public landing page with the game; the research dossier remains at `concept.html`.
 
-## Included
+### Included
 
 - Original 3D street with shopfronts, balconies, overhead cables, lamps, trees, bystanders, and a damaged bus prop.
 - Original articulated courier with running, jumping, and sliding poses.
@@ -13,7 +28,7 @@ First playable browser slice, October 4, 2026. This replaces the public landing 
 - Auto/low/high graphics, reduced-motion option, assist mode, and original synthesised sound.
 - Research links, asset provenance, and QA hooks (`render_game_to_text`, `advanceTime`).
 
-## Not yet included
+### Not yet included
 
 - Photorealistic or AAA-quality characters, scanned environment assets, motion capture, voice acting, or production-quality animation.
 - Open-world exploration, a controllable combat system, player-driven sabotage, companion AI, branching streets, multiple missions, or persistent saves.

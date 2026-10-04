@@ -8,3 +8,10 @@
 - **Research references:** Links in the README and dossier are citations only, not a licence to reuse reporting, photos, audio, or footage.
 
 No Quaternius, Kenney, Mixamo, or Three.js sample character asset is included in the build. Asset research did not constitute importing those models.
+
+## v0.2 Delhi references
+
+- **Barricade reference photograph:** `reference-barricade.jpeg`, by Sidheeq, CC BY-SA 3.0; [original Wikimedia Commons file and licence](https://commons.wikimedia.org/wiki/File:Delhi_Police%27s_Barricade.jpeg). Retained unmodified for reference, not loaded by the game.
+- **Delhi scene assets:** Original approximate geometry and original sign textures. No official endorsement or exact-survey claim.
+- **Bus news photograph:** Consulted privately as a visual reference, not included in the game or repository. The provenance and interpretation limits are documented in `DELHI-REFERENCES.md`.
+- **Protest participants:** Original fictional meshes, not faces or portraits from the reporting.

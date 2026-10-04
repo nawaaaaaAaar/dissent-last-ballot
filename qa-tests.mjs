@@ -43,6 +43,7 @@ export async function mobileQA(p){
 }
 export async function desktopQA(p){
   const result={};
+  let delhiCaptured=false,landmarkCaptured=false;
   await p.reload();await p.waitForFunction(()=>window.render_game_to_text);
   await p.selectOption('#quality','low');assert.equal((await read(p)).quality,'low');
   await p.selectOption('#quality','high');assert.equal((await read(p)).quality,'high');
@@ -68,6 +69,12 @@ export async function desktopQA(p){
     }
     if(s.mode==='won')break;
     assert.equal(s.mode,'running',JSON.stringify(s));
+    if(!delhiCaptured&&s.distance>635){
+      await p.screenshot({path:`${dir}/delhi-protest-bus.png`});delhiCaptured=true;
+    }
+    if(!landmarkCaptured&&s.distance>716){
+      await p.screenshot({path:`${dir}/delhi-observatory.png`});landmarkCaptured=true;
+    }
     const dangerous=s.obstacles.filter(o=>o.ahead>-1&&o.ahead<19);
     const safe=[-1,0,1].filter(l=>!dangerous.some(o=>o.lane===l));
     let desired=s.lane;
