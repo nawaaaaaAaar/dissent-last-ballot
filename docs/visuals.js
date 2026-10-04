@@ -4,20 +4,25 @@ import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 let source;
-export async function loadHuman(){
-  source=(await new GLTFLoader().loadAsync('./assets/courier-base.glb')).scene;
+export async function loadHuman(url='./assets/courier-base.glb'){
+  source=(await new GLTFLoader().loadAsync(url)).scene;
 }
-export function human(shirt='#b85a30',police=false){
+export function human(shirt='#b85a30',police=false,options={}){
   if(!source)return null;
   const group=new THREE.Group(),torso=new THREE.Group(),model=clone(source);
   group.add(torso);torso.add(model);model.rotation.y=Math.PI;model.scale.setScalar(1.1);
   const bones={},rest=new Map();
   model.traverse(n=>{if(n.isBone){bones[n.name]=n;rest.set(n,n.quaternion.clone());}});
-  const cloth=new THREE.Color(shirt),skin=new THREE.Color('#986748'),trousers=new THREE.Color(police?'#887557':'#283544');
+  const cloth=new THREE.Color(shirt),skin=new THREE.Color(options.skin||'#986748'),trousers=new THREE.Color(police?'#887557':'#283544');
   model.traverse(n=>{
     if(!n.isMesh)return;
     n.castShadow=true;n.receiveShadow=true;
     n.geometry=n.geometry.clone();
+    if(/Shirt|Collar|Placket|Trousers|Button/.test(n.name)){
+      const textile=/Trousers/.test(n.name)?trousers:/Button/.test(n.name)?new THREE.Color('#343331'):cloth;
+      n.material=new THREE.MeshStandardMaterial({color:textile,roughness:.93,metalness:0});
+      return;
+    }
     const pos=n.geometry.attributes.position,norm=n.geometry.attributes.normal,idx=n.geometry.attributes.skinIndex,weights=n.geometry.attributes.skinWeight;
     const colors=[];
     for(let i=0;i<pos.count;i++){
@@ -48,13 +53,13 @@ export function human(shirt='#b85a30',police=false){
   // Original hair, eye accents, cap and backpack. No real person's likeness.
   const dark=new THREE.MeshStandardMaterial({color:'#211b17',roughness:.91});
   const hair=accessory(new THREE.SphereGeometry(1,18,12),dark,[0,1.77,0],[.115,.08,.115]);
-  for(let s of [-1,1])accessory(new THREE.SphereGeometry(1,12,8),dark,[s*.031,1.7,.086],[.011,.012,.005]);
+  if(options.detail!==false)for(let s of [-1,1])accessory(new THREE.SphereGeometry(1,12,8),dark,[s*.031,1.7,.086],[.011,.012,.005]);
   if(police){
     hair.visible=false;
     accessory(new THREE.CylinderGeometry(.115,.12,.065,20),new THREE.MeshStandardMaterial({color:'#675f44',roughness:.8}),[0,1.82,0],[1,1,1]);
   }
   const bag=new THREE.Mesh(new RoundedBoxGeometry(.36,.49,.18,3,.04),new THREE.MeshStandardMaterial({color:'#1e3339',roughness:.9}));
-  if(!police){
+  if(!police&&options.bag!==false){
     const spine=bones.spine_03;bag.position.copy(spine.worldToLocal(new THREE.Vector3(0,1.4,.20)));spine.add(bag);bag.castShadow=true;
     const pocket=new THREE.Mesh(new RoundedBoxGeometry(.28,.20,.035,2,.014),new THREE.MeshStandardMaterial({color:'#314951',roughness:.94}));
     pocket.position.set(0,-.1,.1);bag.add(pocket);
@@ -76,14 +81,15 @@ export function poseHuman(p,t,running=true,gesture=0){
     a.applyQuaternion(bone.parent.getWorldQuaternion(new THREE.Quaternion()).invert());
     bone.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(a,angle));
   }
-  const a=running?.62:.015;
+  const drive=typeof running==='number'?running:running?1:0;
+  const a=drive?.62*drive:.015;
   for(const [s,side]of [[1,'l'],[-1,'r']]){
     const phase=t+(s<0?Math.PI:0);
     rotate('thigh_'+side,'x',Math.sin(phase)*a);
-    rotate('calf_'+side,'x',Math.max(0,-Math.sin(phase))*(running?.85:0));
+    rotate('calf_'+side,'x',Math.max(0,-Math.sin(phase))*.85*drive);
     rotate('upperarm_'+side,'z',-s*1.34);
     rotate('upperarm_'+side,'x',-Math.sin(phase)*a*.8);
-    rotate('lowerarm_'+side,'x',running?-.75:-.12);
+    rotate('lowerarm_'+side,'x',-.12-.6*drive);
   }
   if(gesture){
     rotate('upperarm_r','z',-.8*gesture);rotate('upperarm_r','x',-1.1*gesture);

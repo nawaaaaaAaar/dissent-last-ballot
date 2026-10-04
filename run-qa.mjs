@@ -8,14 +8,14 @@ try{
   const ctx=await browser.newContext({viewport:{width:1280,height:720}});
   const p=await ctx.newPage();p.on('pageerror',e=>errors.push(e.message));
   p.setDefaultTimeout(15000);p.setDefaultNavigationTimeout(15000);
-  await p.goto(process.env.DISSENT_URL||'http://127.0.0.1:5173',{waitUntil:'domcontentloaded'});
+  await p.goto(process.env.DISSENT_URL||'http://127.0.0.1:5173/runner.html',{waitUntil:'domcontentloaded'});
   await p.waitForFunction(()=>window.render_game_to_text,null,{timeout:15000});
   console.log('Desktop:',await desktopQA(p));
   await ctx.close();
   const mobile=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   const m=await mobile.newPage();m.on('pageerror',e=>errors.push(e.message));
   m.setDefaultTimeout(15000);m.setDefaultNavigationTimeout(15000);
-  await m.goto(process.env.DISSENT_URL||'http://127.0.0.1:5173',{waitUntil:'domcontentloaded'});
+  await m.goto(process.env.DISSENT_URL||'http://127.0.0.1:5173/runner.html',{waitUntil:'domcontentloaded'});
   await m.waitForFunction(()=>window.render_game_to_text,null,{timeout:15000});
   await m.tap('#start-btn');await m.tap('#skip-opening');await m.tap('[data-action=left]');await m.tap('#pause-btn');
   console.log('Mobile:',await mobileQA(m));

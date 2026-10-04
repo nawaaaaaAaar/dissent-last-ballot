@@ -1,68 +1,46 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171c1d">
-<meta name="description" content="Play DISSENT: The Last Ballot, a fictional 3D student-resistance runner for desktop and mobile. A first playable browser build, not a finished release.">
-<title>DISSENT: The Last Ballot | Play</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171d1c"><title>DISSENT | The Street Is Still Ours</title>
+<meta name="description" content="An explorable fictional resistance story around a source-referenced Jantar Mantar setting. Real-time 3D, desktop and touch controls.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./style.css?v=0.4.2">
+<link rel="stylesheet" href="./world.css?v=0.5.1">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
-<div id="viewport" aria-label="3D game view"></div>
-<div id="shade"></div>
-<div id="flash"></div>
+<div id="viewport" aria-label="Explorable 3D protest world"></div><div id="vignette"></div>
 <header class="topbar">
-  <a class="brand" href="./concept.html" aria-label="Read the Dissent concept"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<span class="build">REAL-TIME RESISTANCE / 0.4</span></span></a>
-  <div class="top-actions"><button id="sound-btn" aria-label="Enable sound" title="Sound">Sound off</button><button id="pause-btn" aria-label="Pause game" hidden>Pause</button></div>
+  <a class="brand" href="./concept.html" aria-label="Dissent design dossier"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<small>JANTAR MANTAR / WORLD 0.5</small></span></a>
+  <div class="top-actions"><button id="sound">Sound off</button><button id="pause" hidden>Pause</button></div>
 </header>
-<main>
-<section id="start-screen" class="screen">
-  <div class="title-panel">
-    <p class="eyebrow">New Delhi / Jantar Mantar protest context</p>
-    <h1>DISSENT<span>The Last Ballot.</span></h1>
-    <p class="intro">Break free. Refuse silence.<br>The state is on your heels.</p>
-    <p class="description">Patel Chowk. Sansad Marg. Jantar Mantar Road. Keep the footage and reach the independent archive.</p>
-    <button id="start-btn" class="primary" disabled>Building the street…</button>
-    <div id="loading-note" role="status">Loading the 3D engine</div>
-    <div class="settings-line"><label>Graphics <select id="quality"><option value="auto">Auto</option><option value="low">Mobile / low</option><option value="high">High</option></select></label><label class="check"><input id="reduced-motion" type="checkbox">Reduced motion</label><label class="check"><input id="assist" type="checkbox">Assist mode</label></div>
-    <details class="how"><summary>Controls &amp; mission</summary><p><strong>Phone:</strong> Swipe left/right to change lanes, up to jump, down to slide. Or use the large on-screen buttons. Tap the mission button during story moments.</p><p><strong>Keyboard:</strong> Arrow keys or A/D to move, Space/W to jump, S to slide. E to interact, P/Escape to pause.</p><p>Collect at least 3 evidence packets, preserve the journalist's footage, and reach the archive. Assist mode reduces collision damage. Nothing is saved when you close the page.</p></details>
-    <p class="disclosure">Fictional resistance story, not a reconstruction or official affiliation. The opening and gameplay are real-time 3D, with a skeletal human mesh. Still a prototype, not photorealistic or production-ready. The Delhi route is compressed.</p>
-    <a class="quiet-link" href="./concept.html">Research &amp; design dossier</a>
+<section id="menu">
+  <div class="menu-copy">
+    <p class="eyebrow">A fictional resistance story / New Delhi</p>
+    <h1>The street<br>is still ours.</h1>
+    <p class="lede">Walk the gathering. Stand with people.<br>Refuse the erasure of their account.</p>
+    <button id="start" class="primary" disabled>Preparing the world…</button>
+    <p id="loading" role="status">Loading the 3D engine…</p>
+    <div class="settings"><label>Graphics <select id="quality"><option value="auto">Auto</option><option value="low">Mobile / low</option><option value="high">High / ambient occlusion</option></select></label><label><input type="checkbox" id="reduced"> Reduced motion</label></div>
+    <details><summary>Movement &amp; story controls</summary><p>Desktop: WASD or arrow keys to walk. Shift to run, Space to jump, E to interact. Drag the scene to turn the camera; movement follows its direction. P/Escape pauses.</p><p>Phone: use the left joystick to move and drag the world to turn the camera. Run, jump and nearby interaction buttons are on screen. Complete the five connected story events; joining the protest is optional.</p></details>
+    <p class="disclosure">Rendered live in 3D. A source-referenced, compressed setting, not a surveyed map or reconstruction of actual incidents. Characters and story are fictional. Still a development build, not a finished photorealistic release.</p>
+    <a class="quiet" href="./concept.html">Research, design &amp; asset provenance</a>
   </div>
-  <div class="scene-caption"><span>NEW DELHI / MISSION 01</span><strong>Patel Chowk → Jantar Mantar</strong><span>900 game metres / compressed route</span></div>
+  <div class="menu-caption"><span>CHAPTER ONE / THE ACCOUNT</span><strong>Jantar Mantar Road</strong><span>A gathering that refuses to disappear.</span></div>
 </section>
-<section id="hud" hidden aria-label="Mission status">
-  <div class="mission-line"><span id="chapter">PATEL CHOWK</span><span id="distance">0 / 900 m</span></div>
-  <div class="route"><i id="route-progress"></i><b style="left:26.6%"></b><b style="left:63.8%"></b></div>
-  <div class="stats"><div><span>CONDITION</span><strong id="condition">100</strong><div class="health"><i id="health-bar"></i></div></div><div><span>EVIDENCE</span><strong id="evidence">0 <small>/ 3</small></strong></div><div><span>SOLIDARITY</span><strong id="solidarity">0</strong></div></div>
-  <div class="pursuit"><span>STATE PURSUIT</span><strong id="pursuit-label">Keep moving</strong><div><i id="pursuit-bar"></i></div></div>
+<section id="hud" hidden aria-label="Story progress">
+  <div class="objective"><span id="location">THE GATHERING</span><strong id="objective">Meet the organiser at the gathering</strong></div>
+  <div class="status"><div><span>STORY ACTS</span><strong id="story-count">0 / 5</strong></div><div><span>SOLIDARITY</span><strong id="solidarity">0</strong></div><div><span id="pressure">THE GATHERING</span><strong>OUR VOICES REMAIN</strong></div></div>
+  <div class="map-wrap"><canvas id="map" width="144" height="144" aria-label="Approximate game map with player and story markers"></canvas><small>GAME MAP / APPROX.</small></div>
 </section>
-<section id="opening" hidden aria-label="Fictional opening cinematic">
-  <video id="opening-video" hidden playsinline muted preload="none"></video>
-  <div class="opening-top"><span>REAL-TIME 3D / FICTIONAL SCENE</span><button id="skip-opening">Skip opening</button></div>
-  <div class="opening-copy"><p class="eyebrow">BREAK FREE</p><h2 id="opening-title">Custody is not consent.</h2><p id="opening-caption">A shattered window. A companion's hand. Refuse the crackdown.</p><button id="opening-action" class="primary">Resist</button><small>Rendered live by the game. Tap the action button or press E. Enter to skip.</small></div>
-</section>
-<div id="subtitle" role="status" aria-live="polite"></div>
-<section id="interaction" class="interaction" hidden>
-  <span class="eyebrow" id="interaction-kicker">STORY MOMENT</span><h2 id="interaction-title"></h2><p id="interaction-copy"></p><button id="interact-btn" class="primary">Continue</button>
-</section>
-<section id="pause-screen" class="modal" hidden>
-  <div class="modal-panel"><p class="eyebrow">Take a breath</p><h2>Paused.</h2><p>Your place on the route is held. Return when you're ready.</p><button id="resume-btn" class="primary">Resume mission</button><button id="restart-pause" class="secondary">Restart from the beginning</button><p class="small">Graphics and accessibility settings are on the title screen.</p><button id="menu-btn" class="text-btn">Return to title</button></div>
-</section>
-<section id="result-screen" class="modal" hidden>
-  <div class="modal-panel"><p class="eyebrow" id="result-kicker">MISSION COMPLETE</p><h2 id="result-title">The account survives.</h2><p id="result-copy"></p><div id="result-stats"></div><button id="retry-btn" class="primary">Run again</button><button id="restart-result" class="secondary" hidden>Restart mission</button><a href="./concept.html" class="quiet-link">Read the research behind the story</a></div>
-</section>
-<section id="error-screen" class="modal" hidden><div class="modal-panel"><h2>Couldn't start the 3D view.</h2><p id="error-message">This browser needs WebGL 2. Try a recent Chrome, Safari, or Firefox with graphics acceleration enabled.</p><button id="reload-btn" class="primary">Reload</button><a href="./concept.html" class="quiet-link">Read the concept instead</a></div></section>
-<div id="touch-controls" hidden aria-label="Touch controls">
-  <div class="steering"><button data-action="left" aria-label="Move left">←</button><button data-action="right" aria-label="Move right">→</button></div>
-  <div class="actions"><button data-action="slide" aria-label="Slide"><span>↓</span><small>SLIDE</small></button><button data-action="jump" aria-label="Jump"><span>↑</span><small>JUMP</small></button></div>
-</div>
-</main>
-<div id="performance">3D loading</div>
-<script type="module" src="./game.js?v=0.4.2"></script>
+<div id="toast" role="status" aria-live="polite"></div>
+<button id="interact" class="interact" hidden>Talk · E</button>
+<section id="dialog" class="modal" hidden><div class="dialog-panel"><p class="eyebrow" id="dialog-kicker"></p><h2 id="dialog-title"></h2><p id="dialog-copy"></p><button id="dialog-confirm" class="primary">Continue</button><button id="dialog-back" class="text-button">Keep exploring</button></div></section>
+<section id="pause-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">Your place is held</p><h2>Paused.</h2><p>Return to the gathering when you are ready. Progress stays in this play session only.</p><button id="resume" class="primary">Resume exploring</button><button id="restart" class="secondary">Restart the chapter</button><button id="title" class="text-button">Return to title</button></div></section>
+<section id="ending" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">The account / Chapter one</p><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="retry" class="primary">Continue from last story point</button><button id="again" class="secondary">Start a new chapter run</button><a class="quiet" href="./concept.html">Read the context and limits</a></div></section>
+<div id="controls" hidden><div id="joystick" aria-label="Touch movement joystick"><div id="stick"></div></div><div class="action-buttons"><button id="sprint">RUN</button><button id="jump">JUMP</button></div><span class="camera-hint">Drag the world to look</span></div>
+<div id="performance">3D LOADING</div>
+<script type="module" src="./world.js?v=0.5.1"></script>
 </body>
 </html>

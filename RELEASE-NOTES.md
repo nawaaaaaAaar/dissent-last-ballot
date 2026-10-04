@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.5: The Street Is Still Ours
+
+- Replaced the default runner with an explorable third-person street and gathering courtyard. Preserved the previous runner at `runner.html`.
+- Added camera-relative walking/running/jumping, drag-to-orbit camera, mobile joystick and contextual action controls.
+- Added five linked story encounters, an optional protest event, fictional barricade collapse, police pursuit, capture/retry and a chapter ending.
+- Authored separate rigged clothing meshes in Blender; added material-aware tree LODs, scanned paving/grass, HDR lighting and high-quality ambient occlusion.
+- Reviewed actual engine captures and revised foliage reduction, monument material, costume coverage, prop readability and crowd placement.
+- Passed deterministic desktop story and touch-control checks. Physical phone/Safari testing remains outstanding.
+- Remains a development build. Not photorealistic, not an exact map, not a simulated protest crowd, and not production-ready.
+
 ## v0.4: Real-time Resistance
 
 - Replaced the default AI-video opening with an actual game-rendered 3D opening and two player-triggered story inputs.

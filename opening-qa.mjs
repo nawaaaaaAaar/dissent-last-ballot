@@ -2,7 +2,7 @@ const {chromium}=await import('playwright');
 const {writeFile}=await import('node:fs/promises');
 const {default:assert}=await import('node:assert/strict');
 const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
-const base=process.env.DISSENT_URL||'http://127.0.0.1:5173';
+const base=process.env.DISSENT_URL||'http://127.0.0.1:5173/runner.html';
 const results={};
 const read=async p=>JSON.parse(await p.evaluate(()=>render_game_to_text()));
 try{

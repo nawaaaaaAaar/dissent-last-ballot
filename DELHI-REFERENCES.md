@@ -1,5 +1,15 @@
 # Delhi setting and visual references
 
+## v0.5 geographical anchors
+
+Delhi Tourism places Jantar Mantar on Parliament Street in Connaught Place and identifies Patel Chowk as the nearest metro station. [Delhi Tourism](https://delhitourism.gov.in/tourist_place/jantar_mantar.html).
+
+The observatory's Samrat Yantra triangular sundial and Rama Yantra open-cylinder forms inform the original in-game geometry; they are not scanned meshes. [Jantar Mantar, New Delhi overview](https://en.wikipedia.org/wiki/Jantar_Mantar,_New_Delhi).
+
+The protest gathering is placed on the street side of a fenced observatory compound. Reporting describes the road opposite the observatory as the demonstration space. [National Herald's description of the protest site](https://www.nationalheraldindia.com/amp/story/politics/jantar-mantar-is-a-police-cantonment-no-freedom-of-expression-here-any-more).
+
+These sources anchor place and form, not every building position, distance or event. The playable road/courtyard/assembly area is a compressed authored level, not GPS-accurate geography or real protest footage.
+
 v0.2 replaces the generic-city setting with a Delhi-grounded art pass. Real place names and public-facing equipment appearance are sourced; gameplay positions, distances, characters, signs, clashes, and the archive are dramatised.
 
 ## Route and streets

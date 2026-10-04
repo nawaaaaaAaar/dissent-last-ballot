@@ -1,5 +1,17 @@
 # QA and limitations
 
+## v0.5 explorable world
+
+`world-qa.mjs` tests the current default world. `qa/world-results.json` records the full five-act chapter, optional protest, jump, pause/resume, police capture, checkpoint recovery, restart and orbit camera through actual keyboard/click input with deterministic stepping.
+
+Mobile Chromium emulation exercises real CDP touch movement on the joystick, camera drag, jump/run buttons, sound after a touch swipe, pause/resume and portrait/landscape layout. This is not physical-device certification. A first landscape screenshot was blank because a late resize cleared the manual-step render; the capture procedure now waits for resize before drawing again.
+
+Actual captures are named `world-final-*` and `world-mobile-*`. Intermediate `world-review-*` captures are retained to document the self-review. `VISUAL-REVIEW.md` records specific faults and corrections rather than declaring the realism target complete.
+
+Run `npm start`, then `npm test`. Long walking segments use fixed simulation stepping to avoid repeatedly rendering every short input interval on software GPUs. The QA hooks freeze normal time; `resumeRealTime()` restores normal gameplay. Reported QA-step FPS is not a performance benchmark.
+
+Current limits: no persistent save, complex crowd/companion AI, authored mocap, physical destruction, spatial ambience or facial performance. The old opening/runner tests below are historical and must target `runner.html`, not the new world entry page.
+
 ## v0.4 real-time opening and visual pass
 
 The new opening is rendered live by Three.js, not a video. Tests cover the Resist input, glass-effect transition, companion-hand input, pause/resume and handoff to the three-pursuer run, on desktop and mobile emulation. `qa/opening-results.json` records those results and a forced human-asset-load failure with primitive-character fallback.
