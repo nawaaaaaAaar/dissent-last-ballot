@@ -50,7 +50,41 @@ def human():
         for p in obj.data.polygons:p.use_smooth=True
         obj.select_set(False)
         return obj
-    garment('Shirt',lambda n,v: any(t in n for t in ['spine','clavicle','upperarm','lowerarm']) or (n=='pelvis' and v.z>.93),shirt,.04)
+    # Continuous cloth topology avoids ragged edges from deleting body vertices
+    # according to their dominant skin-weight group.
+    verts=[];faces=[];weights=[]
+    def strip(rings,axis):
+        start=len(verts);segments=32
+        for center,rx,ry,ws in rings:
+            for i in range(segments):
+                angle=i*math.tau/segments
+                fold=.0015*math.sin(angle*7+center[2]*9)
+                if axis=='z':v=(center[0]+(rx+fold)*math.cos(angle),center[1]+(ry+fold)*math.sin(angle),center[2])
+                else:v=(center[0],center[1]+(rx+fold)*math.cos(angle),center[2]+(ry+fold)*math.sin(angle))
+                verts.append(v);weights.append(ws)
+        for j in range(len(rings)-1):
+            for i in range(segments):
+                a=start+j*segments+i;b=start+j*segments+(i+1)%segments
+                faces.append((a,b,b+segments,a+segments))
+    rings=[]
+    for z,rx,ry,bone in [(.89,.26,.20,'pelvis'),(.96,.258,.195,'pelvis'),(1.05,.24,.175,'spine_01'),(1.16,.23,.165,'spine_02'),(1.29,.245,.17,'spine_03'),(1.43,.26,.16,'spine_03'),(1.49,.25,.15,'spine_03'),(1.55,.095,.085,'neck_01')]:
+        rings.append(((0,.018,z),rx,ry,{bone:1}))
+    strip(rings,'z')
+    for side,sign in [('l',1),('r',-1)]:
+        rings=[]
+        for x,r in [(.19,.095),(.25,.098),(.34,.095),(.43,.09),(.48,.085),(.56,.079),(.65,.07),(.704,.065)]:
+            t=max(0,min(1,(x-.43)/.10))
+            rings.append(((sign*x,.067,1.456),r,r,{f'upperarm_{side}':1-t,f'lowerarm_{side}':t}))
+        if sign<0:rings.reverse()
+        strip(rings,'x')
+    mesh=bpy.data.meshes.new('Tailored continuous shirt');mesh.from_pydata(verts,[],faces);mesh.update()
+    obj=bpy.data.objects.new('Shirt',mesh);bpy.context.collection.objects.link(obj);mesh.materials.append(shirt)
+    for bone in {n for ws in weights for n in ws}:
+        vg=obj.vertex_groups.new(name=bone)
+        for i,ws in enumerate(weights):
+            if ws.get(bone,0)>0:vg.add([i],ws[bone],'REPLACE')
+    for p in mesh.polygons:p.use_smooth=True
+    mod=obj.modifiers.new('Character skeleton','ARMATURE');mod.object=arm;obj.parent=arm
     garment('Trousers',lambda n,v: any(t in n for t in ['thigh','calf']) or n=='pelvis',denim,.033)
     def rigged_primitive(name,verts,faces,mat,bone):
         mesh=bpy.data.meshes.new(name);mesh.from_pydata(verts,[],faces);mesh.update()

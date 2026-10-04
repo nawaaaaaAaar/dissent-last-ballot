@@ -20,9 +20,15 @@ The scattered cubes were replaced with an aid table's bottles, a first-aid case,
 
 Final captures include the street, aid point, barricade, ending and mobile layouts in `qa/world-final-*` and `qa/world-mobile-*`. These are actual Three.js gameplay captures. The generated limewash image is only a surface texture, not a promotional render substituted for game graphics.
 
+## Iteration: close-up costume review
+
+The closer aid-point view exposed ragged shirt topology left by extracting vertices from the body mesh. Removing underlying body triangles alone did not fix it. A continuous ring-based shirt with explicit torso and sleeve weights replaced that extraction, and the lower garment fit was widened to avoid trouser intersections. Aid signage was moved clear of the canopy, and base terrain was added to prevent gaps when orbiting near the courtyard edge.
+
+`qa/world-clothing-review.png` preserves the defective intermediate costume view, not the final art target. This additional check is why a wide screenshot alone is insufficient evidence of finished clothing.
+
 ## Remaining gaps
 
-- **Characters:** Generic base anatomy and faces remain too simplified. Clothing shells can still read as sculpted anatomy rather than naturally draped fabric; the backpack and hair remain visibly simplified.
+- **Characters:** Generic base anatomy and faces remain too simplified. Clothing lacks realistic fabric drape and detailed folds; the backpack and hair remain visibly simplified.
 - **Animation:** Bone-driven procedural walking lacks authored transitions, convincing foot contact and character performance.
 - **Environment:** The street has better scale cues and surface response, but façades repeat and the observatory geometry is approximate. It is not a photogrammetric Jantar Mantar reconstruction.
 - **Foliage:** The adapted tree has a relatively sparse silhouette, particularly in mobile LOD. Further reduction cannot be treated as free visual quality.

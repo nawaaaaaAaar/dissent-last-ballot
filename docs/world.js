@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.2';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.2';
+import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.3';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.3';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.2';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.3';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -50,6 +50,7 @@ function ground(mat,x,z,w,d,y=0){
   const mesh=new THREE.Mesh(geo,mat);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,y,z);mesh.receiveShadow=true;scene.add(mesh);return mesh;
 }
 function buildWorld(){
+  ground(M.sand,0,0,180,180,-.08);
   ground(M.road,0,-7,20,96,.01);ground(M.paving,-19,5,18,36,.15);
   ground(M.paving,-10.2,-7,1.5,96,.16);ground(M.paving,10.2,-7,1.5,96,.16);
   ground(M.sand,29,-12,36,110,-.03);
@@ -83,8 +84,8 @@ function buildWorld(){
   for(let z=-45;z<37;z+=5)box(stat,M.white,0,.026,z,.095,.009,2.2);
   for(let z=-47;z<36;z+=3)for(let x of [-9.9,9.9])box(stat,z%2?M.dark:M.white,x,.18,z,.15,.25,1.5);
   for(let z of [-38,-5,17]){bench(stat,-10,z,Math.PI/2);bench(stat,10,z,-Math.PI/2);}
-  tent(stat,-23,3);sign(stat,'FIRST AID',-23,2.94,4.84,3.5,.65,'#d3c6ab','#744637','COMMUNITY SUPPORT');
-  tent(stat,-24,-7);sign(stat,'PUBLIC RECORD',-24,2.94,-5.16,3.5,.65,'#d3c6ab','#744637','KEEP THE ACCOUNT INTACT');
+  tent(stat,-23,3);sign(stat,'FIRST AID',-23,2.62,5.28,3.5,.65,'#d3c6ab','#744637','COMMUNITY SUPPORT');
+  tent(stat,-24,-7);sign(stat,'PUBLIC RECORD',-24,2.62,-4.72,3.5,.65,'#d3c6ab','#744637','KEEP THE ACCOUNT INTACT');
   const arch=observatory();arch.position.set(32,0,-17);arch.rotation.y=.08;stat.add(arch);
   for(let z of [13,31]){const r=ramaYantra();r.position.set(37,0,z);stat.add(r);}
   for(let x=17;x<44;x+=3){box(stat,M.sand,x,.08,-35,2.7,.16,1.6);box(stat,M.cream,x,.15,-35,.4,.30,.5);}
