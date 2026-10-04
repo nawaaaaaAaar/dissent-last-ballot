@@ -35,8 +35,8 @@
     "treeAsset": true,
     "fps": 0,
     "rendering": {
-      "draws": 304,
-      "triangles": 690346
+      "draws": 305,
+      "triangles": 642936
     },
     "events": [
       {
@@ -117,8 +117,8 @@
     "treeAsset": true,
     "fps": 0,
     "rendering": {
-      "draws": 310,
-      "triangles": 770358
+      "draws": 311,
+      "triangles": 722948
     },
     "events": [
       {

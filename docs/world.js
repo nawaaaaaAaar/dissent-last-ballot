@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.3';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.3';
+import {human,loadHuman,poseHuman} from './visuals.js?v=0.5.4';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.5.4';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.3';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.5.4';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -42,7 +42,17 @@ async function materials(){
   M.road=new THREE.MeshStandardMaterial({map:road,normalMap:norm,roughnessMap:rough,color:'#b4b5ac',roughness:.98,normalScale:new THREE.Vector2(.3,.3)});
   M.cream.map=lime;M.cream.normalMap=wallN;M.cream.roughnessMap=wallR;M.cream.normalScale=new THREE.Vector2(.14,.14);
   M.red.map=lime.clone();M.red.map.repeat.set(.16,.16);M.red.normalMap=wallN;M.red.normalScale=new THREE.Vector2(.09,.09);M.red.color.set('#b5573c');
-  M.paving=new THREE.MeshStandardMaterial({map:wall,normalMap:wallN,roughness:1,color:'#b6b2a2',normalScale:new THREE.Vector2(.25,.25)});
+  const slab=document.createElement('canvas');slab.width=slab.height=512;
+  const c=slab.getContext('2d');c.fillStyle='#555854';c.fillRect(0,0,512,512);
+  for(let row=0;row<4;row++)for(let col=-1;col<3;col++){
+    const x=col*256+(row%2)*128,y=row*128,v=148+((row*13+col*7+21)%17);
+    c.fillStyle=`rgb(${v},${v+2},${v})`;c.fillRect(x+2,y+2,252,124);
+    c.strokeStyle='rgba(238,238,223,.24)';c.strokeRect(x+3,y+3,249,121);
+  }
+  const data=c.getImageData(0,0,512,512);
+  for(let i=0;i<data.data.length;i+=4){const n=(rand()-.5)*12;for(let j=0;j<3;j++)data.data[i+j]+=n;}
+  c.putImageData(data,0,0);const paving=new THREE.CanvasTexture(slab);paving.colorSpace=THREE.SRGBColorSpace;paving.wrapS=paving.wrapT=THREE.RepeatWrapping;paving.anisotropy=4;
+  M.paving=new THREE.MeshStandardMaterial({map:paving,normalMap:wallN,roughness:.98,color:'#dbdcd5',normalScale:new THREE.Vector2(.1,.1)});
   M.grass=new THREE.MeshStandardMaterial({map:grass,normalMap:grassN,color:'#a1b184',roughness:1,normalScale:new THREE.Vector2(.25,.25)});
 }
 function ground(mat,x,z,w,d,y=0){
@@ -277,6 +287,7 @@ function map(){
 }
 function render(){
   if(!renderer||!player)return;
+  renderer.info.reset();
   const menu=s.mode==='menu';
   const target=new THREE.Vector3(s.x,s.y+1.45,s.z);
   const distance=coarse?6.5:7.0;
@@ -346,7 +357,7 @@ async function init(){
   bindings();
   try{
     scene=new THREE.Scene();scene.fog=new THREE.Fog('#b3b5aa',55,135);scene.background=new THREE.Color('#bcc5c7');
-    renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;
+    renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.info.autoReset=false;
     renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();manual=true;toast('Graphics context interrupted. Reload the page to recover this development build.',60);});
     renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.9;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     $('viewport').appendChild(renderer.domElement);
