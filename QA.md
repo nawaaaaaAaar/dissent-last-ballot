@@ -2,6 +2,10 @@
 
 ## v0.6 The Account
 
+The public GitHub Pages frontend commit `4d34f67` (`world.js?v=0.6.1`) was checked in cloud Chromium through supplies, recorder recovery, the public handoff choice, rally pause/resume and three successful beats, companion help and the completed assembly ending. Public low-graphics mobile emulation used actual touch input for start and joystick travel, then portrait/landscape captures with no horizontal overflow. `qa/v06-public-results.json` and `qa/v06-public-*` retain these checks. Deterministic stepping was used; reported FPS is not a hardware benchmark.
+
+The Perplexity preview is also deployed. Its isolated iframe can deny browser storage; storage calls are caught, so play continues without a persistent checkpoint in that environment. Persistent browser checkpoints should be evaluated on the public GitHub Pages build.
+
 `npm test` passed after the character, story and animation overhaul. `qa/world-results.json` records v0.6 with no page errors. Actual keyboard/click inputs cover supply collection, the recorder, optional story fragments, journal review and difficulty changes, local checkpoint restoration after reload, the protest event, rhythm misses and three successful inputs, capture/retry, companion help, both handoff endings, restart and orbit controls.
 
 The first final run found that the rhythm overlay intercepted the visible Pause button. Header stacking and panel spacing were corrected; the rerun pauses and resumes during that encounter. `qa/v06-first-test-failure.log` and `qa/v06-test-run.log` retain the failure and successful rerun. Movement timings were updated after tuning walking to 1.8 and running to 4.6 game metres per second; the mobile movement assertion was also corrected for the slower walk.
