@@ -1,5 +1,11 @@
 Original prompt: Build DISSENT: The Last Ballot as a playable 3D student-resistance runner and make it playable on mobile phones. Push work to GitHub and the public link.
 
+## v0.14 active: a connected Delhi and a repeatable game
+
+Latest request: gameplay first, graphics next pass; make people want to return; expand to actual central Delhi including India Gate, Jantar Mantar, CP and verified recent protest approaches.
+
+QA inventory: OSM road/footprint extraction and projected landmarks; CP-to-Jantar route in normal browser time; exit must not teleport unrescued Kabir; rescue, courier and three-wave rally through actual controls; delivery needs low heat and companion; operation win and return-to-board; three distinct jobs unlock charter, charter advances cycle; repeat approach variant; credits/upgrade purchase and retained effect; save-code export/restore and malformed input; no active-operation overwrite; pause/guide freeze; free roam/abandon; vehicle failure/checkpoint; road/building collision; actual touch movement/striking/boarding/map/selection in portrait and landscape; desktop/mobile screenshots and supplied client. Public deployment version must match final code. Physical phones, Safari, full graphics realism and independent enjoyment remain unverified.
+
 ## v0.9 current movement request
 
 Refocus on the current vote-chori movement, Gyanesh Kumar, SIR and inclusion of eligible voters in affected states, including after elections. Preserve mobile exploration and action; add actual record-comparison decisions and a three-part reform demand, not just slogans.

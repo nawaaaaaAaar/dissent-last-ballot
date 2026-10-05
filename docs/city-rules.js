@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.0';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.1';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -110,7 +110,7 @@ export class City{
     if(this.mode!=='playing')return;
     const p=this.player,v=this.van;
     if(v.occupied){
-      for(const side of[-1,1]){const x=v.x+Math.cos(v.yaw)*2.3*side,z=v.z-Math.sin(v.yaw)*2.3*side;if(this.valid(x,z)){v.occupied=false;v.speed=0;p.x=x;p.z=z;this.friend.aboard=false;this.friend.x=x+1;this.friend.z=z+1;this.say('On foot. Your van stays here.');return;}}
+      for(const side of[-1,1]){const x=v.x+Math.cos(v.yaw)*2.3*side,z=v.z-Math.sin(v.yaw)*2.3*side;if(this.valid(x,z)){v.occupied=false;v.speed=0;p.x=x;p.z=z;this.friend.aboard=false;if(this.friend.rescued){this.friend.x=x+1;this.friend.z=z+1;}this.say('On foot. Your van stays here.');return;}}
       this.say('Move away from the wall to exit.');return;
     }
     const n=this.nearby();
@@ -151,7 +151,7 @@ export class City{
     const m=this.mission,c=this.checkpoint;if(!m){this.start();return;}
     const spec=m.id,style=m.style;this.abandon();this.accept(spec,style);
     this.player.health=6;this.van.health=100;this.player.hurt=2;
-    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;this.friend.x=c.x;this.friend.z=c.z;this.gate.hp=c.gate;this.hold=c.hold;this.checkpoint=c;}
+    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.checkpoint=c;}
     this.say('Checkpoint restored. Earned upgrades remain. Try a different approach.');
   }
   upgrade(id){const prices={tempo:4,reinforce:4,stamina:3};if(!prices[id]||this.network.upgrades.includes(id)||this.network.credits<prices[id])return false;this.network.credits-=prices[id];this.network.upgrades.push(id);return true;}
@@ -201,7 +201,7 @@ export class City{
       if(sight){visible=true;e.last={x:p.x,z:p.z};this.lastSeen={...e.last};}
       if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.cooldown=1.8;if(d<2.5&&!v.occupied)this.hurt();}continue;}
       if(!v.occupied&&d<2.1&&e.cooldown<=0){e.windup=this.mission?.style==='hard'?.55:.8;continue;}
-      if(d<1.6&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else this.chase(e,sight?p:this.hidden<6?e.last:e.home,dt,this.mission?.style==='hard'?3.4:2.6);
+      if(d<1.6&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else this.chase(e,sight?p:this.hidden<6?e.last:e.home,dt,(this.mission?.style==='hard'?3.4:2.6)+Math.max(0,(this.mission?.tier||1)-1)*.2);
     }
     for(let a=0;a<5;a++)for(let b=a+1;b<5;b++){const e=this.enemies[a],f=this.enemies[b],d=dist(e,f);if(e.hp>0&&f.hp>0&&d<.9){const dx=(e.x-f.x)/(d||1),dz=(e.z-f.z)/(d||1);this.move(e,dx*dt,dz*dt);this.move(f,-dx*dt,-dz*dt);}}
     if(this.car.active){
