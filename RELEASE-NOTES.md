@@ -1,5 +1,13 @@
 # DISSENT release notes
 
+## v0.11: Learn the Route
+
+- Added an optional seven-action safe practice lesson and a scrollable winning guide, accessible from the title and Pause.
+- Added two licensed generic adult avatar bases to the previous two, with kurta/long-tunic clothing alongside casual outfits. Adapted the kurta avatar with original short dark hair, and adjusted the earlier woman's hair material. The named cast is fictionally Indian; costumes do not establish nationality.
+- Extracted the running rules into reusable `sprint-controller.js`, integrated with both desktop and mobile inputs.
+- Added a grid-route fallback for pursuers blocked by world geometry.
+- Kept the electoral-resistance story and three action chapters. No new claim of production-quality graphics, exact maps or verified phone performance.
+
 ## v0.10: Signal Run
 
 - Replaced compulsory voter-case quizzes with automatic packet pickups and direct help interactions. Optional cases remain in the journal.

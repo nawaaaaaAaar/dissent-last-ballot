@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {sprintAllowed,updateStamina} from './sprint-controller.js?v=0.11.0';
 
 // Fictional, deliberately abstract action rules. No realistic sabotage mechanics.
 export class ActionGame {
@@ -13,7 +14,7 @@ export class ActionGame {
     this.active=active;this.health=5;this.stamina=100;this.dodge=0;this.cooldown=0;this.hurt=0;this.time=0;this.sweep=0;this.charge=0;
     this.rescued=[];this.barrier=0;this.holding=false;this.hold=0;this.score=0;this.warning.visible=false;this.finish=false;
   }
-  get sprintAllowed(){if(this.stamina<=5)this.exhausted=true;if(this.stamina>=30)this.exhausted=false;return !this.exhausted;}
+  get sprintAllowed(){return sprintAllowed(this);}
   evade() {
     if(!this.active||this.cooldown>0)return false;
     this.dodge=.48;this.cooldown=2.3;this.h.tone(420,.08);return true;
@@ -81,7 +82,7 @@ export class ActionGame {
   update(dt,s,near,police,moving) {
     if(!this.active||this.finish)return;
     this.time+=dt;this.cooldown=Math.max(0,this.cooldown-dt);this.dodge=Math.max(0,this.dodge-dt);this.hurt=Math.max(0,this.hurt-dt);
-    this.stamina=Math.max(0,Math.min(100,this.stamina+(s.sprint&&moving?-18:13)*dt));
+    updateStamina(this,dt,s.sprint,moving);
     if(s.pressure)this.sweep+=dt;
     if(this.sweep>9&&this.charge===0){this.charge=1.6;this.warning.position.set(s.x,.2,s.z);this.warning.visible=true;this.h.tone(180,.1);}
     if(this.charge>0) {

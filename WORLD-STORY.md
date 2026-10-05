@@ -1,5 +1,11 @@
 # DISSENT: The Account
 
+## v0.11 cast and first-player onboarding
+
+Aman is explicitly an Indian student volunteer, not an unnamed generic courier. His search for Kabir connects him to Mira's gathering, Dev's aid work, Sana's controlled account and Iqbal's assembly demand. The invented network carries records and people into invented state help camps. It represents several everyday clothing choices rather than treating any single costume, religion or skin tone as “Indian”.
+
+The optional safe-practice lesson explains actions before pursuit. The winning guide explains each chapter's conditions, including holding actions, waiting for companions and staying inside the final gathering zone. These clarify the existing story and rules; they do not add a new chapter or claim real political outcomes.
+
 ## Current campaign: Signal Run
 
 v0.10 shifts the same fictional movement story into action. Aman carries record packets through pursuit rather than stopping for compulsory case quizzes. Jantar combines collection, a recorder, a fictional breakthrough and Kabir's reunion. Bihar combines collection with an obstacle-aware two-person escort. Bengal combines collection, direct help and a timed gathering hold inside a marked zone.

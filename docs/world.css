@@ -63,3 +63,8 @@ body.action-play #inventory,body.action-play #action-hud>div:last-child{display:
   body.action-play #street-hud{top:150px;bottom:auto}
   body.action-play #action-warning{top:80px;left:auto;right:16px;transform:none;max-width:220px}
 }
+#lesson-tip{position:fixed;right:20px;bottom:110px;width:min(340px,calc(100vw - 40px));padding:16px;background:rgba(22,32,29,.96);border:1px solid #8aab98;z-index:20;color:#f2e9d7}
+#lesson-tip strong{font-size:13px;letter-spacing:.07em}#lesson-tip p{font-size:15px;line-height:1.45;margin:8px 0}#lesson-tip button{padding:8px 12px}
+.guide-panel{max-width:760px}.guide-panel h3{margin-top:28px}.guide-panel li{font-size:16px;line-height:1.5;margin:8px 0}.guide-buttons{display:flex;gap:10px;flex-wrap:wrap}
+@media(pointer:coarse){#lesson-tip{top:245px;bottom:auto;left:16px;right:auto;width:calc(100vw - 32px)}}
+@media(pointer:coarse) and (max-height:500px){#lesson-tip{top:75px;left:35%;width:34%;padding:10px}#lesson-tip p{font-size:12px}}

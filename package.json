@@ -1,6 +1,6 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "description": "Explorable third-person protest-world chapter with mobile controls",
@@ -10,6 +10,7 @@
     "test:action": "node street-qa.mjs",
     "test:action:historical": "node action-qa.mjs",
     "test:campaign": "node street-qa.mjs",
+    "test:tutorial": "node tutorial-qa.mjs",
     "test:runner": "node run-qa.mjs"
   },
   "dependencies": {

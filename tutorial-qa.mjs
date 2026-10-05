@@ -1,0 +1,51 @@
+import {chromium} from 'playwright';
+import {mkdir,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import {sprintAllowed,wantsSprint,updateStamina} from './docs/sprint-controller.js';
+const rules={stamina:100,exhausted:false};
+assert(wantsSprint({touch:true,stickMagnitude:.9}));
+assert(!wantsSprint({touch:true,stickMagnitude:.6}));
+updateStamina(rules,6,true,true);assert.equal(rules.stamina,0);assert(!sprintAllowed(rules));
+updateStamina(rules,3,false,false);assert(sprintAllowed(rules));assert.equal(rules.stamina,39);
+const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
+const errors=[],checks=[];
+const tick=(p,ms)=>p.evaluate(ms=>advanceTime(ms),ms);
+const state=p=>p.evaluate(()=>JSON.parse(render_game_to_text()));
+async function walk(p,x,z){
+  for(let i=0;i<50;i++){const v=await state(p),dx=x-v.position.x,dz=z-v.position.z;
+    if(Math.hypot(dx,dz)<.35)return;
+    const k=Math.abs(dx)>.25?(dx>0?'d':'a'):(dz>0?'s':'w'),d=Math.abs(dx)>.25?Math.abs(dx):Math.abs(dz);
+    await p.keyboard.down(k);await tick(p,Math.min(5000,d/2.6*1000));await p.keyboard.up(k);
+  }throw Error('Blocked practice route');
+}
+try{
+  await mkdir('qa/v11',{recursive:true});
+  const ctx=await browser.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage();
+  p.on('pageerror',e=>errors.push(e.message));
+  await p.goto((process.env.DISSENT_URL||'http://127.0.0.1:5173/')+'?quality=low&qa=tutorial');
+  await p.waitForFunction(()=>typeof render_game_to_text==='function',null,{timeout:120000});await tick(p,0);
+  await p.locator('#learn').click();assert.equal((await state(p)).mode,'guide');
+  await p.locator('#practice').click();assert.equal((await state(p)).pressure,0);
+  await p.keyboard.down('w');await tick(p,900);await p.keyboard.up('w');assert.equal((await state(p)).tutorial.stage,1);
+  await p.keyboard.down('Shift');await p.keyboard.down('w');await tick(p,300);await p.keyboard.up('w');await p.keyboard.up('Shift');assert.equal((await state(p)).tutorial.stage,2);
+  await p.keyboard.press('Space');await tick(p,100);assert.equal((await state(p)).tutorial.stage,3);await tick(p,700);
+  await p.keyboard.press('q');await tick(p,100);assert.equal((await state(p)).tutorial.stage,4);await tick(p,600);
+  await p.keyboard.press('f');await tick(p,100);assert.equal((await state(p)).tutorial.stage,5);
+  await walk(p,0,16);await walk(p,3,16);assert.equal((await state(p)).tutorial.stage,6);
+  await walk(p,-3,16);await walk(p,-3,24);await p.keyboard.down('e');await tick(p,1100);await p.keyboard.up('e');
+  assert.equal((await state(p)).mode,'guide');assert.equal((await state(p)).tutorial.stage,7);assert.equal(Object.keys((await state(p)).campaign).length,0);
+  assert((await p.locator('#lesson-result').textContent()).includes('Practice complete'));
+  await p.screenshot({path:'qa/v11/tutorial-complete.png'});
+  await p.locator('#guide-play').click();assert.equal((await state(p)).mode,'playing');assert.equal((await state(p)).pressure,1);assert.equal((await state(p)).street.packets.length,0);
+  assert.equal((await state(p)).cast.avatarModels,4);checks.push('Seven actual-input practice steps, no pursuit or saved campaign; clean campaign start; four avatar models; sprint exhaustion/recovery rules');
+  await p.locator('#pause').click();await p.locator('#guide-pause').click();const t=(await state(p)).action.time;await tick(p,2000);assert.equal((await state(p)).action.time,t);
+  await p.locator('#guide-close').click();assert.equal((await state(p)).mode,'paused');await p.locator('#resume').click();
+  checks.push('Guide opens from pause, freezes action and returns to pause without losing place');
+  const mobile=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true}),m=await mobile.newPage();
+  m.on('pageerror',e=>errors.push(e.message));await m.goto('http://127.0.0.1:5173/?quality=low&qa=phone-guide');
+  await m.waitForFunction(()=>typeof render_game_to_text==='function',null,{timeout:120000});await tick(m,0);
+  await m.locator('#learn').tap();await m.locator('#practice').tap();await m.screenshot({path:'qa/v11/mobile-practice.png'});
+  await m.locator('#lesson-exit').tap();assert.equal((await state(m)).mode,'guide');await m.locator('#guide-close').tap();assert.equal((await state(m)).mode,'menu');
+  await m.locator('#start').tap();assert.equal((await state(m)).pressure,1);checks.push('Phone guide/practice/exit/fresh-start touch flow');
+  assert.deepEqual(errors,[]);await writeFile('qa/v11/tutorial-results.json',JSON.stringify({pass:true,checks,errors},null,2));console.log(JSON.stringify({pass:true,checks,errors}));
+}finally{await browser.close();}

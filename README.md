@@ -1,6 +1,14 @@
 # DISSENT: The Last Ballot
 
-A mobile-first, third-person resistance adventure about the current vote-chori/SIR movement. **v0.10: Signal Run** makes movement, pickups, readable pursuit and live help the main campaign. It is a playable prototype, not a finished photorealistic release.
+A mobile-first, third-person resistance adventure about the current vote-chori/SIR movement. **v0.11: Learn the Route** adds safe practice, a winning walkthrough, a more varied fictional Indian cast and reusable sprint source. It is a playable prototype, not a finished photorealistic release.
+
+## Start here
+
+Choose **Learn to play & win**, then **Practise the controls**. Complete seven actions without pursuit, then start a fresh campaign. The same guide is available from Pause. Read [the complete winning route and sprint-code example](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md).
+
+The cast now mixes four licensed generic avatar bases with casual clothing, kurtas and long tunics. Aman and the other named characters are explicitly fictional Indian characters; these are not scans of real protesters, and nationality is not inferred from clothing or appearance. The kurta avatar has project-authored short hair instead of the source cap. The wardrobe and hair changes improve variety but do not amount to a finished custom character-art pipeline.
+
+The running mechanic is available as [sprint-controller.js](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/docs/sprint-controller.js) and is used by the playable game, not merely supplied as an unrelated example. Pursuers now try a grid route when direct movement is blocked. Existing campaign objectives remain below.
 
 ## Current game: Signal Run
 

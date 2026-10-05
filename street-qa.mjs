@@ -29,14 +29,14 @@ async function use(p,id,ms=0){
   assert.notEqual((await state(p)).mode,'review','No mandatory quiz should open');
 }
 try{
-  await mkdir('qa/v10',{recursive:true});
+  await mkdir('qa/v11',{recursive:true});
   const ctx=await browser.newContext({viewport:{width:1280,height:800}}),p=await ready(ctx);
   await p.locator('#start').click();await tick(p,0);await slow(p);assert.equal((await state(p)).action.active,true);
   const before=await state(p);await p.keyboard.press('f');const after=await state(p);
   assert.equal(after.street.pulses,1);assert.equal(after.street.energy,before.street.energy-30);
   assert(after.officers.some(a=>a.stun>0));assert(after.police.some((a,i)=>Math.hypot(a.x-before.police[i].x,a.z-before.police[i].z)>1));
   await p.keyboard.press('f');assert.equal((await state(p)).street.pulses,1);
-  await p.screenshot({path:'qa/v10/rally.png'});checks.push('Rally costs energy, creates actual space/stun and cannot bypass cooldown');
+  await p.screenshot({path:'qa/v11/rally.png'});checks.push('Rally costs energy, creates actual space/stun and cannot bypass cooldown');
   await walk(p,-3,31);await walk(p,-3,24);await use(p,'organiser',1100);
   assert((await state(p)).action.rescued.includes('organiser'));assert.equal((await state(p)).electoral.reviewed.length,0);
   await walk(p,3,24.2);
@@ -48,7 +48,7 @@ try{
   await walk(p,4.4,7);await walk(p,4.4,-14);await walk(p,3,-14);assert.equal((await state(p)).street.packets.length,3);await use(p,'recorder');
   await walk(p,0,-14);await walk(p,0,-29.6);await walk(p,-3,-29.6);await use(p,'barrier',2000);
   await walk(p,-6,-29.6);await walk(p,-6,-36);await use(p,'companion');await walk(p,-2,-36);await walk(p,-2,-45);await use(p,'assembly');
-  assert.equal((await state(p)).mode,'won');await p.screenshot({path:'qa/v10/jantar-ending.png'});
+  assert.equal((await state(p)).mode,'won');await p.screenshot({path:'qa/v11/jantar-ending.png'});
   checks.push('Auto-pickup packets, recorder, breakthrough, companion and Jantar completion with zero case quizzes');
   await p.locator('#next-district').click();await slow(p);
   await walk(p,-18,31);await walk(p,-18,20);await use(p,'organiser',1100);
@@ -64,12 +64,12 @@ try{
   await walk(p,-18,12);await walk(p,18,12);await walk(p,18,5);await use(p,'aid',1100);
   await walk(p,4,5);await walk(p,4,-18);await walk(p,-18,-18);await use(p,'protest',1100);
   assert.equal((await state(p)).street.packets.length,3);const outside=(await state(p)).action.settle;await tick(p,1000);assert.equal((await state(p)).action.settle,outside);
-  await walk(p,-6,-18);await walk(p,-6,-36);await p.screenshot({path:'qa/v10/gathering-zone.png'});
+  await walk(p,-6,-18);await walk(p,-6,-36);await p.screenshot({path:'qa/v11/gathering-zone.png'});
   for(let i=0;i<4&&(await state(p)).action.settle<20;i++){await walk(p,6,-36);await walk(p,-6,-36);}
   assert.equal((await state(p)).action.settle,20);await walk(p,0,-36);await use(p,'assembly');
   assert.equal((await state(p)).mode,'won');assert.equal(Object.keys((await state(p)).campaign).length,3);
   assert.deepEqual((await state(p)).electoral.mandate,['accountability','sir','inclusion']);
-  await p.screenshot({path:'qa/v10/campaign-ending.png'});checks.push('Sustain progresses only inside the gathering; full campaign ends with no required charter quiz');
+  await p.screenshot({path:'qa/v11/campaign-ending.png'});checks.push('Sustain progresses only inside the gathering; full campaign ends with no required charter quiz');
   await p.reload({waitUntil:'domcontentloaded'});await p.waitForFunction(()=>typeof render_game_to_text==='function',null,{timeout:120000});await tick(p,0);
   assert.equal(Object.keys((await state(p)).campaign).length,3);await p.locator('#city-map-start').click();await p.locator('#play-jantar').click();await slow(p);
   await walk(p,0,16);await walk(p,3,16);assert.equal((await state(p)).street.packets.length,1);
@@ -92,10 +92,10 @@ try{
   await move(0,-20,1000);const w=(await state(m)).position.z;await move(0,-38,1000);const r=(await state(m)).position.z;assert(31-w<w-r);
   await m.locator('#evade').tap();const z=(await state(m)).position.z;await tick(m,350);assert((await state(m)).position.z<z);await tick(m,500);
   await m.locator('#jump').tap();await tick(m,100);assert((await state(m)).position.y>0);await tick(m,700);
-  await m.locator('#pause').tap();await m.locator('#resume').tap();await m.screenshot({path:'qa/v10/mobile.png'});
+  await m.locator('#pause').tap();await m.locator('#resume').tap();await m.screenshot({path:'qa/v11/mobile.png'});
   await m.locator('#journal').tap();await m.locator('#play-shaheen').tap();await m.setViewportSize({width:844,height:390});await m.waitForTimeout(300);await tick(m,0);
-  assert(await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await m.screenshot({path:'qa/v10/landscape.png'});
+  assert(await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await m.screenshot({path:'qa/v11/landscape.png'});
   checks.push('Actual mobile Rally, walk/run, moving dodge, jump, pause/resume and district switch; portrait/landscape fit');
   assert.deepEqual(errors,[]);
-  await writeFile('qa/v10/results.json',JSON.stringify({version:'0.10',pass:true,checks,errors,physicalPhoneTested:false,humanEnjoymentTested:false},null,2));console.log(JSON.stringify({pass:true,checks,errors}));
+  await writeFile('qa/v11/results.json',JSON.stringify({version:'0.10',pass:true,checks,errors,physicalPhoneTested:false,humanEnjoymentTested:false},null,2));console.log(JSON.stringify({pass:true,checks,errors}));
 }finally{await browser.close();}

@@ -3,7 +3,7 @@
 Run with Blender's bpy Python. Original files and the MIT licence are retained.
 Motion is retargeted by bone-space orientation, with root XY motion removed.
 """
-import os, math
+import os, math, argparse
 import bpy
 from mathutils import Matrix, Vector
 
@@ -11,7 +11,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCE=os.path.join(ROOT,'art','rocketbox-source')
 CLIPS=[('Idle','m_idle_breathe_01.max.fbx'),('Walk','m_walk_neutral_01.max.fbx'),('Run','m_run_neutral_01.max.fbx')]
 
-def convert(kind,name):
+def convert(kind,name,output=None):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     folder=os.path.join(SOURCE,kind)
     bpy.ops.import_scene.fbx(filepath=os.path.join(folder,name+'.fbx'))
@@ -78,13 +78,21 @@ def convert(kind,name):
     arm.select_set(True);mesh.select_set(True)
     bpy.context.scene.frame_set(0)
     bpy.ops.export_scene.gltf(
-        filepath=os.path.join(ROOT,'docs','assets',kind+'-animated.glb'),
+        filepath=os.path.join(ROOT,'docs','assets',(output or kind)+'-animated.glb'),
         export_format='GLB',use_selection=True,export_animations=True,
         export_animation_mode='NLA_TRACKS',export_force_sampling=True,
         export_frame_range=False,export_image_format='WEBP',export_image_quality=88,
         export_optimize_animation_size=True)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'art',kind+'-animated.blend'))
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT,'art',(output or kind)+'-animated.blend'))
     print('Exported',kind,'with',len(mesh.data.polygons),'polygons and Idle/Walk/Run clips')
 
-convert('male','Male_Adult_02')
-convert('female','Female_Adult_04')
+if __name__=='__main__':
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--delhi',action='store_true')
+    opt=parser.parse_args()
+    if opt.delhi:
+        convert('male-delhi','Male_Adult_15')
+        convert('female-delhi','Female_Adult_06')
+    else:
+        convert('male','Male_Adult_02')
+        convert('female','Female_Adult_04')

@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
 
-let male,female;
+let male,female,maleDelhi,femaleDelhi;
 const wardrobe=new Map(),knitColors=[[113,137,124],[132,113,99],[100,118,141]];
 function knitTexture(source,variant){
   const key=source.uuid+':'+variant;if(wardrobe.has(key))return wardrobe.get(key);
@@ -23,25 +23,27 @@ function knitTexture(source,variant){
 }
 export async function loadPeople(asset){
   const loader=new GLTFLoader();
-  const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loadHuman(asset('courier-clothed.glb'))]);
-  [male,female]=results;
+  const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loader.loadAsync(asset('male-delhi-animated.glb')),loader.loadAsync(asset('female-delhi-animated.glb')),loadHuman(asset('courier-clothed.glb'))]);
+  [male,female,maleDelhi,femaleDelhi]=results;
 }
 export function human(color,police=false,options={}){
   if(police)return legacyHuman(color,true,options);
-  const source=options.female?female:male;
+  const source=options.localWardrobe?(options.female?femaleDelhi:maleDelhi):(options.female?female:male);
   const model=clone(source.scene),group=new THREE.Group();
   group.add(model);model.rotation.y=Math.PI;
   model.traverse(o=>{
     if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;
     const fix=m=>{m=m.clone();m.color.set('#ffffff');m.roughness=.83;m.metalness=0;
       if(m.name==='m003_body'&&m.map&&color.toLowerCase()!=='#a86137')m.map=knitTexture(m.map,parseInt(color.slice(-3),16)%3);
+      if(options.localWardrobe&&m.name.includes('body'))m.color.set(color);
+      if(source===female&&m.name==='f004_opacity')m.color.set('#3a2b23');
       if(m.name.includes('opacity')){m.transparent=false;m.alphaTest=.4;m.depthWrite=true;m.side=THREE.DoubleSide;}
       return m;};
     o.material=Array.isArray(o.material)?o.material.map(fix):fix(o.material);
   });
   const mixer=new THREE.AnimationMixer(model),actions={};
   for(const clip of source.animations)actions[clip.name]=mixer.clipAction(clip).play().setEffectiveWeight(clip.name==='Idle'?1:0);
-  const p={group,model,mixer,actions,rocket:true,rigged:true,lastTime:null,blend:{Idle:1,Walk:0,Run:0}};
+  const p={group,model,mixer,actions,rocket:true,rigged:true,wardrobe:options.localWardrobe?'kurta / long tunic':'contemporary casual',lastTime:null,blend:{Idle:1,Walk:0,Run:0}};
   poseHuman(p,0,0);return p;
 }
 export function poseHuman(p,t,running=0,gesture=0){

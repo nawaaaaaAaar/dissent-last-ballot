@@ -1,5 +1,9 @@
 # QA and limitations
 
+## v0.11 Learn the Route
+
+This revision adds two avatar bases and an original hair derivative, safe practice/guide, an integrated sprint module and pursuer route fallback. Campaign and tutorial verification is in progress; the earlier v0.10 results below must not be read as signoff for these changes. The current tutorial suite is `tutorial-qa.mjs`. Physical-phone performance, Safari and novice enjoyment remain unverified.
+
 ## v0.10 Signal Run
 
 The public frontend `14744af` loads `world.js?v=0.10.0`. Cloud Chromium completed Jantar, Bihar and Bengal with three packets each, zero case reviews and no mandatory charter. Jantar included direct help, a sprint-jump, recorder, breakthrough and reunion; Bihar arrived with both companions; Bengal held its marked gathering for twenty game seconds and carried all three reform demands into the direct ending. Public scores were 2193, 2687 and 1550. `qa/v10/public-results.json` and `public-*` captures retain the observations.

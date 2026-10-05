@@ -6,7 +6,7 @@
 <meta name="description" content="A fictional third-person game about the vote-chori/SIR movement: electoral accountability, voter inclusion and case referrals across Delhi and invented Bihar/West Bengal help camps.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./world.css?v=0.10.0">
+<link rel="stylesheet" href="./world.css?v=0.11.0">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -22,6 +22,7 @@
     <p class="lede">Signal Run / action campaign<br>Collect. Dodge. Rally. Break through.</p>
     <button id="start" class="primary" disabled>Preparing the world…</button>
     <button id="city-map-start" class="secondary" disabled>Choose a district</button>
+    <button id="learn" class="secondary" disabled>Learn to play &amp; win</button>
     <button id="story-start" class="secondary" disabled>Archive: earlier fictional story</button>
     <button id="continue" class="secondary" hidden>Continue from your story checkpoint</button>
     <p id="loading" role="status">Loading the 3D engine…</p>
@@ -38,6 +39,21 @@
   <div class="map-wrap"><canvas id="map" width="144" height="144" aria-label="Approximate game map with player and story markers"></canvas><small>GAME MAP / APPROX.</small></div>
 </section>
 <div id="toast" role="status" aria-live="polite"></div>
+<aside id="lesson-tip" hidden><strong id="lesson-title"></strong><p id="lesson-copy"></p><button id="lesson-exit">Exit practice</button></aside>
+<section id="guide-screen" class="modal" hidden><div class="dialog-panel guide-panel">
+<p class="eyebrow">Controls lesson / winning route</p><h2>Learn the route.</h2>
+<p id="lesson-result">Start with safe practice: seven actions, no pursuit. Then try the campaign with Story assist enabled.</p>
+<div class="guide-buttons"><button id="practice" class="primary">Practise the controls</button><button id="guide-play" class="secondary">Start a fresh campaign</button></div>
+<h3>Controls and survival</h3><p>Phone: left stick moves; its outer edge runs. Drag with the right thumb to turn the camera. Desktop: WASD/arrows move, Shift runs. Jump / Space clears low crates; Dodge / Q dashes and avoids a hit; Rally / F briefly creates space. Walk over packets and supplies. Hold Action / E for one second to help and about two seconds to open a barrier with Story assist.</p>
+<p>Rally costs 30 energy and needs six seconds between uses. Keep it for nearby pursuers. Sprint uses stamina; walk briefly to refill it. Move out of red circles before the hit. Helping restores one health. If caught, Retry keeps mission items in this session.</p>
+<h3>Jantar Mantar: Signal Run</h3><ol><li>Take the packet on the right side of the road ahead; jump the crate or walk around it.</li><li>Cross left into the gathering courtyard for the second packet, then return to the road and collect the third beside the recorder.</li><li>Press Action / E near the recorder. Follow the gold marker south to the yellow line, stand close and hold Action until it opens.</li><li>Find Kabir just beyond the line and press Action. Continue to the assembly and press Action to finish.</li></ol>
+<h3>Bihar: Leave Together</h3><ol><li>Collect the left packet beside Mira and hold Action to regroup her.</li><li>Collect the right packet near Kabir and press Action to regroup him.</li><li>Use the east lane around the camp buildings to reach the third packet. Lead both friends to the exit.</li><li>Wait for them to catch up, hold Action to open the exit, then reach the southern handoff together and press Action.</li></ol>
+<h3>Bengal: Hold the Gathering</h3><ol><li>Collect packets and hold Action at the left-front, right-middle and left-rear desks. You may choose the order.</li><li>Enter the large gold circle in the southern gathering. Keep moving inside it for twenty game seconds; Dodge and Rally when pressured. Time stops progressing outside the circle.</li><li>Once the hold is complete, approach the assembly inside the circle and press Action. All three chapters complete the campaign; no case quiz or charter checklist is required.</li></ol>
+<h3>The fictional cast</h3><p>Aman is an Indian student volunteer looking for Kabir. Mira coordinates the gathering, Dev provides first aid, Sana controls how her account is shared, and Iqbal carries the assembly's demand. Their invented Delhi network connects to invented state help camps. Contemporary casual clothing, kurtas and long tunics coexist; nationality is not defined by one costume or skin tone.</p>
+<p>The ending demands leadership accountability, ending the contested SIR process and transparent inclusion support for every eligible voter. It does not claim these outcomes have occurred in real life.</p>
+<p><a href="./sprint-controller.js">Reusable sprint-control source</a> · <a href="https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md">Complete walkthrough</a></p>
+<button id="guide-close" class="text-button">Back to where I was</button>
+</div></section>
 <section id="city-screen" class="modal" hidden><div class="dialog-panel city-panel"><p class="eyebrow">Every eligible voter / fictional campaign</p><h2>Follow the demand.</h2><p id="campaign-progress">0 / 3 chapters completed</p><div class="district-cards">
 <button id="play-jantar" class="district-card"><span>DELHI / PROTEST</span><strong>Signal Run</strong><p>Collect three packets, clear hurdles, dodge pursuit, open the line and reunite.</p><small id="district-status-jantar"></small></button>
 <button id="play-jamia" class="district-card"><span>BIHAR / INVENTED HELP CAMP</span><strong>Leave Together</strong><p>Recover the packets, regroup both companions and deliver together through the camp.</p><small id="district-status-jamia"></small></button>
@@ -53,10 +69,10 @@
 <section id="dialog" class="modal" hidden><div class="dialog-panel"><p class="eyebrow" id="dialog-kicker"></p><h2 id="dialog-title"></h2><p id="dialog-copy"></p><button id="dialog-confirm" class="primary">Continue</button><button id="dialog-alt" class="secondary" hidden></button><button id="dialog-back" class="text-button">Keep exploring</button></div></section>
 <section id="rally-screen" class="modal rally-modal" hidden><div class="dialog-panel"><p class="eyebrow">A fictional crowd set piece</p><h2>Hold the rhythm.</h2><p>Press E or tap when the marker enters the gold window. Three shared beats bring the gathering forward. No penalty for missing.</p><div class="rally-track"><span class="rally-window"></span><span id="rally-cursor"></span></div><p id="rally-feedback">Wait for the gold window.</p><strong id="rally-count">0 / 3</strong><button id="rally-input" class="primary">Together · E</button><button id="rally-skip" class="text-button">Story assist: continue without timing</button></div></section>
 <section id="journal-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">People, not trophies</p><h2>Your journal.</h2><p id="journal-copy"></p><div id="optional-cases" hidden><h3>Optional: compare the fictional case files</h3><p>These are not required to play or win.</p><button id="case-organiser" class="secondary">Case file 1</button><button id="case-aid" class="secondary">Case file 2</button><button id="case-protest" class="secondary">Case file 3</button></div><label class="assist-setting"><input type="checkbox" id="assist-game"> Story assist: slower pursuit and a rhythm skip</label><button id="journal-close" class="primary">Return to the gathering · J</button></div></section>
-<section id="pause-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">Your place is held</p><h2>Paused.</h2><h3 id="mission-brief-title">The Account</h3><p id="mission-brief-copy">Move freely, help people and protect the account.</p><p>Completed campaign districts save in this browser when storage is available. Action mission retries retain their stage within this tab; they do not restore that run after reload. No progress is sent to a server.</p><button id="resume" class="primary">Resume</button><button id="restart" class="secondary">Restart this mission</button><button id="title" class="text-button">Return to title</button></div></section>
+<section id="pause-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">Your place is held</p><h2>Paused.</h2><h3 id="mission-brief-title">The Account</h3><p id="mission-brief-copy">Move freely, help people and protect the account.</p><p>Completed campaign districts save in this browser when storage is available. Action mission retries retain their stage within this tab; they do not restore that run after reload. No progress is sent to a server.</p><button id="resume" class="primary">Resume</button><button id="guide-pause" class="secondary">Tutorial &amp; winning route</button><button id="restart" class="secondary">Restart this mission</button><button id="title" class="text-button">Return to title</button></div></section>
 <section id="ending" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">People and accounts / campaign</p><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="retry" class="primary">Retry checkpoint</button><button id="reopen-charter" class="primary" hidden>Review the complete reform demand</button><button id="next-district" class="primary" hidden>Continue to the next district</button><button id="again" class="secondary">Replay this district</button><a class="quiet" href="./concept.html">Read the context and limits</a></div></section>
 <div id="controls" hidden><div id="joystick" aria-label="Touch movement joystick"><div id="stick"></div></div><div class="action-buttons"><button id="evade" hidden>DODGE · Q</button><button id="rally-power" hidden>RALLY · F</button><button id="sprint">RUN</button><button id="jump">JUMP</button></div><span class="camera-hint">Drag the world to look</span></div>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./world.js?v=0.10.0"></script>
+<script type="module" src="./world.js?v=0.11.0"></script>
 </body>
 </html>

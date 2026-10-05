@@ -1,19 +1,20 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.10.0';
-import {STORY,ITEMS} from './story.js?v=0.10.0';
-import {WorldAudio} from './world-audio.js?v=0.10.0';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.11.0';
+import {STORY,ITEMS} from './story.js?v=0.11.0';
+import {WorldAudio} from './world-audio.js?v=0.11.0';
 import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
-import {ActionGame} from './action-game.js?v=0.10.0';
-import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.10.0';
-import {route} from './navigation.js?v=0.10.0';
-import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.10.0';
-import {StreetPlay} from './street-play.js?v=0.10.0';
+import {ActionGame} from './action-game.js?v=0.11.0';
+import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.11.0';
+import {route} from './navigation.js?v=0.11.0';
+import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.11.0';
+import {StreetPlay} from './street-play.js?v=0.11.0';
+import {wantsSprint,SPRINT_RULES} from './sprint-controller.js?v=0.11.0';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.10.0';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.11.0';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -46,7 +47,7 @@ function continueGame(){
 }
 const keys=new Set(),joy={x:0,y:0},actors=[],police=[],trees=[],flags=[],colliders=[],events=[];
 const zoneData=new Map(),collections={actors,police,trees,flags,colliders,events};
-let district='jantar',mapReturn='menu',journalReturn='playing',reviewReturn='playing',street;
+let district='jantar',mapReturn='menu',journalReturn='playing',reviewReturn='playing',street,lesson=false,lessonStage=0,guideReturn='menu';
 let renderer,scene,camera,player,composer,ssao,sun,treeSource,barriers=[],clock,manual=false,last=0,anim=0,fps=0,frames=0,frameStart=performance.now(),toastTime=0,cameraDrag=null,ambient,action;
 const rng=seed=>()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},rand=rng(5108);
 const objectives=[
@@ -57,6 +58,28 @@ const objectives=[
   ['assembly','Bring the account to the assembly']
 ];
 function toast(text,time=4){$('toast').textContent=text;toastTime=time;$('toast').classList.add('show');}
+const LESSONS=[
+  ['Move two metres', 'Use WASD / arrows, or the left thumbstick. Drag the world to look around.'],
+  ['Sprint', 'Hold Shift, or push the phone stick to its outer edge. Sprint uses the stamina bar.'],
+  ['Jump', 'Press Space or tap Jump. Use it before a low crate; walking into a crate will stop you.'],
+  ['Dodge', 'Press Q or tap Dodge. Without a direction it dashes forward; red warnings tell you when to move.'],
+  ['Rally', 'Press F or tap Rally. It costs 30 energy and has a six-second cooldown. Supplies refill energy.'],
+  ['Collect your first packet', 'Walk to the gold-ringed packet at the right side of the road ahead. No Action press is needed.'],
+  ['Help Mira', 'Return to Mira by the gold ring near the starting area. Stay close and hold E / Action for one second.']
+];
+function guide(){keys.clear();joy.x=joy.y=0;action.holding=false;guideReturn=s.mode;mode('guide');}
+function startLesson(){
+  begin(true,'jantar');lesson=true;lessonStage=0;s.pressure=0;action.hurt=1;
+  $('sprint').classList.remove('active');$('lesson-result').textContent='No pursuit during practice. Repeat the lesson at any time.';
+  $('lesson-tip').hidden=false;updateLesson();
+}
+function updateLesson(){
+  const done=[Math.hypot(s.x,s.z-31)>2,s.sprint&&s.move>0,s.y>.2,action.cooldown>0,street.pulses>0,street.collected.length>0,action.rescued.includes('organiser')];
+  if(done[lessonStage])lessonStage++;
+  if(lessonStage>=LESSONS.length){lesson=false;action.active=false;action.finish=true;$('lesson-result').textContent='Practice complete. You moved, sprinted, jumped, dodged, rallied, collected a packet and helped Mira. Start a fresh campaign below.';guideReturn='menu';mode('guide');return;}
+  $('lesson-title').textContent=`PRACTICE ${lessonStage+1}/7 · ${LESSONS[lessonStage][0]}`;
+  $('lesson-copy').textContent=LESSONS[lessonStage][1];
+}
 function mode(m){
   s.mode=m;$('menu').hidden=m!=='menu';$('hud').hidden=['loading','menu','error'].includes(m);
   if(m==='menu')$('continue').hidden=!savedGame();
@@ -77,6 +100,8 @@ function mode(m){
   $('evade').hidden=!action?.active;
   $('rally-power').hidden=!action?.active;$('street-hud').hidden=!action?.active||m!=='playing';
   $('pickup-pop').hidden=m!=='playing'||!street?.popTime;
+  $('guide-screen').hidden=m!=='guide';
+  $('lesson-tip').hidden=!lesson||m!=='playing';
   document.body.classList.toggle('playing',m!=='menu'&&m!=='loading');
   document.body.classList.toggle('action-play',!!action?.active);
 }
@@ -205,7 +230,7 @@ function addActor(x,z,color,pol=false,options={}){
 }
 function event(id,x,z,title,prompt,color){
   const coords=DISTRICTS[district].coords[id];if(coords)[x,z]=coords;
-  const a=addActor(x,z,color,false,{female:['organiser','witness','record'].includes(id)}),marker=new THREE.Group();
+  const a=addActor(x,z,color,false,{female:['organiser','witness','record'].includes(id),localWardrobe:['witness','aid','assembly','protest','companion'].includes(id)}),marker=new THREE.Group();
   const ring=new THREE.Mesh(new THREE.TorusGeometry(.58,.026,6,32),new THREE.MeshBasicMaterial({color:'#d9af71'}));ring.rotation.x=Math.PI/2;ring.position.y=.028;marker.add(ring);
   const dot=new THREE.Mesh(new THREE.SphereGeometry(.07,12,8),new THREE.MeshBasicMaterial({color:'#e6c486'}));dot.position.y=2.35;marker.add(dot);
   marker.position.set(x,.02,z);scene.add(marker);events.push({id,x,z,title,prompt,a,marker});return a;
@@ -241,7 +266,7 @@ function populate(){
     const clusters=district==='jamia'?[[-14,20],[18,14],[-20,-23],[8,-18]]:district==='shaheen'?[[-8,24],[9,6],[-8,-17],[0,-36]]:[[-19,-6],[-24,8],[-16,15],[-5,22]];
     const c=clusters[Math.floor(i/4)];
     const x=c[0]+(i%4-1.5)*.9,z=c[1]+(i%2)*1.2+rand()*.5;
-    const a=addActor(x,z,['#816251','#85907c','#676b7f','#c4b395','#6b7271'][i%5],false,{female:district==='shaheen'?i%3!==0:i%4===0});a.p.group.scale.setScalar(.92+rand()*.13);
+    const a=addActor(x,z,['#c3b58d','#85907c','#676b7f','#c4b395','#6b7271'][i%5],false,{female:district==='shaheen'?i%3!==0:i%4===0,localWardrobe:i%3!==0});a.p.group.scale.setScalar(.92+rand()*.13);
     if(i===10||i===11)a.walking=true;
     if(i%3===0){const placard=new THREE.Group();cylinder(placard,M.wood,0,1.9,.12,.014,.85);
       const words=['VOTE CHORI BAND KARO','END SIR','GYANESH KUMAR: RESIGN','INCLUDE ELIGIBLE VOTERS','SAVE DEMOCRACY'][i%5];
@@ -370,6 +395,7 @@ function journal(){
   mode('journal');
 }
 function begin(playAction=false,region='jantar'){
+  lesson=false;lessonStage=0;
   selectDistrict(playAction?region:'jantar');
   movement.reset();
   action?.reset(playAction,DISTRICTS[district].mission);
@@ -408,7 +434,7 @@ function step(dt){
   if(['loading','error'].includes(s.mode))return;
   s.time+=dt;
   if(s.mode==='paused'||s.mode==='caught'||s.mode==='won')return;
-  if(['journal','citymap','brief','review','charter'].includes(s.mode))return;
+  if(['journal','citymap','brief','review','charter','guide'].includes(s.mode))return;
   if(s.mode==='rally'){s.rallyTime+=dt;const phase=Math.abs(Math.sin(s.rallyTime*2));$('rally-cursor').style.left=`${phase*100}%`;$('rally-count').textContent=`${s.rallyHits} / 3`;return;}
   if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
   if(s.mode==='menu'){anim+=dt;poseHuman(player,anim*.5,0);return;}
@@ -417,8 +443,8 @@ function step(dt){
   let iz=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
   if(action?.active&&action.dodge>0&&Math.hypot(ix,iz)<.1){ix=0;iz=1;}
   const mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;}
-  s.sprint=(keys.has('ShiftLeft')||keys.has('ShiftRight')||$('sprint').classList.contains('active')||(coarse&&action?.active&&Math.hypot(joy.x,joy.y)>.85))&&(!action?.active||action.sprintAllowed);
-  const speed=action?.active&&action.dodge>0?7.5:s.sprint?4.6:action?.active?2.6:1.8;
+  s.sprint=wantsSprint({shift:keys.has('ShiftLeft')||keys.has('ShiftRight'),toggle:$('sprint').classList.contains('active'),touch:coarse&&action?.active,stickMagnitude:Math.hypot(joy.x,joy.y)})&&(!action?.active||action.sprintAllowed);
+  const speed=action?.active&&action.dodge>0?7.5:s.sprint?SPRINT_RULES.runSpeed:action?.active?SPRINT_RULES.walkSpeed:1.8;
   const dx=(ix*Math.cos(s.yaw)-iz*Math.sin(s.yaw))*speed*dt;
   const dz=(-ix*Math.sin(s.yaw)-iz*Math.cos(s.yaw))*speed*dt;
   const previousX=s.x,previousZ=s.z;
@@ -457,7 +483,16 @@ function step(dt){
       if(action?.active&&d<2.4&&a.attackCooldown===0){a.windup=.85;a.telegraph.visible=true;continue;}
       const flank=action?.active&&police.indexOf(a)===2?1.5:0;
       const dx=s.x+flank-p.x,dz=s.z-p.z,length=Math.max(.1,Math.hypot(dx,dz)),speed=action?.active?(s.assist?2.0:2.7):(s.assist?1.3:1.7);
-      if(d>1.2){const x=p.x+dx/length*speed*dt,z=p.z+dz/length*speed*dt;if(valid(x,z,false)){p.x=x;p.z=z;}}
+      if(d>1.2){
+        const x=p.x+dx/length*speed*dt,z=p.z+dz/length*speed*dt;
+        if(valid(x,z,false)){p.x=x;p.z=z;}
+        else{
+          a.pathClock=(a.pathClock||0)-dt;
+          if(!a.path?.length||a.pathClock<=0){a.path=route(p,{x:s.x+flank,z:s.z},(x,z)=>valid(x,z,false));a.pathClock=.8;}
+          const n=a.path?.[0];if(n){const q=Math.hypot(n.x-p.x,n.z-p.z),v=Math.min(q,speed*dt),nx=p.x+(n.x-p.x)/Math.max(.001,q)*v,nz=p.z+(n.z-p.z)/Math.max(.001,q)*v;
+            if(valid(nx,nz,false)){p.x=nx;p.z=nz;}if(q<.3)a.path.shift();}
+        }
+      }
       a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;poseHuman(a.p,s.time*8+a.phase,.7);
       if(d<1.25&&!action?.active)s.capture+=dt;
     }else if(a.walking){
@@ -474,7 +509,7 @@ function step(dt){
   if(!s.reduced)flags.forEach((f,i)=>{const p=f.geometry.attributes.position;for(let j=0;j<p.count;j++)p.setZ(j,Math.sin(s.time*2+p.getX(j)*4+i)*.055*(p.getX(j)+.6));p.needsUpdate=true;});
   events.forEach(e=>{e.marker.visible=!(e.item?s.items.includes(e.id):s.tasks[e.id])&&Math.hypot(s.x-e.x,s.z-e.z)<25;if(e.id==='companion')e.marker.visible=(s.tasks.barrier||action?.mission==='escort')&&!s.companion;if(e.id==='record')e.marker.visible=s.tasks.barrier&&s.choice==='archive'&&!s.tasks.assembly;if(action?.active&&(e.id==='witness'||e.id==='record'||action.rescued.includes(e.id)))e.marker.visible=action.mission==='hold'&&action.rescued.includes(e.id);if(e.marker.children[0]?.material)e.marker.children[0].material.color.set(action?.mission==='hold'&&action.rescued.includes(e.id)?'#91c697':'#d9af71');});
   nearest();
-  if(action?.active){street.update(dt,s,action);action.update(dt,s,s.near,police,s.move>0);actionHud();}
+  if(action?.active){street.update(dt,s,action);if(lesson){s.pressure=0;action.hurt=1;updateLesson();}action.update(dt,s,s.near,police,s.move>0);actionHud();}
   hud();map();
   events.forEach(e=>e.marker.scale.setScalar(e.id===s.target?1.5:1));
 }
@@ -494,6 +529,7 @@ function hud(){
   if(s.tasks.barrier){id=s.choice==='archive'?'record':'assembly';text=s.choice==='archive'?'Reach Leela at the protected record desk':'Bring Sana’s statement to Iqbal at the assembly';}
   if(s.tasks.assembly)text='Chapter complete';
   if(action?.active){id=action.target(s);text=action.objective(s);}
+  if(lesson){id=lessonStage===6?'organiser':'packet-0';text=LESSONS[Math.min(6,lessonStage)][0]+' · safe practice';}
   s.target=id;const target=events.find(e=>e.id===id);$('objective').textContent=text;
   const hint=action?.active&&action.mission==='escort'?'Keep the group together':action?.active&&action.mission==='hold'?'Choose your station order':s.tasks.barrier&&!s.companion?'Kabir can still be helped near the line':'Follow the gold marker';
   $('objective-distance').textContent=target&&!s.tasks.assembly?`${Math.round(Math.hypot(s.x-target.x,s.z-target.z))} m · ${hint}`:'';
@@ -516,6 +552,7 @@ function actionHud(){
   $('action-warning').hidden=action.charge<=0;
 }
 function actionWin(){
+  if(lesson){lesson=false;guideReturn='menu';mode('guide');return;}
   campaign.record(district,action.score,action.rescued.length);
   s.tasks.assembly=true;mode('won');
   const medal=action.health>=4&&action.rescued.length>=2?'SOLIDARITY':action.health>=3?'DEFIANCE':'SURVIVOR';
@@ -621,6 +658,8 @@ function bindings(){
   document.addEventListener('click',e=>{if(performance.now()-lastTouch<700&&(e.pointerType==='touch'||e.detail>0)){e.preventDefault();e.stopImmediatePropagation();}},true);
   function button(id,fn){$(id).addEventListener('pointerup',e=>{if(e.pointerType==='touch'){lastTouch=performance.now();fn();}});$(id).onclick=e=>{if(e.detail===0||performance.now()-lastTouch>700)fn();};}
   button('start',startCampaign);button('story-start',()=>begin(false));button('pause',pause);button('resume',pause);button('restart',()=>begin(action?.active,district));button('again',()=>begin(action?.active,district));
+  button('learn',guide);button('guide-pause',guide);button('guide-close',()=>mode(guideReturn));
+  button('practice',startLesson);button('guide-play',()=>begin(true,'jantar'));button('lesson-exit',()=>{lesson=false;action.active=false;action.finish=true;guideReturn='menu';mode('guide');});
   button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;if(action.active){action.health=5;action.hurt=2;action.stamina=100;action.charge=0;action.sweep=0;action.warning.visible=false;}police.forEach((a,i)=>{a.p.group.position.set(s.x+4+i*.5,0,s.z+5);a.windup=0;a.stun=0;a.attackCooldown=1;a.telegraph.visible=false;});mode('playing');toast('Checkpoint restored. Keep going.');});
   button('title',()=>{mode('menu');keys.clear();joy.x=joy.y=0;});
   button('dialog-confirm',complete);button('dialog-back',()=>{s.dialog=null;mode('playing');});
@@ -695,7 +734,7 @@ async function init(){
       const sky=tasks[3].value;sky.mapping=THREE.EquirectangularReflectionMapping;const gen=new THREE.PMREMGenerator(renderer);
       scene.environment=gen.fromEquirectangular(sky).texture;scene.environmentIntensity=.55;scene.background=sky;scene.backgroundIntensity=.55;scene.backgroundRotation.y=.9;gen.dispose();
     }
-    player=human('#a86137');player.group.position.set(0,0,31);scene.add(player.group);buildDistricts();campaign.load();
+    player=human('#c7bda4',false,{localWardrobe:true});player.group.position.set(0,0,31);scene.add(player.group);buildDistricts();campaign.load();
     street=new StreetPlay(scene,{toast,tone:(...args)=>audio.tone(...args),pop:text=>{$('pickup-pop').textContent=text;$('pickup-pop').hidden=false;},hud:v=>{
       $('street-count').textContent=`PACKETS ${v.collected.length}/3 · CHAIN ×${v.chain||1}`;
       $('rally-energy').style.width=v.energy+'%';$('rally-power').textContent=v.cooldown>0?'RALLY '+v.cooldown.toFixed(1):coarse?'RALLY':'RALLY · F';
@@ -710,14 +749,16 @@ async function init(){
     },stations:()=>events.filter(e=>['organiser','aid','protest'].includes(e.id)&&action.rescued.includes(e.id)),escortReady:()=>events.filter(e=>e.id==='companion'||e.id==='organiser').every(e=>Math.hypot(e.a.p.group.position.x-s.x,e.a.p.group.position.z-s.z)<6),win:actionWin,fail:actionFail});
     composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));ssao=new SSAOPass(scene,camera,innerWidth,innerHeight);
     ssao.kernelRadius=.5;ssao.minDistance=.002;ssao.maxDistance=.08;composer.addPass(ssao);composer.addPass(new OutputPass());
-    quality();mode('menu');$('start').disabled=false;$('story-start').disabled=false;$('start').textContent=campaign.count()?'PLAY · Continue campaign':'PLAY · Start the campaign';$('loading').textContent='Three districts ready • Desktop and touch controls';
+    quality();mode('menu');$('start').disabled=false;$('story-start').disabled=false;$('learn').disabled=false;$('start').textContent=campaign.count()?'PLAY · Continue campaign':'PLAY · Start the campaign';$('loading').textContent='Three districts ready • Desktop and touch controls';
     $('continue').hidden=!savedGame();
     window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.10`;};
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.11`;};
+    const baseText=window.render_game_to_text;
+    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(baseText()),tutorial:{active:lesson,stage:lessonStage,total:7},cast:{player:'Aman / fictional Indian student',wardrobe:player.wardrobe,avatarModels:4}});
     const worldText=window.render_game_to_text;
     window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),district,campaign:campaign.results,street:{packets:street.collected,energy:+street.energy.toFixed(1),cooldown:+street.cooldown.toFixed(2),pulses:street.pulses,chain:street.chain,inGathering:street.inGathering(s),obstacles:colliders.filter(c=>c.street).map(c=>({x:c.x,z:c.z}))},officers:police.map(a=>({windup:+a.windup.toFixed(2),stun:+a.stun.toFixed(2)})),electoral:{reviewed:movement.reviewed,outcomes:movement.outcomes,activeCase:movement.active,attempts:movement.attempts,mandate:movement.mandate},party:events.filter(e=>e.id==='companion'||e.id==='organiser').map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),action:{active:action.active,mission:action.mission,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),settle:+action.settle.toFixed(2),contested:action.contested,charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score,support:action.support}});
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
-    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.10`;}}
+    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.11`;}}
     requestAnimationFrame(frame);
   }catch(e){console.error(e);s.mode='error';$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }
