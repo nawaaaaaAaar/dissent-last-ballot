@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.14.1';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.14.1';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.14.2';
+import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.14.2';
 import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.12.0';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
 import {WorldAudio} from './world-audio.js';
@@ -53,6 +53,7 @@ function board(){
   $('save-code').value='';drawCityMap();render();
 }
 button('missions',board);button('board-close',()=>setMode(helpReturn==='menu'?'menu':'playing'));
+button('operations-jump',()=>$('contracts').scrollIntoView({block:'start',behavior:'smooth'}));
 button('explore',()=>{if(game.mode==='board'&&helpReturn==='menu')game.start();else game.abandon();setMode('playing');});
 button('export-save',()=>{$('save-code').value=game.save();$('board-note').textContent='Copy this code somewhere safe. Paste it here next visit and press Restore. No browser storage is required.';});
 button('import-save',()=>{const ok=game.load($('save-code').value);board();$('board-note').textContent=ok?'Network progress restored. Choose your next operation.':'Invalid save code. Your current progress is unchanged.';});
@@ -193,6 +194,7 @@ function paintMap(c,n,point,labels){
   c.fillStyle='#223c31';c.fillRect(0,0,n,n);c.strokeStyle='#85917e';c.lineWidth=labels?2:5;
   c.beginPath();for(const s of WORLD.segments){const a=point(s.a),b=point(s.b);c.moveTo(...a);c.lineTo(...b);}c.stroke();
   c.strokeStyle='#dfb279';c.lineWidth=labels?3:2;c.beginPath();guideRoute.forEach((p,i)=>{const q=point(p);i?c.lineTo(...q):c.moveTo(...q);});c.stroke();
+  c.fillStyle='#e38164';for(const b of[game.gate.hp>0?game.gate:null,game.roadblock?game.block:null].filter(Boolean)){const[x,y]=point(b);c.fillRect(x-6,y-2,12,4);}
   for(const [p,color,r] of [[game.target(),'#dfb279',5],[game.van,'#dfe4d2',3],[game.player,'#a9efcc',4],...game.enemies.filter(e=>e.hp>0).map(e=>[e,'#df7a5b',2])]){
     const[x,y]=point(p);c.fillStyle=color;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();
   }
@@ -234,7 +236,7 @@ function step(dt){
     playerRing.visible=!game.van.occupied;playerRing.position.set(game.player.x,.045,game.player.z);
     friendRing.visible=friend.group.visible;friendRing.position.set(game.friend.x,.045,game.friend.z);
     for(let i=0;i<game.enemies.length;i++){
-      const e=game.enemies[i],m=enemyModels[i];m.p.group.visible=Math.hypot(e.x-game.player.x,e.z-game.player.z)<38;
+      const e=game.enemies[i],m=enemyModels[i];m.p.group.visible=!!game.mission&&e.active&&Math.hypot(e.x-game.player.x,e.z-game.player.z)<38;
       if(m.p.group.visible){pose(m.p,e,dt,e.hp>0&&e.stun<=0?2.6:0);m.p.group.rotation.z=e.hp<=0?Math.PI/2:0;m.p.group.position.y=e.hp<=0?.15:0;}
       m.ring.visible=e.windup>0;m.bars.visible=e.hp>0&&Math.hypot(e.x-game.player.x,e.z-game.player.z)<10;m.bars.position.set(e.x,2.3,e.z);
       m.segments.forEach((s,j)=>s.material.color.set(j<e.hp?(e.stun>0?'#a5e7ce':'#dfb279'):'#443e33'));
@@ -272,12 +274,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.14.1');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.14.2');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.14.1',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.14.2',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · BREAKOUT / 0.13 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

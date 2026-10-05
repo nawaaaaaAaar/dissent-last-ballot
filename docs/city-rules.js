@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.1';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.2';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -36,7 +36,8 @@ export class City{
     WORLD.record={...this.mission.source};WORLD.safe={...this.mission.destination};
     const source=this.mission.source;
     this.gate={x:source.x,z:source.z+8,w:8,hp:spec.type==='rescue'?4:0,fall:spec.type==='rescue'?0:1};
-    this.block={x:source.x+9,z:source.z-9};this.roadblock=false;
+    const returnRoute=roadRoute(source,this.mission.destination);
+    this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;
     this.spawn(source,spec.type==='rally'?3:spec.type==='rescue'?4:2);
     this.car.active=false;this.heat=0;this.checkpoint=null;this.mode='playing';
     this.say(spec.story,7);return true;
@@ -44,7 +45,7 @@ export class City{
   spawn(p,count){
     this.enemies.forEach((e,i)=>{
       const angle=(i+.5)*Math.PI*2/count+this.serial*.7,q=snap({x:p.x+Math.sin(angle)*10,z:p.z+Math.cos(angle)*10});
-      Object.assign(e,{x:q.x,z:q.z,hp:i<count?3:0,stun:0,windup:0,cooldown:1.5,route:[],routeAge:0,home:{...q},last:{...q},down:0});
+      Object.assign(e,{x:q.x,z:q.z,hp:i<count?3:0,active:i<count,stun:0,windup:0,cooldown:1.5,route:[],routeAge:0,home:{...q},last:{...q},down:0});
     });
   }
   say(t,seconds=3){this.message=t;this.messageTime=seconds;}
@@ -121,11 +122,11 @@ export class City{
     if(n?.id==='van'){
       if(this.friend.rescued&&dist(this.friend,v)>8){this.say('Kabir is behind. Wait or regroup.');return;}
       v.occupied=true;this.friend.aboard=this.friend.rescued;
-      if(this.record){this.car.active=true;const q=snap({x:v.x-Math.sin(v.yaw)*20,z:v.z-Math.cos(v.yaw)*20});Object.assign(this.car,q,{route:[],routeAge:0});this.heat=Math.max(2,this.heat);}
+      if(this.record){this.car.active=true;const q=snap({x:v.x-Math.sin(v.yaw)*20,z:v.z-Math.cos(v.yaw)*20});Object.assign(this.car,q,{route:[],routeAge:0});this.heat=Math.max(2,this.heat);this.roadblock=this.mission?.variant===2;}
       this.saveCheckpoint();this.say(this.record?'Route choice matters. Hide behind blocks to lose pursuit, then reach the green destination.':'Drive to the gold mission marker. You can exit and explore anywhere.',4);
     }
   }
-  saveCheckpoint(){this.checkpoint={x:this.player.x,z:this.player.z,van:{...this.van},record:this.record,rescued:this.friend.rescued,gate:this.gate.hp,hold:this.hold};}
+  saveCheckpoint(){this.checkpoint={x:this.player.x,z:this.player.z,van:{...this.van},record:this.record,rescued:this.friend.rescued,gate:this.gate.hp,hold:this.hold,roadblock:this.roadblock};}
   hurt(){const p=this.player;if(p.hurt>0||p.dash>0||this.mode!=='playing')return;p.health--;p.hurt=1.2;this.burst(p.x,p.z,'red',5);if(p.health<=0){this.mode='caught';this.say('Caught. Retry the checkpoint or try a different mission.');}else this.say('Red warning: dodge, interrupt, or use another route.',2);}
   carHit(amount){if(this.van.hurt>0)return;this.van.health=Math.max(0,this.van.health-amount*(this.network.upgrades.includes('reinforce')?.7:1));this.van.hurt=1;this.van.speed*=.3;this.crashes++;if(this.van.health<=0){this.mode='caught';this.say('Van disabled. Your earned network progress is safe.');}}
   readyWin(){
@@ -149,9 +150,13 @@ export class City{
   abandon(){this.mission=null;this.enemies.forEach(e=>e.hp=0);this.car.active=false;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.heat=0;this.gate.hp=0;this.roadblock=false;this.mode='playing';}
   retry(){
     const m=this.mission,c=this.checkpoint;if(!m){this.start();return;}
-    const spec=m.id,style=m.style;this.abandon();this.accept(spec,style);
+    const spec=m.id,style=m.style;this.abandon();this.accept(spec,style);this.mission.variant=m.variant;
     this.player.health=6;this.van.health=100;this.player.hurt=2;
     if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.checkpoint=c;}
+    if(c?.record&&c.van.occupied){
+      this.car.active=true;Object.assign(this.car,snap({x:c.van.x-Math.sin(c.van.yaw)*20,z:c.van.z-Math.cos(c.van.yaw)*20}),{route:[],routeAge:0});
+      this.heat=2;this.lastSeen={x:c.x,z:c.z};this.roadblock=c.roadblock;
+    }
     this.say('Checkpoint restored. Earned upgrades remain. Try a different approach.');
   }
   upgrade(id){const prices={tempo:4,reinforce:4,stamina:3};if(!prices[id]||this.network.upgrades.includes(id)||this.network.credits<prices[id])return false;this.network.credits-=prices[id];this.network.upgrades.push(id);return true;}
@@ -167,11 +172,13 @@ export class City{
   objective(){
     const m=this.mission;if(!m)return 'EXPLORE DELHI · open Missions to join the network';
     if(m.type==='rally')return `HOLD THE GATHERING · ${Math.floor(this.hold)} / 24 s · wave ${this.wave+1}`;
+    if(!this.record&&!this.van.occupied&&dist(this.player,m.source)>35&&dist(this.player,this.van)<6)return 'BOARD THE VAN · travel to '+PLACES.find(p=>p.id===m.from).name.toUpperCase();
     if(!this.record)return m.type==='rescue'?'RESCUE KABIR · clear or evade guards at Jantar Mantar':'RECOVER THE DISPATCH · step out of the van at the gold marker';
+    if(m.type==='rescue'&&!this.van.occupied)return 'REGROUP AT THE VAN · bring Kabir with you';
     if(this.heat>=.7)return this.seen?'BREAK SIGHT · use the city blocks':'STAY HIDDEN · let the search cool';
     return 'DELIVER TO '+PLACES.find(p=>p.id===m.to).name.toUpperCase();
   }
-  target(){return this.mission?(this.mission.type==='rally'?this.mission.source:!this.record?this.mission.source:this.mission.destination):PLACES[0];}
+  target(){return this.mission?(this.mission.type==='rally'?this.mission.source:!this.record?this.mission.source:this.mission.type==='rescue'&&!this.van.occupied?this.van:this.mission.destination):PLACES[0];}
   update(dt){
     if(this.mode!=='playing')return;dt=Math.min(.05,dt);this.time+=dt;if(this.mission)this.elapsed+=dt;this.messageTime=Math.max(0,this.messageTime-dt);
     const p=this.player,v=this.van,i=this.input,mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));

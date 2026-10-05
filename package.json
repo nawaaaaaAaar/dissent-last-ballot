@@ -1,12 +1,13 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.13.1",
+  "version": "0.14.2",
   "private": true,
   "type": "module",
   "description": "Top-down 3D resistance action mission with driving and mobile dual-stick controls",
   "scripts": {
     "start": "python -m http.server 5173 --directory docs",
-    "test": "node breakout-unit.mjs",
+    "test": "node city-unit.mjs",
+    "test:city": "node city-unit.mjs",
     "test:breakout": "node breakout-unit.mjs",
     "test:browser": "node breakout-qa.mjs",
     "test:mobile": "node breakout-mobile-qa.mjs",

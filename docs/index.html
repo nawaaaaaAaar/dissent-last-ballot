@@ -8,7 +8,7 @@
 <meta name="description" content="An original top-down 3D resistance action mission: fight, rescue, drive and escape. Fictional Delhi-inspired encounters.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./breakout.css?v=0.14.1">
+<link rel="stylesheet" href="./breakout.css?v=0.14.2">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -124,7 +124,7 @@
 <li>For deliveries, lose sight of pursuers until heat is below one bar, then slow down at the destination. Gold medals reward keeping health and avoiding vehicle crashes, not a destruction tally.</li>
 <li>After a win, choose another job. Finish the three different operations to unlock the charter run. Repeating jobs changes guard approaches. Support credits buy strike tempo, van protection or running endurance. The next network cycle continues after the charter.</li>
 </ol>
-<p>Medkits restore health. On-foot health and vehicle condition can fail independently. Retry restores the latest rescue/boarding checkpoint within this tab. There are no mandatory case quizzes and no real personal records.</p>
+<p>Medkits restore health. On-foot health and vehicle condition can fail independently. Retry restores the latest rescue/boarding checkpoint within this tab. Some repeat runs put a red roadblock along the suggested route: bypass it, or exit and strike it open. There are no mandatory case quizzes and no real personal records.</p>
 <button id="help-close" class="primary">Back</button>
 </div>
 </section>
@@ -147,6 +147,7 @@
 <p class="eyebrow">A connected central-Delhi world</p>
 <h2>Choose your next move.</h2>
 <p id="network-status"></p>
+<button id="operations-jump" class="primary">Choose an operation ↓</button>
 <canvas id="city-map" width="420" height="420" aria-label="Central Delhi map with India Gate, Jantar Mantar, Connaught Place and route"></canvas>
 <p class="map-credit">© <a href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">OpenStreetMap contributors</a> · ODbL 1.0. North is up. Uniform 0.14 scale; streets widened for play. This is central Delhi, not the entire city. Monument art and encounters are fictional approximations.</p>
 <p id="board-note"></p>
@@ -164,7 +165,7 @@
 </section>
 <a class="osm-credit" href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./breakout.js?v=0.14.1">
+<script type="module" src="./breakout.js?v=0.14.2">
 </script>
 </body>
 </html>
