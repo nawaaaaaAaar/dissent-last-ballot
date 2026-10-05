@@ -96,10 +96,10 @@ function vehicle(police=false){
   if(police){box(g,M.metal,0,2.45,.2,1.05,.08,.24);box(g,M.red,-.33,2.53,.2,.30,.1,.23);box(g,trim,.33,2.53,.2,.30,.1,.23);}
   return {g,wheels};
 }
-function ground(material,x,z,w,d){
+function ground(material,x,z,w,d,y=.01){
   const geo=new THREE.PlaneGeometry(w,d),uv=geo.attributes.uv;
   for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*w/4,uv.getY(i)*d/4);
-  const mesh=new THREE.Mesh(geo,material);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.01,z);mesh.receiveShadow=true;scene.add(mesh);
+  const mesh=new THREE.Mesh(geo,material);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,y,z);mesh.receiveShadow=true;scene.add(mesh);
 }
 async function textures(){
   const load=async(n,color=false)=>{const t=await new THREE.TextureLoader().loadAsync(asset(n));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=color?THREE.SRGBColorSpace:THREE.NoColorSpace;t.anisotropy=4;return t;};
@@ -109,9 +109,9 @@ async function textures(){
 }
 function build(){
   const paving=new THREE.MeshStandardMaterial({map:M.cream.map,color:'#a3a393',roughness:.95});
-  ground(paving,0,0,200,200);
-  for(const x of [-34,0,34])ground(M.road,x,0,13,114);
-  for(const z of [-32,0,32])ground(M.road,0,z,114,13);
+  ground(paving,0,0,200,200,0);
+  for(const x of [-34,0,34])ground(M.road,x,0,13,114,.015);
+  for(const z of [-32,0,32])ground(M.road,0,z,114,13,.019);
   const stat=new THREE.Group();
   const roof=new THREE.MeshStandardMaterial({map:M.cream.map,color:'#9b9d92',roughness:.94});
   for(const b of WORLD.buildings){

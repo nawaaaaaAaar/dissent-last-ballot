@@ -8,6 +8,8 @@ This is a readability and systems pass using earlier licensed art, not final hig
 
 Public portrait review caught the toast stretching vertically because both top and bottom offsets were set; selector precedence was corrected and `public-phone-portrait.jpg` shows the bounded result. Landscape resizing now immediately redraws the game. `final-public-west.jpg`, `final-public-ending.jpg` and `final-public-phone.jpg` show the published patch, not a promotional render. Roof and paving detail improves surface cues but the large blocks, sparse props and simplified police still make the scene visibly prototype-like.
 
+The v0.12.1 phone capture exposed coplanar depth fighting: foundation paving, north-south roads and east-west roads shared one height. v0.12.2 gives them distinct small height offsets instead of accepting the striped frame as finished. Earlier captures remain evidence of the defect, not final visual signoff.
+
 ## v0.9 scope
 
 This pass changes the campaign's theme, case decisions, charter and signage using the existing art. The invented Bihar/West Bengal camps reuse earlier authored spaces; they are not new regional scans or geographically authentic models. Review covers readable before/current record panels, touch choices, scrollable charter controls and live-game captures. No new photorealism, wardrobe or facial-animation claim is made.
