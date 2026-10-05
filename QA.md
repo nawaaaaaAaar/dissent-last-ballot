@@ -2,7 +2,7 @@
 
 ## v0.12 Breakout
 
-The current root is the new top-down mission; archived campaign results below do not test it. Seven isolated rule checks pass: barrier/cooldown, aimed melee interruption and opponent condition, dodge cost/invulnerability, rescue/boarding prerequisites, occlusion/search/win conditions, vehicle acceleration/braking/destruction and valid barricade-detour navigation.
+The current root is the new top-down mission; archived campaign results below do not test it. Eight isolated rule checks pass: barrier/cooldown, aimed melee interruption and opponent condition, dodge cost/invulnerability, rescue/boarding prerequisites, occlusion/search/win conditions, vehicle acceleration/braking/destruction, valid barricade-detour navigation and roadblock/reboarding/checkpoint persistence.
 
 Local Chromium completed the mission with actual keyboard inputs, not rule-state teleportation: four barrier strikes, rescue, recording pickup, companion boarding, four directional driving segments, heat loss and parked victory. It also checked pause/help freezing and returning, fresh capture and retry with restored health. `qa/v12/local-results.json` and `local-test.log` retain the scope and have no page errors. The supplied game client separately captured movement and strike state in `qa/v12-client/`.
 
@@ -10,7 +10,11 @@ Iteration found a path-grid edge crossing the thin line, an unsuitable initial v
 
 Phone-emulated Chromium separately completed the mission through actual touch, including right-stick melee damage, Dodge, four barrier strikes, rescue/recording, boarding, vehicle destruction from a real drive into a building, boarding-checkpoint retry, four driving segments and parked victory. Portrait 390×844 and landscape 844×390 were captured without horizontal overflow. `qa/v12/mobile-results.json` and `mobile-test.log` retain the scope. Review found overlapping panels and a resize-cleared deterministic render; both were revised rather than passing the initial captures as final.
 
-Public verification is recorded separately once completed. Deterministic stepping is not FPS measurement. Physical phones, Safari, first-time-player enjoyment, higher-fidelity combat/crowd animation and production realism remain open requirements.
+Public frontend `0b49679` was completed in cloud Chromium through actual keyboard input: barrier, rescue, recording, boarding, eastern route, search loss and parked victory. A separate public touch run verified melee damage (opponent condition 3 to 2), Dodge, rescue/recording, boarding, portrait/landscape, real collision-caused vehicle failure, boarding retry, driving/braking and victory. Public captures retain actual rendering, not generated art.
+
+Alternate-route review then caught a roadblock regenerating whenever the player reboarded and a checkpoint always restoring the initial van position. v0.12.1 retains a cleared roadblock and saves the actual boarding position/heading. Local actual-input QA crossed west, exited, struck the line, reboarded, drove through it, failed by collision and restored that earned location with the line still clear. Its passed result has no page errors. The software-WebGL command reached the platform time limit after writing the passed results; the file and completed log were inspected independently, so the command timeout is not silently reported as a clean command exit.
+
+Deterministic stepping is not FPS measurement. Physical phones, Safari, first-time-player enjoyment, higher-fidelity combat/crowd animation and production realism remain open requirements.
 
 ## v0.11 Learn the Route
 

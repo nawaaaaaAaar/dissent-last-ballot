@@ -1,6 +1,6 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "type": "module",
   "description": "Top-down 3D resistance action mission with driving and mobile dual-stick controls",

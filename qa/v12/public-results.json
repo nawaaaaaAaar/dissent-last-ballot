@@ -1,0 +1,40 @@
+{
+  "frontend": "0b49679",
+  "version": "0.12.0",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=0b49679-public&quality=low",
+  "method": "Cloud Chromium, actual CDP keyboard/touch inputs; advanceTime deterministic stepping; no position/health edits",
+  "keyboard": {
+    "passed": true,
+    "barrier_hp": 0,
+    "companion_aboard": true,
+    "recording": true,
+    "route": "east road, far crossing west, western safe house",
+    "final_mode": "won",
+    "game_seconds": 27.08,
+    "heat": 0.69,
+    "seen": false,
+    "vehicle_condition": 100,
+    "score": 2166
+  },
+  "touch": {
+    "passed": true,
+    "portrait": [390,844],
+    "landscape": [844,390],
+    "horizontal_overflow": false,
+    "melee_condition_before": 3,
+    "melee_condition_after": 2,
+    "dodge_cooldown_after": 1.5,
+    "rescued": true,
+    "recording": true,
+    "companion_aboard": true,
+    "collision_caused_vehicle_failure": true,
+    "boarding_retry_preserved_items_and_companion": true,
+    "final_mode": "won",
+    "heat": 0.17,
+    "seen": false,
+    "vehicle_condition": 100,
+    "score_after_retry": 1600
+  },
+  "limitations": ["Not physical phones", "Not Safari", "Not a frame-rate benchmark", "Not novice enjoyment testing", "Not production-quality realism"],
+  "patch_0_12_1": "Adds roadblock/reboarding persistence and actual boarding-location checkpoints. See local-results.json for actual west-route/collision/retry checks and final-public-results.json for the final public patch."
+}

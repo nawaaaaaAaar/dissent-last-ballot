@@ -41,4 +41,10 @@ check('Vehicle acceleration and braking work; destruction restores the boarding 
 check('Navigation detours around live barricades and static buildings',()=>{
   const g=fresh();const route=g.route({x:0,z:20},{x:0,z:12});assert(route.length);assert(route.every(p=>g.valid(p.x,p.z,.4)));assert(route.some(p=>Math.abs(p.x)>5));
 });
+check('Cleared roadblock stays cleared after reboarding and checkpoint recovery',()=>{
+  const g=fresh();g.friend.rescued=true;g.record=true;Object.assign(g.player,WORLD.van);Object.assign(g.friend,WORLD.van);g.interact();
+  g.interact();Object.assign(g.player,{x:-34,z:-15});g.attack();assert(!g.roadblock);
+  Object.assign(g.van,{x:-34,z:-12});Object.assign(g.player,{x:-34,z:-13});Object.assign(g.friend,{x:-33,z:-13});g.interact();assert(g.van.occupied);assert(!g.roadblock);assert.equal(g.checkpoint.x,-34);
+  g.retry();assert(g.van.occupied&&!g.roadblock);assert.equal(g.van.x,-34);
+});
 console.log(JSON.stringify({suite:'Breakout isolated rules',checks,passed:true}));

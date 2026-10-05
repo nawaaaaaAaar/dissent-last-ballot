@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {Breakout,WORLD} from './breakout-rules.js?v=0.12.0';
+import {Breakout,WORLD} from './breakout-rules.js?v=0.12.1';
 import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.12.0';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
 import {WorldAudio} from './world-audio.js';
@@ -30,7 +30,7 @@ function finish(){
     game.message+' Recovered recording and rescue/boarding checkpoints are retained within this tab, not after reload.';
   $('results').innerHTML=`<span>RUN SCORE<br><b>${game.score}</b></span><span>TIME<br><b>${Math.floor(game.time/60)}:${String(Math.floor(game.time%60)).padStart(2,'0')}</b></span><span>VAN CONDITION<br><b>${Math.round(game.van.health)}%</b></span>`;
 }
-function start(){keys.clear();sticks.move={x:0,z:0};game.start();poses.forEach(resetHuman);if(!audio.enabled)toggleAudio();syncPanels();render();}
+function start(){keys.clear();sticks.move={x:0,z:0};mouseAim=false;aimBrake=brakeHeld=false;game.start();poses.forEach(resetHuman);if(!audio.enabled)toggleAudio();syncPanels();render();}
 function help(){helpReturn=game.mode;keys.clear();sticks.move={x:0,z:0};game.input.attack=false;setMode('help');}
 function pause(){if(game.mode==='paused')setMode('playing');else if(game.mode==='playing'){keys.clear();sticks.move={x:0,z:0};game.input.attack=false;setMode('paused');}}
 function toggleAudio(){

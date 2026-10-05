@@ -23,7 +23,7 @@ export class Breakout{
     this.friend={...WORLD.friend,rescued:false,aboard:false};this.record=false;this.gate={...WORLD.gate,hp:4,fall:0};
     this.enemies=[[5,32],[-6,30],[4,13],[-5,5],[34,-6]].map(([x,z],id)=>({id,x,z,yaw:0,hp:3,stun:0,windup:0,cooldown:1.2,route:[],routeAge:0,last:{x,z},home:{x,z},down:0}));
     this.car={x:0,z:36,yaw:Math.PI,speed:0,active:false,stun:0,route:[],routeAge:0};
-    this.heat=1.25;this.seen=false;this.hidden=0;this.lastSeen={x:0,z:43};this.phase='pursuit';this.roadblock=false;
+    this.heat=1.25;this.seen=false;this.hidden=0;this.lastSeen={x:0,z:43};this.phase='pursuit';this.roadblock=false;this.escapeStarted=false;
     this.supplies=WORLD.medkits.map(p=>({...p,taken:false}));this.score=0;this.hits=0;this.message='';this.messageTime=0;this.particles=[];this.checkpoint=null;
     this.input={x:0,z:0,aimX:0,aimZ:-1,sprint:false,attack:false,brake:false};this.helped=0;this.crashes=0;
   }
@@ -121,8 +121,9 @@ export class Breakout{
     if(n?.id==='van'){
       if(!this.friend.rescued||!this.record){this.say('Rescue Kabir and recover the recording before leaving.',3);return;}
       if(dist(this.friend,this.van)>7){this.say('Wait for Kabir to catch up to the van.',3);return;}
-      this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.heat=Math.max(2.6,this.heat);this.roadblock=true;
-      this.checkpoint={x:10,z:-4,gate:0,record:true,rescued:true,vehicle:true};this.say('Both aboard. Escape through the side streets. Lose sight of the pursuers, then reach the western safe house.',5);
+      this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.heat=Math.max(2.6,this.heat);
+      if(!this.escapeStarted){this.roadblock=true;this.escapeStarted=true;}
+      this.checkpoint={x:this.van.x,z:this.van.z,yaw:this.van.yaw,gate:this.gate.hp,roadblock:this.roadblock,record:true,rescued:true,vehicle:true};this.say('Both aboard. Escape through the side streets. Lose sight of the pursuers, then reach the western safe house.',5);
     }
   }
   hurt(amount=1){
@@ -141,7 +142,7 @@ export class Breakout{
   retry(){
     const c=this.checkpoint;this.start();if(!c)return;
     this.gate.hp=c.gate;this.record=c.record;this.friend.rescued=c.rescued;this.helped=1;this.player.x=c.x;this.player.z=c.z;this.friend.x=c.x+1;this.friend.z=c.z+1;
-    if(c.vehicle){this.van.x=c.x;this.van.z=c.z;this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.heat=2.4;this.roadblock=true;}
+    if(c.vehicle){this.van.x=c.x;this.van.z=c.z;this.van.yaw=c.yaw??Math.PI/2;this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.escapeStarted=true;this.heat=2.4;this.roadblock=c.roadblock??true;}
     this.enemies.forEach((e,i)=>{e.x=(i%3-1)*4;e.z=c.z+12+i*2;});this.checkpoint=c;this.player.hurt=2;this.say('Checkpoint restored. Try another escape route.',3);
   }
   objective(){

@@ -2,6 +2,8 @@
 
 ## v0.12: Breakout
 
+Patch v0.12.1 fixes a roadblock respawning on reboarding and stores/restores the actual boarding position and heading. It also resets input aim on a fresh run. These are tested gameplay fixes, not new character art.
+
 - Replaced the default task-led campaign with one top-down 3D action mission. The previous game remains at `chapter-v11.html`.
 - Added directional close-range strikes, opponent attack interruption, knockback, condition and a stamina-based short dodge.
 - Added a four-hit breakable line and a clear-or-draw-away rescue, companion following and joint boarding requirement.

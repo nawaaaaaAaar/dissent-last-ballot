@@ -28,7 +28,7 @@ The current movement's sourced context and disputed-claim distinctions remain in
 
 ## Development and verification
 
-Run `npm ci`, `npx playwright install chromium`, then `npm start`. `npm test` runs seven isolated rules checks; `npm run test:browser` completes the current mission with actual keyboard input and tests pause/help, capture and retry. `DISSENT_URL` can point that browser suite at the public page. Historical `test:campaign`, `test:tutorial` and other old scripts belong to the archived campaign, not current-game signoff.
+Run `npm ci`, `npx playwright install chromium`, then `npm start`. `npm test` runs eight isolated rules checks; `npm run test:browser` completes the current mission with actual keyboard input and tests pause/help, both routes, capture and retry. `npm run test:mobile` exercises actual touch in phone emulation. `DISSENT_URL` can point either browser suite at the public page. Historical `test:campaign`, `test:tutorial` and other old scripts belong to the archived campaign, not current-game signoff.
 
 Original rules are in `docs/breakout-rules.js`, rendering/input in `docs/breakout.js` and interface in `docs/breakout.css`. `render_game_to_text()` exposes inspectable state and `advanceTime(ms)` advances deterministic QA time; QA stepping is not a device FPS measurement.
 

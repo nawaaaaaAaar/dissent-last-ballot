@@ -45,7 +45,23 @@ try{
  await driveAxis('x',34);await driveAxis('z',-32);await driveAxis('x',-34);await driveAxis('z',-48);await tick(3000);
  await record('Final route');await page.screenshot({path:out+'/local-final.png'});
  assert.equal((await state()).mode,'won','Complete mission through keyboard driving');
- await page.locator('#again').click();await tick(45000);assert.equal((await state()).mode,'caught');
+ await page.locator('#again').click();await tick(0);
+ await page.keyboard.down('Shift');await key('w',3660);await page.keyboard.up('Shift');
+ for(let j=0;j<4;j++)await key('Space',520);
+ await page.keyboard.down('Shift');await key('w',1700);await page.keyboard.up('Shift');await key('e');
+ assert((await state()).friend.rescued);
+ await footTo(-2,6);await footTo(0,0);await footTo(10,0);await footTo(10,-4);await tick(500);await key('e');
+ await driveAxis('x',-34);await driveAxis('z',-13.4);await key('e');assert(!(await state()).van.occupied);
+ await footTo(-34,-15.1);await key('Space',500);assert(!(await state()).roadblock,'Roadblock clears through actual strike');
+ await key('e');await tick(0);assert((await state()).van.occupied);assert(!(await state()).roadblock,'Reboarding must not regenerate it');
+ await driveAxis('z',-32);await record('Western roadblock route passed');
+ await page.screenshot({path:out+'/local-west-route.png'});
+ // Fail by collision and restore the last earned boarding location.
+ await driveAxis('x',-16);await page.keyboard.down('w');await tick(30000);await page.keyboard.up('w');
+ assert.equal((await state()).mode,'caught');await page.locator('#retry').click();await tick(0);
+ assert((await state()).van.occupied&&!(await state()).roadblock);await record('Actual boarding checkpoint restored');
+ await page.locator('#pause').click();await page.locator('#restart').click();
+ await tick(45000);assert.equal((await state()).mode,'caught');
  await page.locator('#retry').click();await tick(0);assert.equal((await state()).mode,'playing');assert.equal((await state()).player.health,6);
  await record('Capture and fresh retry');
  assert.equal(errors.length,0);
