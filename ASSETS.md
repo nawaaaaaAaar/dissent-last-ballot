@@ -1,5 +1,9 @@
 # Asset provenance
 
+## v0.9 movement revision
+
+The new voter files, case-comparison panels, feedback, reform charter, text and revised signage are original code/content. Existing models, scanned materials, clothing variants and authored geometry are reused under the licences below. Bihar/West Bengal help-camp labels do not imply that the geometry was scanned or photographed there. No real electoral rolls, news photographs, signatures, voter identifiers or public-official likenesses are incorporated.
+
 ## v0.8 authored districts and texture variations
 
 - **District geometry:** Campus blocks, symbolic arched entrance, market façades, canopy, mats, bunting, stations and layout are project-authored in `docs/districts.js`. They reuse the credited surface materials below. No new news photographs, real participant portraits or survey data are incorporated.

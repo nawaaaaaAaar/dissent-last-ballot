@@ -1,8 +1,25 @@
 # DISSENT: The Last Ballot
 
-A mobile-first, third-person resistance adventure across three freely explorable, reference-inspired Delhi districts. The runner is an archive, not the main game. **v0.8: A City of Accounts** is an implemented campaign prototype, not a finished photorealistic release.
+A mobile-first, third-person resistance adventure about the current vote-chori/SIR movement. **v0.9: Every Eligible Voter** connects a Delhi protest to invented Bihar and West Bengal voter-help camps. It is a campaign prototype, not a finished photorealistic release.
 
-## What game is this?
+## Current game: Every Eligible Voter
+
+The movement's demand is broader than replacing Gyanesh Kumar: leadership accountability, ending the contested SIR process, and inclusion with transparent review across affected states. The campaign names those demands without claiming that electoral-manipulation allegations have been proven or that officials/policies have actually changed.
+
+Each chapter requires three invented, consented case referrals. Compare the before/current records and the resident's account, then choose inclusion assistance, recognition that one valid entry remains, or pending-appeal support. Wrong answers give feedback; leaving produces no completion. Reading pauses action.
+
+- **Jantar Mantar:** Protect the recorder, review voter files, cross the fictional line and reunite.
+- **Bihar help camp:** Review omitted, first-time and duplicate cases, then deliver referrals with both companions.
+- **West Bengal help camp:** Preserve appeal follow-up and eligible-voter referrals, sustain three desks and build a complete reform demand.
+- **Final charter:** A resignation-only response is insufficient. Select all three commitments to finish the hypothetical ending; no actual roll, registration, policy or election result changes.
+
+The second and third locations reuse authored game geometry and are explicitly invented, not actual regional camps or maps. All files use fictional adult characters; no real voter database, uploads or political messages are sent. The campaign uses a new browser-local v0.9 save key, so v0.8 completion is not mistaken for case review.
+
+Phone controls retain the left joystick with outer-edge running, right-thumb camera drag, Jump, Dodge and contextual held Action. Review choices and charter controls are touch-accessible scrollable panels. Movement and combat mechanics remain; the new decisions make electoral inclusion part of play, not just scenery.
+
+Read [the current movement research and implementation](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md), [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) and [asset/visual limits](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/VISUAL-REVIEW.md). To run locally, use `npm ci`, `npx playwright install chromium`, `npm start`, then `npm run test:campaign`. The earlier slower narrative and runner are archives.
+
+## v0.8 design history
 
 Explore, orient yourself, help people, and act under pressure. Each district changes the central challenge rather than reskinning the same chase:
 

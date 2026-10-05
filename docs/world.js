@@ -1,17 +1,18 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.8.0';
-import {STORY,ITEMS} from './story.js?v=0.8.0';
-import {WorldAudio} from './world-audio.js?v=0.8.0';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.9.0';
+import {STORY,ITEMS} from './story.js?v=0.9.0';
+import {WorldAudio} from './world-audio.js?v=0.9.0';
 import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
-import {ActionGame} from './action-game.js?v=0.8.0';
-import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.8.0';
-import {route} from './navigation.js?v=0.8.0';
+import {ActionGame} from './action-game.js?v=0.9.0';
+import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.9.0';
+import {route} from './navigation.js?v=0.9.0';
+import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.9.0';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.8.0';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.9.0';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -64,11 +65,13 @@ function mode(m){
   $('pause').textContent=m==='paused'?'Resume':'Pause';$('interact').hidden=m!=='playing'||!s.near;
   $('retry').hidden=m!=='caught';
   $('next-district').hidden=m!=='won'||!action?.active;
+  $('reopen-charter').hidden=m!=='won'||!action?.active||campaign.count()!==3;
   $('journal').hidden=!['playing','journal','menu'].includes(m)||(m==='journal'&&action?.active);
   $('journal').disabled=['loading','error'].includes(m);$('city-map-start').disabled=['loading','error'].includes(m);
   $('journal').textContent=action?.active||m==='menu'?'City map':'Journal';
   $('rally-screen').hidden=m!=='rally';$('journal-screen').hidden=m!=='journal';
   $('city-screen').hidden=m!=='citymap';
+  $('review-screen').hidden=m!=='review';$('charter-screen').hidden=m!=='charter';
   $('action-hud').hidden=!action?.active||['menu','loading','error','won','caught'].includes(m);
   $('evade').hidden=!action?.active;
   document.body.classList.toggle('playing',m!=='menu'&&m!=='loading');
@@ -140,7 +143,7 @@ function buildWorld(){
   for(let z=-45;z<37;z+=5)box(stat,M.white,0,.026,z,.095,.009,2.2);
   for(let z=-47;z<36;z+=3)for(let x of [-9.9,9.9])box(stat,z%2?M.dark:M.white,x,.18,z,.15,.25,1.5);
   for(let z of [-38,-5,17]){bench(stat,-10,z,Math.PI/2);bench(stat,10,z,-Math.PI/2);}
-  tent(stat,-23,3);sign(stat,'FIRST AID',-23,2.62,5.28,3.5,.65,'#d3c6ab','#744637','COMMUNITY SUPPORT');
+  tent(stat,-23,3);sign(stat,'VOTER HELP',-23,2.62,5.28,3.5,.65,'#d3c6ab','#744637','CONSENTED FICTIONAL CASES');
   tent(stat,-24,-7);sign(stat,'PUBLIC RECORD',-24,2.62,-4.72,3.5,.65,'#d3c6ab','#744637','KEEP THE ACCOUNT INTACT');
   const arch=observatory();arch.position.set(32,0,-17);arch.rotation.y=.08;stat.add(arch);
   colliders.push({x:32,z:-17,w:24,d:30,h:16,name:'observatory instrument'});
@@ -236,7 +239,7 @@ function populate(){
     const a=addActor(x,z,['#816251','#85907c','#676b7f','#c4b395','#6b7271'][i%5],false,{female:district==='shaheen'?i%3!==0:i%4===0});a.p.group.scale.setScalar(.92+rand()*.13);
     if(i===10||i===11)a.walking=true;
     if(i%3===0){const placard=new THREE.Group();cylinder(placard,M.wood,0,1.9,.12,.014,.85);
-      const words=(district==='jantar'?['VOTE CHORI BAND KARO','LET JOURNALISTS REPORT','ACCOUNTABILITY NOW','SAVE DEMOCRACY','OUR VOICES REMAIN']:['PUBLIC SPACE FOR ALL','REMEMBER. RESIST.','OUR VOICES REMAIN','STAND TOGETHER','ACCOUNTABILITY NOW'])[i%5];
+      const words=['VOTE CHORI BAND KARO','END SIR','GYANESH KUMAR: RESIGN','INCLUDE ELIGIBLE VOTERS','SAVE DEMOCRACY'][i%5];
       sign(placard,words,0,2.35,.14,.8,.38,'#e5dcc5','#7d3b30');
       a.p.group.add(placard);a.placard=placard;
     }
@@ -301,7 +304,7 @@ function nearest(){
   $('interact').hidden=s.mode!=='playing'||!best;
   if(best)$('interact').textContent=action?.active?
     (best.id==='barrier'?`HOLD · ${Math.round(action.barrier*100)}%`:
-    ['aid','organiser','protest'].includes(best.id)?action.mission==='hold'?'HOLD · SUPPORT':'HOLD · HELP':
+    ['aid','organiser','protest'].includes(best.id)?'HOLD · REVIEW':
     best.id==='companion'?(coarse?'REGROUP':'GET KABIR MOVING · E'):best.id==='assembly'?(coarse?'HANDOFF':'FINISH THE RUN · E'):coarse?(best.type==='recorder'?'RECOVER':best.type==='water'?'TAKE WATER':'READ'):best.prompt+' · E'):best.prompt+'  ·  E';
 }
 function dialog(e){
@@ -357,11 +360,12 @@ function journal(){
   $('assist-game').checked=s.assist;
   $('journal-copy').textContent=`AMAN’S JOURNAL\n\nI came to find Kabir. Mira asked me to make myself useful first.\n\nCURRENT TASK\n${$('objective').textContent}\n\nCOMPLETED\n${objectives.filter(([id])=>s.tasks[id]).map(([id])=>STORY[id].name).join(' • ')||'No story encounters completed yet.'}\n\nWater: ${s.inventory.water}/3 • Recorder: ${s.inventory.recorder?'recovered':'not recovered'}\nHandoff: ${s.choice==='archive'?'protected record desk':'public assembly'}\nKabir: ${s.companion?'staying with me':'still separated'}\n\n`+
     (s.notes.map(n=>n.title+'\n'+n.copy).join('\n\n')||'Explore the benches and courtyard for optional story fragments.');
-  if(action?.active)$('journal-copy').textContent=`${DISTRICTS[district].name.toUpperCase()}\n\n${DISTRICTS[district].brief}\n\nCURRENT TASK\n${$('objective').textContent}\n\nTHE NETWORK\n${campaign.count()} / 3 districts completed. Help in another district grants one automatic health recovery in this mission. This is an abstract game benefit, not medical advice.\n\n`+(s.notes.map(n=>n.title+'\n'+n.copy).join('\n\n')||'Optional fragments are on the benches and tables. They are fictional personal accounts, not evidence of actual incidents.');
+  if(action?.active)$('journal-copy').textContent=`THE VOTE-CHORI / SIR CAMPAIGN\n\n${DISTRICTS[district].brief}\n\nCURRENT TASK\n${$('objective').textContent}\n\nMOVEMENT DEMANDS\n${DEMANDS.map(d=>d.title+': '+d.copy).join('\n\n')}\n\nREVIEWED FILES\n${movement.outcomes.map(o=>o.case+' • '+o.response+' • '+o.status).join('\n')||'No files referred yet.'}\n\nTHE NETWORK\n${campaign.count()} / 3 chapters completed. Help in another chapter grants one emergency health recovery. Names and records are fictional; no real voter data is collected.\n\nRead the sourced movement dossier through the research link. Claims of partisan deletion are disputed; this campaign does not establish guilt, scrap SIR or change electoral rolls.`;
   mode('journal');
 }
 function begin(playAction=false,region='jantar'){
   selectDistrict(playAction?region:'jantar');
+  movement.reset();
   action?.reset(playAction,DISTRICTS[district].mission);
   try{localStorage.removeItem(SAVE_KEY);}catch{}
   keys.clear();joy.x=joy.y=0;$('sprint').classList.remove('active');
@@ -397,7 +401,7 @@ function step(dt){
   if(['loading','error'].includes(s.mode))return;
   s.time+=dt;
   if(s.mode==='paused'||s.mode==='caught'||s.mode==='won')return;
-  if(s.mode==='journal'||s.mode==='citymap'||s.mode==='brief')return;
+  if(['journal','citymap','brief','review','charter'].includes(s.mode))return;
   if(s.mode==='rally'){s.rallyTime+=dt;const phase=Math.abs(Math.sin(s.rallyTime*2));$('rally-cursor').style.left=`${phase*100}%`;$('rally-count').textContent=`${s.rallyHits} / 3`;return;}
   if(toastTime>0){toastTime-=dt;if(toastTime<=0)$('toast').classList.remove('show');}
   if(s.mode==='menu'){anim+=dt;poseHuman(player,anim*.5,0);return;}
@@ -498,9 +502,37 @@ function actionWin(){
   campaign.record(district,action.score,action.rescued.length);
   s.tasks.assembly=true;mode('won');
   const medal=action.health>=4&&action.rescued.length>=2?'SOLIDARITY':action.health>=3?'DEFIANCE':'SURVIVOR';
-  $('ending-title').textContent=campaign.count()===3?'A city that still speaks.':DISTRICTS[district].chapter+' · COMPLETE';
-  $('ending-copy').textContent=DISTRICTS[district].debrief+` ${campaign.count()} / 3 districts completed. ${medal} · ${action.score} points. This fictional campaign preserves people and accounts, not a verified reconstruction of actual incidents.`;
+  $('ending-title').textContent=campaign.count()===3?'Replacement is not repair.':DISTRICTS[district].chapter+' · COMPLETE';
+  $('ending-copy').textContent=DISTRICTS[district].debrief+` ${campaign.count()} / 3 chapters completed. ${medal} · ${action.score} points. ${movement.reviewed.length} fictional voter files referred. No actual registration or election result changed.`;
   $('next-district').hidden=false;$('next-district').textContent=campaign.count()===3?'Explore the city map':'Continue to the next district';
+  if(campaign.count()===3)openCharter();
+}
+function openReview(e){
+  movement.active=e.id;const entry=CASES[district][e.id];
+  keys.clear();joy.x=joy.y=0;action.holding=false;
+  $('review-title').textContent=entry.name;
+  $('review-before').textContent=entry.before;$('review-after').textContent=entry.after;$('review-account').textContent=entry.account;
+  $('review-feedback').textContent='Choose the appropriate referral. Reading is paused; there is no penalty for taking time.';
+  $('review-feedback').dataset.correct='';mode('review');
+}
+function reviewAnswer(choice){
+  if(s.mode!=='review'||!movement.active)return;
+  const result=movement.answer(district,choice);
+  $('review-feedback').textContent=result.copy;$('review-feedback').dataset.correct=String(result.correct);
+  if(result.correct){action.help(s,result.id);mode('playing');hud();nearest();toast(result.copy,6);}
+  else $('review-feedback').scrollIntoView({block:'nearest',behavior:'instant'});
+}
+function openCharter(){
+  keys.clear();joy.x=joy.y=0;movement.mandate=[];document.querySelectorAll('#charter-screen input').forEach(e=>e.checked=false);
+  $('charter-feedback').textContent='The fictional assembly will not accept “one resignation and we are done”. Build all three commitments.';
+  mode('charter');
+}
+function finishCharter(){
+  movement.mandate=DEMANDS.filter(d=>$('demand-'+d.id).checked).map(d=>d.id);
+  if(movement.mandate.length!==3){$('charter-feedback').textContent='A leadership change alone leaves omitted voters and unresolved cases behind. Include all three commitments.';return;}
+  mode('won');$('ending-title').textContent='A mandate to repair, not erase.';
+  $('ending-copy').textContent='In this fictional ending, the assembly adopts a demand for Gyanesh Kumar’s exit through lawful constitutional processes, ending the contested SIR process, and transparent inclusion and appeal support across affected states. The win is a complete public demand backed by consented case referrals, not a claim that an official resigned, SIR was abolished, voters were registered, or past elections reversed. Keep every eligible voter in view.';
+  try{localStorage.setItem('dissent-charter-v09','complete');}catch{}
 }
 function actionFail(){
   mode('caught');$('ending-title').textContent='Caught in the crackdown.';
@@ -571,6 +603,9 @@ function bindings(){
   button('continue',continueGame);
   button('rally-input',rallyHit);button('rally-skip',finishRally);button('journal',()=>{if(action?.active||s.mode==='menu')cityMap();else journal();});button('journal-close',journal);
   button('city-map-start',cityMap);button('city-close',cityMap);
+  CHOICES.forEach(c=>button('review-'+c.id,()=>reviewAnswer(c.id)));
+  button('review-back',()=>{movement.active=null;mode('playing');});
+  button('charter-confirm',finishCharter);button('charter-back',()=>{mode('won');});button('reopen-charter',openCharter);
   button('city-journal',journal);
   button('next-district',()=>{if(campaign.count()===3)cityMap();else begin(true,campaign.next());});
   for(const id of Object.keys(DISTRICTS))button('play-'+id,()=>begin(true,id));
@@ -633,9 +668,9 @@ async function init(){
       scene.environment=gen.fromEquirectangular(sky).texture;scene.environmentIntensity=.55;scene.background=sky;scene.backgroundIntensity=.55;scene.backgroundRotation.y=.9;gen.dispose();
     }
     player=human('#a86137');player.group.position.set(0,0,31);scene.add(player.group);buildDistricts();campaign.load();
-    action=new ActionGame(scene,{toast,tone:(...args)=>audio.tone(...args),collect:e=>{
+    action=new ActionGame(scene,{toast,review:openReview,missingReview:()=>movement.missing(district),tone:(...args)=>audio.tone(...args),collect:e=>{
       s.items.push(e.id);e.prop.visible=e.marker.visible=false;
-      if(e.type==='recorder'){s.inventory.recorder=true;toast('Recorder secured. Get through the barricade.',3);}
+    if(e.type==='recorder'){s.inventory.recorder=true;toast('Recorder secured. Compare the voter files before crossing the line.',3);}
       else if(e.type==='water'){s.inventory.water++;action.health=Math.min(5,action.health+1);toast('Water recovered. Health restored.',2);}
       else{s.notes.push(e);toast(e.title+' added to the journal.',2);}
       audio.tone(480,.12);
@@ -645,11 +680,11 @@ async function init(){
     quality();mode('menu');$('start').disabled=false;$('story-start').disabled=false;$('start').textContent=campaign.count()?'PLAY · Continue campaign':'PLAY · Start the campaign';$('loading').textContent='Three districts ready • Desktop and touch controls';
     $('continue').hidden=!savedGame();
     window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.8`;};
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.9`;};
     const worldText=window.render_game_to_text;
-    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),district,campaign:campaign.results,party:events.filter(e=>e.id==='companion'||e.id==='organiser').map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),action:{active:action.active,mission:action.mission,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),settle:+action.settle.toFixed(2),contested:action.contested,charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score,support:action.support}});
+    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),district,campaign:campaign.results,electoral:{reviewed:movement.reviewed,outcomes:movement.outcomes,activeCase:movement.active,attempts:movement.attempts,mandate:movement.mandate},party:events.filter(e=>e.id==='companion'||e.id==='organiser').map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),action:{active:action.active,mission:action.mission,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),settle:+action.settle.toFixed(2),contested:action.contested,charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score,support:action.support}});
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
-    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.8`;}}
+    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.9`;}}
     requestAnimationFrame(frame);
   }catch(e){console.error(e);s.mode='error';$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }

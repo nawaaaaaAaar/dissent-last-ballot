@@ -1,5 +1,15 @@
 # DISSENT: The Account
 
+## Current campaign: Every Eligible Voter
+
+The v0.9 campaign follows the current vote-chori/SIR movement rather than historical protest chapters. Aman and the team carry a broader demand than Gyanesh Kumar's departure: accountability, ending the contested SIR process, and transparent inclusion/appeal support across affected states.
+
+Jantar Mantar introduces the public demand and three fictional voter files. An invented Bihar help camp adds an omitted resident, a first-time voter and a duplicate with one valid registration, then requires the referral team to leave together. An invented West Bengal camp preserves an unresolved appeal alongside eligible-voter support and culminates in a complete reform charter.
+
+The finale explicitly rejects “one resignation and we are done.” All three commitments are required. This hypothetical story ending does not say that an official resigned, SIR was repealed, any application was approved or a past election reversed. Case referrals are not legal eligibility determinations; all records and participants are invented. See [the dated current-movement dossier](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md).
+
+## v0.8 history
+
 ## Current campaign: A City of Accounts
 
 The v0.8 default is a three-district resistance adventure. Aman is useful to a network, not an invulnerable lone saviour. Its connection is fictional narrative progression across separate places and historical inspirations, not a claim that the incidents occurred on one day.

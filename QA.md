@@ -1,5 +1,17 @@
 # QA and limitations
 
+## v0.9 Every Eligible Voter
+
+`npm run test:campaign` passed the nine invented case referrals across Jantar Mantar and the Bihar/West Bengal help-camp chapters. Actual keyboard/click inputs cover record comparison, incorrect-response feedback, leaving without a referral, action-time freeze during review, the breakthrough, both escort companions arriving, desk sustain, rejection of a resignation-only charter, and completion with all three commitments.
+
+The same suite passes completed-chapter persistence, replay/reset and in-session menu Resume. Mobile Chromium emulation covers partial-stick walk/outer-stick run, stamina, Dodge, pause, camera drag, a held file review, incorrect and correct touch responses, map/journal navigation and portrait/landscape fit. `qa/v09/results.json` and captures retain the scope, with no page errors. Emergency network recovery is also covered by an isolated damage-rule check, not presented as a full phone combat test.
+
+Review of actual captures found incorrect-answer feedback below the desktop panel's visible area and a more-specific later CSS rule overriding the intended width. A specificity correction widens desktop review, and an incorrect answer now scrolls feedback into view. Contextual captions and toasts were corrected from generic rescue language to case-review/referral language. Public verification checks the final frontend after this readability pass.
+
+All files and names are invented and labelled; no actual voter data, official registration, external petition or political messages are produced. Camp geometry is reused and explicitly not a real Bihar/West Bengal location. The fictional charter does not announce an official's actual resignation, SIR repeal or reversed election.
+
+Physical iPhone/Android performance, Safari and novice enjoyment remain unverified. v0.9 is a theme/mechanics revision, not an art-quality or complete legal-procedure simulation. Earlier action/story regression results below are historical; the current campaign suite is the signoff scope for the changed gameplay.
+
 ## v0.8 three-district campaign
 
 The public frontend commit `80cadd7` loads `world.js?v=0.8.0`. All three campaign missions were completed in cloud Chromium with actual keyboard/mouse input and deterministic stepping. The campus ended with both companions at z=-41.22, within the arrival radius of the player's z=-43 destination; the community mission recorded all three stations and twenty sustain seconds. `qa/v08/public-results.json` and `public-*` captures retain the observed states.

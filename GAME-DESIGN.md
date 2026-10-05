@@ -1,5 +1,11 @@
 # DISSENT: making the resistance story playable
 
+## v0.9: make the electoral theme a decision
+
+The current campaign requires comparison of pre-SIR/current invented records and resident accounts. Different outcomes lead to inclusion assistance, preserving a single valid entry, or pending-appeal support. The player must understand those distinctions, not click “restore everyone” regardless of the file. Every chapter requires its three referrals, while action pauses for reading.
+
+An escort and a sustain encounter connect those decisions to movement and responsibility. The final charter makes a resignation-only demand insufficient and requires leadership accountability, ending the contested SIR process and inclusion/review. This is fictional adoption of a demand, not a real political outcome. [CURRENT-MOVEMENT.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md) explains the evidence, primary-source dates and boundaries.
+
 ## v0.8: choose the game before adding features
 
 The current identity is a mobile-first third-person resistance adventure with three bounded explorable districts. The complete further research, source distinctions, mobile rationale and implementation decisions are in [DISSENT: what game are we making?](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md). The history below records earlier iterations, not proof that the current game has passed human enjoyment testing.

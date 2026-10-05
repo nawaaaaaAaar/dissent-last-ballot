@@ -19,17 +19,19 @@ export class ActionGame {
     this.dodge=.48;this.cooldown=2.3;this.h.tone(420,.08);return true;
   }
   target(s) {
-    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'organiser';if(!s.companion)return 'companion';if(!s.tasks.barrier)return 'barrier';return 'assembly';}
+    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'organiser';if(!s.companion)return 'companion';const review=this.h.missingReview?.();if(review)return review;if(!s.tasks.barrier)return 'barrier';return 'assembly';}
     if(this.mission==='hold')return ['organiser','aid','protest'].find(id=>!this.rescued.includes(id))||'assembly';
     if(!s.inventory.recorder)return 'recorder';
+    const review=this.h.missingReview?.();if(review)return review;
     if(!s.tasks.barrier)return 'barrier';
     if(!s.companion)return 'companion';
     return 'assembly';
   }
   objective(s) {
-    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'Regroup Mira in the courtyard.';if(!s.companion)return 'Find Kabir. Keep Mira close.';if(!s.tasks.barrier)return 'Lead both companions to the exit. Hold ACTION.';return 'Reach the gathering together. Wait for your companions.';}
-    if(this.mission==='hold'){const names={organiser:'community kitchen',aid:'first aid',protest:'reading circle'},id=this.target(s);if(id!=='assembly')return `Support the ${names[id]} (${this.rescued.length} / 3). Choose any order.`;return this.settle<20?`${this.contested?'Clear pressure from the stations':'Sustain the gathering'} · ${Math.ceil(20-this.settle)} seconds`:'The gathering holds. Join the assembly.';}
+    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'Review Mira’s voter file. Hold ACTION.';if(!s.companion)return 'Regroup Kabir. Keep the referral team close.';if(this.h.missingReview?.())return `Compare the remaining voter files (${this.rescued.length} / 3).`;if(!s.tasks.barrier)return 'Lead both companions to the exit. Hold ACTION.';return 'Deliver the referrals together. Wait for your companions.';}
+    if(this.mission==='hold'){const names={organiser:'appeal file',aid:'inclusion file',protest:'first-time voter file'},id=this.target(s);if(id!=='assembly')return `Review the ${names[id]} (${this.rescued.length} / 3). Choose any order.`;return this.settle<20?`${this.contested?'Clear pressure from the desks':'Keep the desks supported'} · ${Math.ceil(20-this.settle)} seconds`:'Deliver the inclusion-and-review charter.';}
     if(!s.inventory.recorder)return 'Recover the recorder. Keep moving.';
+    if(this.h.missingReview?.())return `Compare three consented voter files (${this.rescued.length} / 3). Hold ACTION.`;
     if(!s.tasks.barrier)return 'Reach the line. Hold ACTION to break through.';
     if(!s.companion)return 'Find Kabir beyond the barricade.';
     return 'Reach the assembly together.';
@@ -47,7 +49,7 @@ export class ActionGame {
     if(['aid','organiser','protest'].includes(e.id)) {
       if(this.rescued.includes(e.id))return;
       this.holding=true;
-      this.h.toast('Stay close and hold ACTION to get them moving.',1.5);return;
+      this.h.toast(this.h.review?'Hold ACTION to compare this consented voter case.':'Stay close and hold ACTION to get them moving.',1.5);return;
     }
     if(e.id==='barrier') {
       if(this.mission==='break'&&!s.inventory.recorder){this.h.toast('Recover the recorder before crossing the line.',2);return;}
@@ -59,12 +61,18 @@ export class ActionGame {
       s.companion=true;this.score+=250;this.h.tone(600,.16);this.h.toast('Kabir is with you. Get to the assembly.',3);return;
     }
     if(e.id==='assembly') {
+      if(this.h.missingReview?.()){this.h.toast('Review all three voter files. One resignation is not the whole demand.',3);return;}
       if(this.mission==='break'&&(!s.inventory.recorder||!s.companion)){this.h.toast('Do not leave the recorder or Kabir behind.',2);return;}
       if(this.mission==='escort'&&(!s.tasks.barrier||!s.companion||!this.rescued.includes('organiser')||!this.h.escortReady())){this.h.toast('Wait for both companions. An escort ends together.',2);return;}
       if(this.mission==='hold'&&this.settle<20){this.h.toast('Support all three stations and sustain the gathering first.',2);return;}
       this.finish=true;this.score+=Math.round(this.health*100+Math.max(0,240-this.time)*3);
       this.h.win();return;
     }
+  }
+  help(s,id){
+    if(this.rescued.includes(id))return;
+    this.rescued.push(id);this.hold=0;this.holding=false;this.score+=200;this.health=Math.min(5,this.health+1);s.pressure=1;s.checkpoint={x:s.x,z:s.z};this.h.tone(550,.15);
+    this.h.toast(this.h.review?'File referred. A referral is not official voter restoration.':this.mission==='hold'?'Station supported. The organisers bring people to the gathering.':'They are safe. +200 · recovered one health.',3);
   }
   update(dt,s,near,police,moving) {
     if(!this.active||this.finish)return;
@@ -80,10 +88,10 @@ export class ActionGame {
     if(this.holding&&near) {
       if(near.id==='barrier'&&!s.tasks.barrier&&(s.inventory.recorder||this.mission==='escort')) {
         this.barrier=Math.min(1,this.barrier+dt/(s.assist?1.8:2.7));
-        if(this.barrier>=1){s.tasks.barrier=true;this.score+=300;s.checkpoint={x:s.x,z:s.z};this.holding=false;this.h.toast('The line gives way. Find Kabir!',3);this.h.tone(250,.2);}
+        if(this.barrier>=1){s.tasks.barrier=true;this.score+=300;s.checkpoint={x:s.x,z:s.z};this.holding=false;this.h.toast(this.mission==='escort'?'The exit opens. Deliver the referrals together.':'The line gives way. Find Kabir!',3);this.h.tone(250,.2);}
       }else if(['aid','organiser','protest'].includes(near.id)&&!this.rescued.includes(near.id)) {
         this.hold+=dt;
-        if(this.hold>=1){this.rescued.push(near.id);this.hold=0;this.holding=false;this.score+=200;this.health=Math.min(5,this.health+1);s.pressure=1;s.checkpoint={x:s.x,z:s.z};this.h.tone(550,.15);this.h.toast(this.mission==='hold'?'Station supported. The organisers bring people to the gathering.':this.mission==='escort'&&near.id==='organiser'?'Mira is with you. Find Kabir; choose a route around the buildings.':'They are safe. +200 · recovered one health.',2);}
+        if(this.hold>=1){this.hold=0;this.holding=false;if(this.h.review)this.h.review(near);else this.help(s,near.id);}
       }else this.hold=0;
     }else this.hold=0;
     if(this.mission==='hold'&&this.rescued.length===3){

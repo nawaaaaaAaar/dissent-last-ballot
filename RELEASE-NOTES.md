@@ -1,5 +1,14 @@
 # DISSENT release notes
 
+## v0.9: Every Eligible Voter
+
+- Refocused on vote chori, CEC Gyanesh Kumar, SIR and inclusion of eligible voters beyond a leadership change. Sourced primary documents and disputed-claim distinctions are in [CURRENT-MOVEMENT.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md).
+- Replaced the current historical Jamia/Shaheen Bagh chapters with invented Bihar and West Bengal help camps, openly reusing authored geometry rather than claiming real regional maps.
+- Added nine fictional consented case decisions with before/current records and resident accounts: inclusion, valid-entry/duplicate distinction, and pending-appeal support. All three referrals are required in each chapter.
+- Added paused reading, feedback/retry for incorrect responses, cancel without progress, and a final three-commitment reform charter that rejects resignation-only completion.
+- Retained mobile exploration, action, escort, sustain, checkpoints and replay. New campaign storage separates v0.9 case-based completion from v0.8 scores.
+- No actual voter records, submissions, policy changes or past-election reversals. This reuses existing art and is not a photorealistic production or physical-device certification.
+
 ## v0.8: A City of Accounts
 
 - Defined a mobile-first third-person resistance adventure with three distinct mission structures, rather than expanding the runner or adding more dialogue errands. Research and implementation decisions are in [DESIGN-REBUILD.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md).
