@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {sprintAllowed,updateStamina} from './sprint-controller.js?v=0.11.0';
+import {sprintAllowed,updateStamina} from './sprint-controller.js?v=0.11.1';
 
 // Fictional, deliberately abstract action rules. No realistic sabotage mechanics.
 export class ActionGame {

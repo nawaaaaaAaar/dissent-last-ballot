@@ -1,0 +1,5 @@
+
+> dissent-last-ballot@0.11.0 test:campaign
+> node street-qa.mjs
+
+{"pass":true,"checks":["Rally costs energy, creates actual space/stun and cannot bypass cooldown","Live help replaces quiz; actual sprint-jump clears a physical hurdle","Auto-pickup packets, recorder, breakthrough, companion and Jantar completion with zero case quizzes","Packet route and obstacle-aware two-person escort complete without mandatory reading","Sustain progresses only inside the gathering; full campaign ends with no required charter quiz","Saved campaign, replay/reset, deliberate capture/retry keeps packet, damage clears chain, optional case cannot be farmed, pause/resume","Actual mobile Rally, walk/run, moving dodge, jump, pause/resume and district switch; portrait/landscape fit"],"errors":[]}

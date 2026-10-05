@@ -36,6 +36,7 @@ export function human(color,police=false,options={}){
     const fix=m=>{m=m.clone();m.color.set('#ffffff');m.roughness=.83;m.metalness=0;
       if(m.name==='m003_body'&&m.map&&color.toLowerCase()!=='#a86137')m.map=knitTexture(m.map,parseInt(color.slice(-3),16)%3);
       if(options.localWardrobe&&m.name.includes('body'))m.color.set(color);
+      if(m.name==='Short dark hair')m.color.set('#261b15');
       if(source===female&&m.name==='f004_opacity')m.color.set('#3a2b23');
       if(m.name.includes('opacity')){m.transparent=false;m.alphaTest=.4;m.depthWrite=true;m.side=THREE.DoubleSide;}
       return m;};

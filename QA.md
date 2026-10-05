@@ -2,7 +2,11 @@
 
 ## v0.11 Learn the Route
 
-This revision adds two avatar bases and an original hair derivative, safe practice/guide, an integrated sprint module and pursuer route fallback. Campaign and tutorial verification is in progress; the earlier v0.10 results below must not be read as signoff for these changes. The current tutorial suite is `tutorial-qa.mjs`. Physical-phone performance, Safari and novice enjoyment remain unverified.
+The local action campaign suite passed all three chapters, Rally/displacement/cooldown, physical hurdle jump, zero required quizzes, two-person escort, zone-only sustain, persistence, replay, capture/retry, optional-case anti-farming and phone controls/layouts with no page errors. `qa/v11/results.json` and `v11-test.log` retain the scope.
+
+The tutorial suite passed all seven actual-input practice steps without pursuit or recorded campaign completion, a clean campaign start afterwards, guide freeze/return from Pause, phone guide/practice/exit/start, and sprint exhaustion/recovery rules. `qa/v11/tutorial-results.json` and `v11-tutorial-test.log` retain these checks. The supplied client separately records active movement and jumping in `qa/v11-client/`.
+
+Public visual review caught the custom hair material being overwritten with white by the common material normalisation. The material now explicitly retains its dark colour, and the earlier casual woman's head/hair textures have a separate baked derivative rather than a whole-face tint. Final public verification follows this material-only correction. Physical-phone performance, Safari, novice enjoyment and production-quality realism remain unverified.
 
 ## v0.10 Signal Run
 

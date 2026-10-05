@@ -1,0 +1,9 @@
+{
+  "pass": true,
+  "checks": [
+    "Seven actual-input practice steps, no pursuit or saved campaign; clean campaign start; four avatar models; sprint exhaustion/recovery rules",
+    "Guide opens from pause, freezes action and returns to pause without losing place",
+    "Phone guide/practice/exit/fresh-start touch flow"
+  ],
+  "errors": []
+}

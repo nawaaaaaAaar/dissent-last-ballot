@@ -44,7 +44,7 @@ try{
   const mobile=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true}),m=await mobile.newPage();
   m.on('pageerror',e=>errors.push(e.message));await m.goto('http://127.0.0.1:5173/?quality=low&qa=phone-guide');
   await m.waitForFunction(()=>typeof render_game_to_text==='function',null,{timeout:120000});await tick(m,0);
-  await m.locator('#learn').tap();await m.locator('#practice').tap();await m.screenshot({path:'qa/v11/mobile-practice.png'});
+  await m.locator('#learn').tap();await m.locator('#practice').tap();await tick(m,0);await m.screenshot({path:'qa/v11/mobile-practice.png'});
   await m.locator('#lesson-exit').tap();assert.equal((await state(m)).mode,'guide');await m.locator('#guide-close').tap();assert.equal((await state(m)).mode,'menu');
   await m.locator('#start').tap();assert.equal((await state(m)).pressure,1);checks.push('Phone guide/practice/exit/fresh-start touch flow');
   assert.deepEqual(errors,[]);await writeFile('qa/v11/tutorial-results.json',JSON.stringify({pass:true,checks,errors},null,2));console.log(JSON.stringify({pass:true,checks,errors}));
