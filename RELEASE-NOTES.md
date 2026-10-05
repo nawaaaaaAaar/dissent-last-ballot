@@ -2,6 +2,8 @@
 
 ## v0.7: Break Through
 
+v0.7.1 adds visible movement toward shelter after optional rescues, with reset on a new run. A tested arrival-threshold correction prevents the evacuee from stopping before the courtyard turn.
+
 - Made the default Play button start an action chapter rather than a chain of dialogue errands. The older branching story is available separately.
 - Added immediate police pursuit, five health pips, contact damage, telegraphed red pressure zones, a short dodge with cooldown, stamina-driven sprinting and jump-clearable fallen barriers.
 - Added optional live hold-to-help rescues, a live hold-to-break barricade interaction, recorder recovery, companion movement and a playable handoff without dialogue interruptions.

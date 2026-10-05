@@ -37,6 +37,7 @@ try{
   assert((await state(p)).action.rescued.includes('organiser'));
   await walk(p,3,24);await walk(p,3,-14);await p.keyboard.press('e');
   assert.equal((await state(p)).inventory.recorder,true);
+  assert((await state(p)).action.evacuees.find(e=>e.id==='organiser').x<-10,JSON.stringify((await state(p)).action.evacuees));
   await walk(p,-3,-14);await walk(p,-3,-29.6);
   await p.keyboard.down('e');await tick(p,2000);await p.keyboard.up('e');
   assert.equal((await state(p)).tasks.barrier,true);

@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman} from './people.js?v=0.7.0';
-import {STORY,ITEMS} from './story.js?v=0.7.0';
-import {WorldAudio} from './world-audio.js?v=0.7.0';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.7.0';
+import {human,loadPeople,poseHuman} from './people.js?v=0.7.1';
+import {STORY,ITEMS} from './story.js?v=0.7.1';
+import {WorldAudio} from './world-audio.js?v=0.7.1';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.7.1';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
-import {ActionGame} from './action-game.js?v=0.7.0';
+import {ActionGame} from './action-game.js?v=0.7.1';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.7.0';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.7.1';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -321,6 +321,7 @@ function begin(playAction=false){
   Object.assign(s,{x:0,z:31,y:0,vy:0,capture:0,pressure:0,solidarity:0,yaw:0,dialog:null,checkpoint:null});
   Object.assign(s,{items:[],inventory:{water:0,recorder:false},choice:'public',companion:false,protestDone:false,rallyHits:0,notes:[]});
   events.filter(e=>e.item).forEach(e=>e.prop.visible=true);
+  actors.forEach(a=>a.p.group.position.set(a.x,0,a.z));
   const friend=events.find(e=>e.id==='companion');if(friend)friend.a.p.group.position.set(friend.x,0,friend.z);
   for(const k in s.tasks)s.tasks[k]=false;
   barriers.forEach(g=>g.rotation.x=0);police.forEach((a,i)=>{a.p.group.position.set(4+i*1.3,0,-37-i);});
@@ -367,9 +368,17 @@ function step(dt){
   anim+=dt*(s.move?(s.sprint?10.5:7.5):.75);poseHuman(player,anim,s.move?(s.sprint?1:.65):0);
   for(const a of actors){
     const dist=Math.hypot(a.p.group.position.x-s.x,a.p.group.position.z-s.z);
+    const rescuedEvent=action?.active?events.find(e=>e.a===a&&action.rescued.includes(e.id)):null;
     a.p.group.visible=s.quality==='high'||dist<28||(a.police&&s.pressure>0);
-    if(!a.p.group.visible)continue;
-    if(a===events.find(e=>e.id==='companion')?.a&&s.companion){
+    if(!a.p.group.visible&&!rescuedEvent)continue;
+    if(rescuedEvent){
+      const p=a.p.group.position,target=rescuedEvent.id==='organiser'?{x:-18,z:20}:rescuedEvent.id==='aid'?{x:-27,z:6}:{x:-26,z:-8};
+      const dz=target.z-p.z,dx=Math.abs(dz)>.15?0:target.x-p.x;
+      const d=Math.abs(dz)>.15?Math.abs(dz):Math.abs(dx);
+      a.p.worldSpeed=d>.15?2.8:0;
+      if(d>.15){const nx=p.x+Math.sign(dx)*Math.min(Math.abs(dx),2.8*dt),nz=p.z+Math.sign(dz)*Math.min(Math.abs(dz),2.8*dt);if(valid(nx,nz)){p.x=nx;p.z=nz;}a.p.group.rotation.y=Math.atan2(dx,dz)+Math.PI;}
+      poseHuman(a.p,s.time*10.5+a.phase,d>.15?1:0);
+    }else if(a===events.find(e=>e.id==='companion')?.a&&s.companion){
       const p=a.p.group.position,d=Math.hypot(s.x-p.x,s.z-p.z);a.p.worldSpeed=d>1.6?4.1:0;
       if(d>1.6){const x=p.x+(s.x-p.x)/d*4.1*dt,z=p.z+(s.z-p.z)/d*4.1*dt;if(valid(x,z)){p.x=x;p.z=z;}a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;}
       poseHuman(a.p,s.time*7.5+a.phase,d>1.6?.65:0);
@@ -558,7 +567,7 @@ async function init(){
     window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.7`;};
     const worldText=window.render_game_to_text;
-    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),action:{active:action.active,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),charge:+action.charge.toFixed(2),rescued:action.rescued,barrier:+action.barrier.toFixed(2),score:action.score}});
+    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),action:{active:action.active,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score}});
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
     function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.7`;}}
     requestAnimationFrame(frame);

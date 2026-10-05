@@ -2,6 +2,8 @@
 
 ## v0.7 Break Through
 
+The v0.7.1 follow-up makes helped characters visibly run toward shelter. Its route assertion caught an inconsistent arrival threshold that left an evacuee stopped before turning into the courtyard. Matching that threshold and continuing off-camera evacuation corrected it; the full action/mobile test rerun passed, including the organiser reaching the courtyard.
+
 The supplied game client also exercised movement and jumping in the default action mode (`qa/v07-client/`). Its initial five-second Play wait expired before the models finished loading; the adapted client now waits up to 90 seconds for the deterministic game hook, freezes rendering, then clicks Play. The rerun records `playing`, active pressure and airborne height. This adaptation is a test-loader accommodation, not a claim of fast cold loading.
 
 `npm run test:action` passed the default action chapter through live rescue, recorder recovery, held barricade progress, Kabir and the winning assembly handoff. Separate assertions cover dodge/cooldown, paused mission time, deliberate capture and checkpoint retry, stamina consumption/recovery, actual mobile touch movement and Dodge, and portrait/landscape fit. Results and actual engine captures are in `qa/v07/`; there were no page errors.

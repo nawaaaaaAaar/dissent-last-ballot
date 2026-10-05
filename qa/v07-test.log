@@ -1,5 +1,5 @@
 
-> dissent-last-ballot@0.7.0 test:action
+> dissent-last-ballot@0.7.1 test:action
 > node action-qa.mjs
 
 {"pass":true,"checks":["immediate playable action, dodge and cooldown","hold-to-help rescue, recorder pickup, live barricade progress, companion and winning handoff without dialogue","damage, capture and checkpoint retry","sprint consumes stamina; resting restores it","real touch movement, dodge, held rescue action, pause; portrait and landscape layout"],"errors":[]}
