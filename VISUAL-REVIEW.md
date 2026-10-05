@@ -6,6 +6,8 @@ Actual local gameplay inspection found unreadable light text over pale roofs, an
 
 This is a readability and systems pass using earlier licensed art, not final high-graphics approval. Uniforms and police anatomy remain basic, vehicle surfaces lack authored wear/interiors, streets lack convincing lived-in density, faces repeat and melee is a procedural gesture rather than an authored motion set. No screenshot or successful gameplay test establishes photorealism, physical-phone performance or enjoyment.
 
+Public portrait review caught the toast stretching vertically because both top and bottom offsets were set; selector precedence was corrected and `public-phone-portrait.jpg` shows the bounded result. Landscape resizing now immediately redraws the game. `final-public-west.jpg`, `final-public-ending.jpg` and `final-public-phone.jpg` show the published patch, not a promotional render. Roof and paving detail improves surface cues but the large blocks, sparse props and simplified police still make the scene visibly prototype-like.
+
 ## v0.9 scope
 
 This pass changes the campaign's theme, case decisions, charter and signage using the existing art. The invented Bihar/West Bengal camps reuse earlier authored spaces; they are not new regional scans or geographically authentic models. Review covers readable before/current record panels, touch choices, scrollable charter controls and live-game captures. No new photorealism, wardrobe or facial-animation claim is made.

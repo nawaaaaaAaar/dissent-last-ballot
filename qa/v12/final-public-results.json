@@ -1,0 +1,36 @@
+{
+  "frontend": "710f76c",
+  "module": "breakout.js?v=0.12.1",
+  "rules": "breakout-rules.js?v=0.12.1",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=710f76c-final&quality=low",
+  "method": "Cloud Chromium with actual CDP keyboard/touch inputs and deterministic game time; no position or health edits",
+  "west_route": {
+    "passed": true,
+    "rescued": true,
+    "recording": true,
+    "boarded": true,
+    "driven_to_roadblock": true,
+    "exited_and_struck_roadblock": true,
+    "reboarded_without_respawning_roadblock": true,
+    "drove_through_cleared_line": true,
+    "collision_caused_vehicle_failure": true,
+    "retry_position": {"x":-37.171822565394095,"z":-14.433810575278725,"yaw":-3.118369322998109},
+    "retry_retained_companion_recording_and_cleared_roadblock": true,
+    "continued_to_safe_house": true,
+    "final_mode": "won",
+    "heat": 0.69,
+    "vehicle_condition": 100,
+    "score_after_retry": 1604,
+    "game_seconds_after_retry": 8.07
+  },
+  "final_patch_phone": {
+    "viewport": [390,844],
+    "module_confirmed": "0.12.1",
+    "guide_open_return": true,
+    "touch_start_and_outer_stick_sprint": true,
+    "four_touch_strikes_cleared_barrier": true,
+    "horizontal_overflow": false
+  },
+  "earlier_complete_keyboard_and_phone_missions": "public-results.json",
+  "limits": ["Phone emulation only", "Safari untested", "Not FPS benchmark", "Novice enjoyment untested", "Final high-quality realism not reached"]
+}

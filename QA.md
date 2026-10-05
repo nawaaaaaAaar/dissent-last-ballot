@@ -14,6 +14,8 @@ Public frontend `0b49679` was completed in cloud Chromium through actual keyboar
 
 Alternate-route review then caught a roadblock regenerating whenever the player reboarded and a checkpoint always restoring the initial van position. v0.12.1 retains a cleared roadblock and saves the actual boarding position/heading. Local actual-input QA crossed west, exited, struck the line, reboarded, drove through it, failed by collision and restored that earned location with the line still clear. Its passed result has no page errors. The software-WebGL command reached the platform time limit after writing the passed results; the file and completed log were inspected independently, so the command timeout is not silently reported as a clean command exit.
 
+Final public frontend `710f76c` was confirmed to load `breakout.js?v=0.12.1`. Cloud Chromium completed the west-route exit/strike/reboard/crossing sequence, deliberately failed by driving into a building, restored the actual western boarding position/heading with Kabir and recording aboard and the roadblock still clear, then won by parking unseen at the safe house. The final patch also passed phone-emulated guide/start, outer-stick sprint and four touch barrier strikes without horizontal overflow. `qa/v12/final-public-results.json` records the exact scope; the earlier complete public phone mission remains separately identified rather than relabelled as a final-patch full run.
+
 Deterministic stepping is not FPS measurement. Physical phones, Safari, first-time-player enjoyment, higher-fidelity combat/crowd animation and production realism remain open requirements.
 
 ## v0.11 Learn the Route
