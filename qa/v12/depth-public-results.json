@@ -1,0 +1,28 @@
+{
+  "frontend": "00cfd3b",
+  "renderer": "breakout.js?v=0.12.2",
+  "rules": "breakout-rules.js?v=0.12.1",
+  "keyboard": {
+    "method": "Actual keyboard inputs with deterministic game-time stepping in cloud Chromium",
+    "quality": "high",
+    "complete_rescue_recording_boarding_east_route_and_parked_finish": true,
+    "mode": "won",
+    "health": 6,
+    "vehicle_condition": 100,
+    "heat": 0.69,
+    "score": 2167,
+    "game_seconds": 26.6
+  },
+  "touch": {
+    "method": "Actual touch start, movement and four strikes in cloud Chromium phone emulation",
+    "quality": "low",
+    "portrait": [390,844],
+    "landscape": [844,390],
+    "barrier_hp": 0,
+    "player_z_after_sprint": 19.210000000000377,
+    "horizontal_overflow": false
+  },
+  "visual_review": "Actual public barricade, driving, portrait and landscape captures inspected after separating coplanar ground planes; the earlier horizontal depth-flicker stripes are absent.",
+  "prior_full_phone_and_west_route_checks": ["public-results.json","final-public-results.json"],
+  "limits": ["Not physical devices", "Not Safari", "Not FPS benchmark", "Not production-quality realism", "No novice enjoyment study"]
+}

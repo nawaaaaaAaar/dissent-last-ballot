@@ -10,6 +10,8 @@ Public portrait review caught the toast stretching vertically because both top a
 
 The v0.12.1 phone capture exposed coplanar depth fighting: foundation paving, north-south roads and east-west roads shared one height. v0.12.2 gives them distinct small height offsets instead of accepting the striped frame as finished. Earlier captures remain evidence of the defect, not final visual signoff.
 
+The final public `depth-public-*` captures show the fix at desktop High and phone Low settings. The road intersection and phone confrontation no longer show the earlier horizontal striping. This closes that rendering defect, not the larger production-art gap.
+
 ## v0.9 scope
 
 This pass changes the campaign's theme, case decisions, charter and signage using the existing art. The invented Bihar/West Bengal camps reuse earlier authored spaces; they are not new regional scans or geographically authentic models. Review covers readable before/current record panels, touch choices, scrollable charter controls and live-game captures. No new photorealism, wardrobe or facial-animation claim is made.

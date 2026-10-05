@@ -16,6 +16,8 @@ Alternate-route review then caught a roadblock regenerating whenever the player 
 
 Final public frontend `710f76c` was confirmed to load `breakout.js?v=0.12.1`. Cloud Chromium completed the west-route exit/strike/reboard/crossing sequence, deliberately failed by driving into a building, restored the actual western boarding position/heading with Kabir and recording aboard and the roadblock still clear, then won by parking unseen at the safe house. The final patch also passed phone-emulated guide/start, outer-stick sprint and four touch barrier strikes without horizontal overflow. `qa/v12/final-public-results.json` records the exact scope; the earlier complete public phone mission remains separately identified rather than relabelled as a final-patch full run.
 
+Final renderer v0.12.2 was confirmed on public frontend `00cfd3b` after GitHub Pages reported a successful build. Cloud Chromium completed the east-route mission again using actual keyboard input on High graphics (health 6, van 100%, heat 0.69, score 2167). Actual touch start, sprint and barrier strikes were repeated on Low in portrait/landscape; public captures were inspected to confirm removal of depth-flicker stripes. `qa/v12/depth-public-results.json` separates this renderer recheck from the earlier full phone and west-route tests. The v0.12.1 game rules are unchanged.
+
 Deterministic stepping is not FPS measurement. Physical phones, Safari, first-time-player enjoyment, higher-fidelity combat/crowd animation and production realism remain open requirements.
 
 ## v0.11 Learn the Route
