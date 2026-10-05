@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.14.3';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.14.4';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -51,6 +51,11 @@ check('boarding retry restores pursuit and variant, not an empty world',()=>{
 });
 check('rally marker changes and standing at the first point cannot finish',()=>{
   const g=new City();g.start();g.accept('hold');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,g.mission.source);g.hold=7.99;g.update(.05);assert.equal(g.wave,1);const hold=g.hold;g.update(.05);assert.equal(g.hold,hold);assert.notEqual(g.target().x,g.mission.source.x);
+});
+check('cleared return roadblock stays cleared after reboarding and retry',()=>{
+  const g=new City();g.start();g.accept('signal');g.mission.variant=2;g.record=true;g.interact();assert(g.roadblock);assert(g.blockActivated);
+  g.interact();g.roadblock=false;g.interact();assert(!g.roadblock);assert(g.van.occupied);
+  g.carHit(100);g.retry();assert(!g.roadblock);assert(g.blockActivated);g.interact();g.interact();assert(!g.roadblock);
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v14',{recursive:true});fs.writeFileSync('qa/v14/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

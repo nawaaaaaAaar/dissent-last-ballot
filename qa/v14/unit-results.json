@@ -1,5 +1,5 @@
 {
-  "passed": 12,
+  "passed": 13,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -12,6 +12,7 @@
     "rally requires time in zone on foot, outside pauses, not resets",
     "building footprint and world boundaries block movement",
     "boarding retry restores pursuit and variant, not an empty world",
-    "rally marker changes and standing at the first point cannot finish"
+    "rally marker changes and standing at the first point cannot finish",
+    "cleared return roadblock stays cleared after reboarding and retry"
   ]
 }
