@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.2';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.3';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -20,7 +20,7 @@ export class City{
     this.friend={...snap(PLACES[0]),rescued:false,aboard:false};this.record=false;
     this.gate={x:0,z:0,w:8,hp:0,fall:1};this.block={x:0,z:0};
     this.enemies=Array.from({length:5},(_,id)=>({id,x:0,z:0,yaw:0,hp:0,stun:0,windup:0,cooldown:1,route:[],routeAge:0,last:{x:0,z:0},home:{x:0,z:0},down:1}));
-    this.car={x:0,z:0,yaw:0,speed:0,active:false,route:[],routeAge:0};
+    this.car={x:0,z:0,yaw:0,speed:0,active:false,route:[],routeAge:0,windup:0,ram:0,cooldown:1.5,contactCooldown:0,recoil:0,attackYaw:0};
     this.heat=0;this.hidden=0;this.seen=false;this.lastSeen={...p};this.phase='clear';this.roadblock=false;
     this.supplies=WORLD.medkits.map(p=>({...p,taken:false}));this.score=0;this.hits=0;this.crashes=0;this.helped=0;this.message='';this.messageTime=0;this.particles=[];this.checkpoint=null;
     this.input={x:0,z:0,aimX:0,aimZ:-1,sprint:false,attack:false,brake:false};
@@ -50,7 +50,7 @@ export class City{
     this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;this.blockActivated=false;
     this.mission.zones=[source,snap({x:source.x+14,z:source.z-6}),snap({x:source.x-14,z:source.z+9})];
     this.spawn(source,spec.type==='rally'?3:spec.type==='rescue'?this.network.total?4:3:3);
-    this.car.active=false;this.heat=0;this.checkpoint=null;this.mode='playing';
+    Object.assign(this.car,{active:false,windup:0,ram:0,cooldown:1.5,contactCooldown:0,recoil:0});this.heat=0;this.checkpoint=null;this.mode='playing';
     this.say(spec.story,7);return true;
   }
   spawn(p,count){
@@ -221,7 +221,7 @@ export class City{
       let corner=0;if(mag>.12){const desired=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,desired));v.yaw+=turn(v.yaw,desired)*Math.min(1,dt*8);}
       const desired=i.brake?0:mag*20*(corner>.35?Math.max(.27,Math.cos(corner)):1);
       v.speed+=(desired-v.speed)*Math.min(1,dt*(i.brake?9:mag<.1?5:corner>.65?4.5:2));
-      const travel=this.move(v,Math.sin(v.yaw)*v.speed*dt,Math.cos(v.yaw)*v.speed*dt,1.2);
+      const travel=this.move(v,Math.sin(v.yaw)*v.speed*dt,Math.cos(v.yaw)*v.speed*dt,1.05);
       if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.55,2,10));this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to coast, or Brake before the corner.',1.6);}
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;if(this.friend.aboard){this.friend.x=v.x;this.friend.z=v.z;}
     }else{
@@ -256,8 +256,17 @@ export class City{
     for(let a=0;a<5;a++)for(let b=a+1;b<5;b++){const e=this.enemies[a],f=this.enemies[b],d=dist(e,f);if(e.hp>0&&f.hp>0&&d<.9){const dx=(e.x-f.x)/(d||1),dz=(e.z-f.z)/(d||1);this.move(e,dx*dt,dz*dt);this.move(f,-dx*dt,-dz*dt);}}
     if(this.car.active){
       const c=this.car,d=dist(c,p),sight=d<28&&this.line(c,p);if(sight){visible=true;this.lastSeen={x:p.x,z:p.z};}
-      c.speed=this.chase(c,sight?p:this.lastSeen,dt,sight?11:5,1.1)/dt;
-      if(v.occupied&&d<2.9)this.carHit(10);
+      c.cooldown=Math.max(0,c.cooldown-dt);c.contactCooldown=Math.max(0,c.contactCooldown-dt);
+      if(c.recoil>0){c.recoil-=dt;c.speed=-4;this.move(c,-Math.sin(c.attackYaw)*4*dt,-Math.cos(c.attackYaw)*4*dt,1.05);}
+      else if(c.ram>0){
+        c.ram-=dt;c.yaw=c.attackYaw;c.speed=16;this.move(c,Math.sin(c.attackYaw)*16*dt,Math.cos(c.attackYaw)*16*dt,1.05);
+        if(v.occupied&&dist(c,p)<2.5&&c.contactCooldown<=0){this.carHit(12);c.contactCooldown=4;c.recoil=.7;c.ram=0;c.cooldown=5;this.say('Ram landed. It must recover: take a different street.',2);}
+      }else{
+        const following=sight&&v.occupied?{x:p.x-Math.sin(v.yaw)*5,z:p.z-Math.cos(v.yaw)*5}:sight?p:this.lastSeen;
+        c.speed=this.chase(c,following,dt,sight?8.5:5,1.05)/dt;
+        if(c.windup>0){c.windup-=dt;if(c.windup<=0){c.attackYaw=Math.atan2(c.ramTarget.x-c.x,c.ramTarget.z-c.z);c.ram=.65;c.cooldown=5;}}
+        else if(v.occupied&&sight&&d>4&&d<14&&c.cooldown<=0){c.windup=.85;c.ramTarget={x:p.x+Math.sin(v.yaw)*v.speed*.25,z:p.z+Math.cos(v.yaw)*v.speed*.25};c.attackYaw=Math.atan2(c.ramTarget.x-c.x,c.ramTarget.z-c.z);this.say('Patrol committing to a ram. Turn out of the red path.',1.6);}
+      }
     }
     this.seen=visible;
     if(visible){this.hidden=0;this.heat=Math.min(5,Math.max(this.heat,.8)+dt*.04);this.phase='pursuit';}
@@ -278,5 +287,5 @@ export class City{
     if(this.gate.hp<=0)this.gate.fall=Math.min(1,this.gate.fall+dt*2);
     for(const q of this.particles){q.life-=dt;q.x+=q.vx*dt;q.z+=q.vz*dt;q.y+=q.vy*dt;q.vy-=9*dt;}this.particles=this.particles.filter(q=>q.life>0);
   }
-  text(){return{mode:this.mode,coordinates:'x east, z south; OSM central Delhi, 0.14 game units / real metre; roads widened for play',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},record:this.record,gate:{...this.gate},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup})=>({id,x,z,hp,stun,windup})),car:{x:this.car.x,z:this.car.z,active:this.car.active},strikes:this.hits,score:Math.round(this.score),crashes:this.crashes,checkpoint:this.checkpoint,mission:this.mission,hold:+this.hold.toFixed(2),network:this.network,visited:this.visited,result:this.result};}
+  text(){return{mode:this.mode,coordinates:'x east, z south; OSM central Delhi, 0.14 game units / real metre; roads widened for play',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},record:this.record,gate:{...this.gate},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup})=>({id,x,z,hp,stun,windup})),car:{x:this.car.x,z:this.car.z,active:this.car.active,windup:this.car.windup,ram:this.car.ram,cooldown:this.car.cooldown},strikes:this.hits,score:Math.round(this.score),crashes:this.crashes,checkpoint:this.checkpoint,mission:this.mission,hold:+this.hold.toFixed(2),network:this.network,visited:this.visited,result:this.result};}
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.2';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.3';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -102,6 +102,25 @@ check('underground station is excluded while original surface footprints remain'
 check('trimmed street display has a clear vehicle spawn',()=>{
   const g=new City();g.start();assert(g.valid(g.van.x,g.van.z,1.2));
   for(const b of WORLD.buildings)assert(!b.poly.some((p,i)=>Math.hypot(p.x-g.van.x,p.z-g.van.z)<1));
+});
+function patrolScene(){
+  const g=new City();g.start();g.accept('signal');g.enemies.forEach(e=>e.hp=0);
+  const p=snap(PLACES[1]);Object.assign(g.player,p);Object.assign(g.van,{...p,yaw:0,speed:0,occupied:true,health:100});
+  Object.assign(g.car,{x:p.x,z:p.z-8,active:true,cooldown:0,windup:0,ram:0,contactCooldown:0,recoil:0});
+  return g;
+}
+check('patrol following does not inflict passive overlap damage',()=>{
+  const g=patrolScene();g.car.z=g.player.z-2;g.car.cooldown=10;
+  for(let i=0;i<40;i++)g.update(.05);assert.equal(g.van.health,100);
+});
+check('vehicle charge has a warning and a single hit with recovery',()=>{
+  const g=patrolScene();g.update(.05);assert(g.car.windup>.7);assert.equal(g.car.ram,0);assert.equal(g.van.health,100);
+  for(let i=0;i<30;i++)g.update(.05);assert.equal(g.van.health,88);assert(g.car.contactCooldown>3);
+  for(let i=0;i<10;i++)g.update(.05);assert.equal(g.van.health,88);assert(Math.hypot(g.car.x-g.player.x,g.car.z-g.player.z)>2.5);
+});
+check('steering across the warned charge can avoid its locked target',()=>{
+  const g=patrolScene();g.update(.05);const locked={...g.car.ramTarget};g.input.x=1;
+  for(let i=0;i<20;i++)g.update(.05);g.input.x=0;g.input.brake=true;for(let i=0;i<20;i++)g.update(.05);assert.deepEqual(g.car.ramTarget,locked);assert.equal(g.car.contactCooldown,0);assert.equal(g.van.health,100);
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

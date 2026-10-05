@@ -1,5 +1,5 @@
 {
-  "passed": 24,
+  "passed": 27,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -24,6 +24,9 @@
     "volunteer service is consumed once per operation",
     "abandoning failure starts a playable new operation, not zero-condition limbo",
     "underground station is excluded while original surface footprints remain",
-    "trimmed street display has a clear vehicle spawn"
+    "trimmed street display has a clear vehicle spawn",
+    "patrol following does not inflict passive overlap damage",
+    "vehicle charge has a warning and a single hit with recovery",
+    "steering across the warned charge can avoid its locked target"
   ]
 }

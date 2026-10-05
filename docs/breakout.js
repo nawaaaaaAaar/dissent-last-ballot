@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.2';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.2';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.2';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.3';
+import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.3';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.3';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js?v=0.15.2';
-import {cityArt} from './city-art.js?v=0.15.2';
+import {WorldAudio} from './world-audio.js?v=0.15.3';
+import {cityArt} from './city-art.js?v=0.15.3';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.2';
+const asset=name=>'./assets/'+name+'?v=0.15.3';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
-let art,actionHeld=false,actionHoldOnly=false;
+let art,actionHeld=false,actionHoldOnly=false,carTell;
 let wideCamera=false,routeMarks=[],readerModels=[];
 let manual=false,last=0,clock=0,fps=0,frames=0,frameStart=performance.now(),mouseAim=false,helpReturn='menu',engineTone,engineGain,brakeHeld=false,aimBrake=false,crowdClock=0,mouseStrike=false,stickStrike=false,buttonStrike=false,routeClock=0,guideRoute=[];
 const particleMeshes=[],medModels=[],crowd=[],enemyModels=[];
@@ -123,6 +123,7 @@ function vehicle(police=false){
     const w=cylinder(g,M.dark,x,.43,z,.43,.23,Math.PI/2);cylinder(g,M.chrome,x*1.09,.43,z,.22,.035,Math.PI/2);wheels.push(w);
   }
   if(police){box(g,M.metal,0,2.45,.2,1.05,.08,.24);box(g,M.red,-.33,2.53,.2,.30,.1,.23);box(g,trim,.33,2.53,.2,.30,.1,.23);}
+  g.scale.setScalar(.88);
   return {g,wheels};
 }
 function ground(material,x,z,w,d,y=.01){
@@ -172,6 +173,7 @@ function build(){
   gate=new THREE.Group();for(const x of [-3.3,0,3.3]){const b=barricade();b.position.x=x;gate.add(b);}gate.position.set(0,0,17);scene.add(gate);
   block=new THREE.Group();for(const x of [-3.3,0,3.3]){const b=barricade();b.position.x=x;block.add(b);}block.position.set(-34,0,-17);scene.add(block);
   van=vehicle();scene.add(van.g);enemyCar=vehicle(true);scene.add(enemyCar.g);
+  carTell=new THREE.Mesh(new THREE.CircleGeometry(11,24,-.22,.44),new THREE.MeshBasicMaterial({color:'#ed7758',transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}));scene.add(carTell);
   player=human('#628978',false,{localWardrobe:false});friend=human('#a89775',false,{localWardrobe:true});scene.add(player.group,friend.group);poses.push(player,friend);
   playerRing=ring('#91d4ba',.55,0,0);friendRing=ring('#dfb279',.5,0,0);
   for(let i=0;i<2;i++){const p=human('#b8875f',false,{female:i===0,localWardrobe:true});scene.add(p.group);readerModels.push(p);}
@@ -223,7 +225,7 @@ function hud(){
   $('direction').style.transform=`rotate(${Math.atan2(next.x-p.x,-(next.z-p.z))}rad)`;
   $('health').textContent='HEALTH '+Array.from({length:6},(_,i)=>i<p.health?'●':'○').join('');
   $('stamina').style.width=p.stamina+'%';$('vehicle-status').textContent=game.van.occupied?`VAN ${Math.round(game.van.health)}% · ${Math.round(game.van.speed*3)} GAME km/h`:'ON FOOT · '+(game.friend.rescued?'KABIR WITH YOU':game.mission?.type==='rescue'?'FIND KABIR':game.mission?.type==='rally'?'STAND TOGETHER':game.record?'DISPATCH SECURED':'EXPLORE');
-  $('phase').textContent=game.phase.toUpperCase();$('heat-note').textContent=game.seen?'They can see you':game.heat<.7?'Route to safety is clear':`Out of sight · ${game.hidden.toFixed(0)} seconds`;
+  $('phase').textContent=game.phase.toUpperCase();$('heat-note').textContent=game.car.windup>0?'RAM WARNING · turn out of its path':game.seen?'They can see you':game.heat<.7?'Route to safety is clear':`Out of sight · ${game.hidden.toFixed(0)} seconds`;
   $('heat-bars').innerHTML=Array.from({length:5},(_,i)=>`<i class="${i<Math.ceil(game.heat)?'on':''}"></i>`).join('');
   const n=game.nearby();$('action').hidden=!n||game.mode!=='playing';$('action').textContent=n?.label||'ACTION';
   $('dash').textContent=game.van.occupied?'BRAKE':p.dashCd>0?'DODGE '+p.dashCd.toFixed(1):'DODGE';$('strike').textContent=game.van.occupied?'HORN':'STRIKE';$('aim-label').textContent=game.van.occupied?'HOLD BRAKE':'AIM + STRIKE';
@@ -266,6 +268,7 @@ function step(dt){
     gate.rotation.x=game.gate.fall*Math.PI/2;gate.position.set(game.gate.x,0,game.gate.z);gate.visible=!!game.mission&&game.gate.hp>0||game.gate.fall<1;block.visible=game.roadblock;block.position.set(game.block.x,0,game.block.z);
     for(const [model,e] of [[van,game.van],[enemyCar,game.car]]){model.g.position.set(e.x,0,e.z);model.g.rotation.y=e.yaw+Math.PI;model.wheels.forEach(w=>w.rotation.y+=e.speed*dt/.43);}
     enemyCar.g.visible=game.car.active;recorder.visible=recordRing.visible=game.mission?.type==='courier'&&!game.record;
+    carTell.visible=game.car.active&&(game.car.windup>0||game.car.ram>0);carTell.position.set(game.car.x,.07,game.car.z);carTell.rotation.set(-Math.PI/2,0,game.car.attackYaw-Math.PI/2);carTell.material.opacity=game.car.ram>0?.5:.12+.25*(1-game.car.windup/.85);
     recorder.position.set(WORLD.record.x,0,WORLD.record.z);recordRing.position.set(WORLD.record.x,.04,WORLD.record.z);
     const zone=game.mission?.type==='rally'?game.target():WORLD.safe;
     safeRing.position.set(zone.x,.04,zone.z);safeRing.scale.setScalar(1);safeRing.visible=!!game.mission&&(game.record||game.mission.type==='rally');
@@ -297,12 +300,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.2');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.15.3');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.2',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.3',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

@@ -8,6 +8,7 @@ Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and 
 - **Desktop:** WASD/arrows move or steer, Shift runs, held Space chains nearby-assisted strikes or brakes in the van, Q dodges, E interacts. Hold E for dispatch copying and aid support. Mouse aiming is optional; hold its left button on the world to strike. P pauses, M opens missions and Z toggles close/overview view.
 - **Navigation:** Gold is the objective and suggested street route. Green is a delivery destination or the active gathering zone. Red circles warn of incoming attacks; red bars on the radar show barriers. The small radar follows you; the mission board shows the full central-Delhi area.
 - **Driving:** You steer in world directions, not tank controls. Ease the stick toward the centre before tight turns and release/brake before parking. The route is guidance, not autopilot. A red roadblock may require a side route or an on-foot arcade strike.
+- **Pursuit:** The patrol follows at separation rather than inflicting constant overlap damage. A red path and “RAM WARNING” announce a committed charge. Turn across that path; the charge keeps its committed direction and must recover after a hit or miss. Avoid turning early across buildings just because the next destination is diagonally nearby.
 
 ## The first operation: bring the witness home
 
