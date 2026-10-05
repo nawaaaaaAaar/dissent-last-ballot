@@ -1,5 +1,11 @@
 # QA and limitations
 
+## v0.13 Play review
+
+Normal-time review of v0.12.2 used actual browser keyboard input without `advanceTime`: walking, held Space, Dodge, movement/pausing and a separate barrier/rescue/recording/boarding/two-turn/brake attempt. Holding Space for 2.2 seconds produced one hit, while officers could overlap at zero distance. The fast turn/brake attempt ended at x40.34/z-38.33, beyond the intended eastern junction. `PLAYER-REVIEW.md` separates deliberate action from time spent exposed between tool calls.
+
+Eleven isolated checks pass, including the added melee stopping distance, corner-speed/released-input braking and nearby patrol/last-seen restoration tests. The supplied game client verified held Space produces repeated damage in `qa/v13-client/`, leaving opponents on condition 1 and 2 without player damage. Earlier public completion records below belong to v0.12; current public signoff is recorded separately after verification.
+
 ## v0.12 Breakout
 
 The current root is the new top-down mission; archived campaign results below do not test it. Eight isolated rule checks pass: barrier/cooldown, aimed melee interruption and opponent condition, dodge cost/invulnerability, rescue/boarding prerequisites, occlusion/search/win conditions, vehicle acceleration/braking/destruction, valid barricade-detour navigation and roadblock/reboarding/checkpoint persistence.

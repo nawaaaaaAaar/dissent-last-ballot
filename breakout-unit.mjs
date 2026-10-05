@@ -47,4 +47,16 @@ check('Cleared roadblock stays cleared after reboarding and checkpoint recovery'
   Object.assign(g.van,{x:-34,z:-12});Object.assign(g.player,{x:-34,z:-13});Object.assign(g.friend,{x:-33,z:-13});g.interact();assert(g.van.occupied);assert(!g.roadblock);assert.equal(g.checkpoint.x,-34);
   g.retry();assert(g.van.occupied&&!g.roadblock);assert.equal(g.van.x,-34);
 });
+check('Pursuers stop at readable melee distance rather than occupying the player',()=>{
+  const g=fresh();g.enemies.slice(1).forEach(e=>e.hp=0);Object.assign(g.enemies[0],{x:0,z:40});run(g,1);
+  const d=Math.hypot(g.player.x-g.enemies[0].x,g.player.z-g.enemies[0].z);assert(d>1.35&&d<1.7);
+});
+check('Large steering changes slow the van; released input reduces coasting',()=>{
+  const g=fresh();g.van.occupied=true;g.friend.aboard=true;g.enemies.forEach(e=>e.hp=0);g.van.x=34;g.van.z=0;g.van.speed=19;g.van.yaw=Math.PI/2;g.input.z=-1;
+  run(g,.2);assert(g.van.speed<15);assert(g.van.x<37);g.input.z=0;run(g,.8);assert(g.van.speed<1);
+});
+check('Vehicle retry restores nearby pursuit and last-seen context',()=>{
+  const g=fresh();g.friend.rescued=true;g.record=true;Object.assign(g.player,WORLD.van);Object.assign(g.friend,WORLD.van);g.interact();
+  assert(Math.hypot(g.car.x-g.van.x,g.car.z-g.van.z)<20);g.retry();assert.equal(g.lastSeen.x,g.van.x);assert.equal(g.lastSeen.z,g.van.z);assert(Math.hypot(g.car.x-g.van.x,g.car.z-g.van.z)<22);
+});
 console.log(JSON.stringify({suite:'Breakout isolated rules',checks,passed:true}));

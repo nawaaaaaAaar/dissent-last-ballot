@@ -83,19 +83,21 @@ export class Breakout{
     for(const e of this.enemies){
       if(e.hp<=0||dist(p,e)>2.9)continue;
       if(Math.abs(turn(aim,Math.atan2(e.x-p.x,e.z-p.z)))>1.25)continue;
-      e.hp--;e.stun=.65;e.windup=0;e.cooldown=1.2;this.move(e,Math.sin(aim)*1.2,Math.cos(aim)*1.2);this.burst(e.x,e.z,'teal');hit=true;
+      const interrupted=e.windup>0;
+      e.hp--;e.stun=.65;e.windup=0;e.cooldown=1.2;this.move(e,Math.sin(aim)*.8,Math.cos(aim)*.8);this.burst(e.x,e.z,'teal');hit=true;
+      if(interrupted)this.say('Attack interrupted. Move or strike again.',1.3);
       if(e.hp<=0){e.down=1;this.score+=80;}this.heat=Math.min(5,this.heat+.18);
     }
     if(this.gate.hp>0&&Math.abs(p.x)<6&&Math.abs(p.z-17)<3){this.gate.hp--;this.burst(p.x,17);this.heat=Math.min(5,this.heat+.1);hit=true;if(this.gate.hp<=0){this.score+=150;this.say('The line is open. Kabir is ahead.',3);}}
     if(this.roadblock&&Math.abs(p.x+34)<6&&Math.abs(p.z+17)<3){this.roadblock=false;this.burst(-34,-17);this.say('Roadblock cleared.',2);hit=true;}
-    if(!hit)this.say('Strike toward a nearby opponent or the barricade. The right stick aims.',1.4);
+    if(!hit)this.say('Too far. Close the gap or aim toward a nearby opponent or barricade.',1.4);
     return true;
   }
   dash(){
     const p=this.player;if(this.mode!=='playing')return false;
     if(this.van.occupied){this.input.brake=true;return true;}
     if(p.dashCd>0||p.stamina<15)return false;
-    p.dash=.30;p.dashCd=1.6;p.stamina-=15;return true;
+    p.dash=.30;p.dashCd=1.6;p.stamina-=15;this.burst(p.x,p.z,'teal',5);return true;
   }
   nearby(){
     if(this.van.occupied)return {id:'exit',label:'EXIT VAN'};
@@ -122,7 +124,7 @@ export class Breakout{
       if(!this.friend.rescued||!this.record){this.say('Rescue Kabir and recover the recording before leaving.',3);return;}
       if(dist(this.friend,this.van)>7){this.say('Wait for Kabir to catch up to the van.',3);return;}
       this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.heat=Math.max(2.6,this.heat);
-      if(!this.escapeStarted){this.roadblock=true;this.escapeStarted=true;}
+      if(!this.escapeStarted){this.roadblock=true;this.escapeStarted=true;this.car.x=-4;this.car.z=-4;this.car.yaw=Math.PI/2;this.car.route=[];this.car.routeAge=0;}
       this.checkpoint={x:this.van.x,z:this.van.z,yaw:this.van.yaw,gate:this.gate.hp,roadblock:this.roadblock,record:true,rescued:true,vehicle:true};this.say('Both aboard. Escape through the side streets. Lose sight of the pursuers, then reach the western safe house.',5);
     }
   }
@@ -142,7 +144,12 @@ export class Breakout{
   retry(){
     const c=this.checkpoint;this.start();if(!c)return;
     this.gate.hp=c.gate;this.record=c.record;this.friend.rescued=c.rescued;this.helped=1;this.player.x=c.x;this.player.z=c.z;this.friend.x=c.x+1;this.friend.z=c.z+1;
-    if(c.vehicle){this.van.x=c.x;this.van.z=c.z;this.van.yaw=c.yaw??Math.PI/2;this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.escapeStarted=true;this.heat=2.4;this.roadblock=c.roadblock??true;}
+    if(c.vehicle){
+      this.van.x=c.x;this.van.z=c.z;this.van.yaw=c.yaw??Math.PI/2;this.van.occupied=true;this.friend.aboard=true;this.car.active=true;this.escapeStarted=true;this.heat=2.4;this.roadblock=c.roadblock??true;
+      const behind={x:c.x-Math.sin(this.van.yaw)*14,z:c.z-Math.cos(this.van.yaw)*14};
+      if(this.valid(behind.x,behind.z,1.1)){this.car.x=behind.x;this.car.z=behind.z;}else{this.car.x=0;this.car.z=clamp(c.z+14,-52,52);}
+      this.lastSeen={x:c.x,z:c.z};
+    }else this.lastSeen={x:c.x,z:c.z};
     this.enemies.forEach((e,i)=>{e.x=(i%3-1)*4;e.z=c.z+12+i*2;});this.checkpoint=c;this.player.hurt=2;this.say('Checkpoint restored. Try another escape route.',3);
   }
   objective(){
@@ -161,8 +168,10 @@ export class Breakout{
     v.hurt=Math.max(0,v.hurt-dt);
     const mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));
     if(v.occupied){
-      if(mag>.12){const wanted=Math.atan2(dx,dz);v.yaw+=turn(v.yaw,wanted)*Math.min(1,dt*(Math.abs(v.speed)>2?3.6:6));}
-      const desired=i.brake?0:mag*19;v.speed+=(desired-v.speed)*Math.min(1,dt*(i.brake?7:2));
+      let corner=0;
+      if(mag>.12){const wanted=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,wanted));v.yaw+=turn(v.yaw,wanted)*Math.min(1,dt*5.8);}
+      const desired=i.brake?0:mag*19*(corner>.35?Math.max(.35,Math.cos(corner)):1);
+      v.speed+=(desired-v.speed)*Math.min(1,dt*(i.brake?9:mag<.1?5:corner>.65?4.5:2));
       const travel=this.move(v,Math.sin(v.yaw)*v.speed*dt,Math.cos(v.yaw)*v.speed*dt,1.2);
       if(v.speed>4&&travel<v.speed*dt*.2)this.carHit(8);
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;this.friend.x=v.x;this.friend.z=v.z;
@@ -187,7 +196,15 @@ export class Breakout{
       if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.cooldown=1.8;if(d<2.5&&!v.occupied)this.hurt();}continue;}
       if(!v.occupied&&d<2.1&&e.cooldown<=0){e.windup=.75;continue;}
       const speed=2.6+(this.heat>3?.6:0);
-      this.chase(e,sight?p:this.hidden<6?e.last:e.home,dt,speed);
+      if(!v.occupied&&sight&&d<1.55){e.yaw=Math.atan2(p.x-e.x,p.z-e.z);}
+      else this.chase(e,sight?p:this.hidden<6?e.last:e.home,dt,speed);
+    }
+    // Separate live opponents so their anticipation and condition remain readable.
+    for(let a=0;a<this.enemies.length;a++)for(let b=a+1;b<this.enemies.length;b++){
+      const e=this.enemies[a],f=this.enemies[b];if(e.hp<=0||f.hp<=0)continue;
+      let dx=e.x-f.x,dz=e.z-f.z,d=Math.hypot(dx,dz);if(d>=.9)continue;
+      if(d<.001){dx=a%2?1:-1;dz=.2;d=Math.hypot(dx,dz);}
+      const amount=Math.min(.06,dt*1.6);this.move(e,dx/d*amount,dz/d*amount);this.move(f,-dx/d*amount,-dz/d*amount);
     }
     if(this.car.active){
       const c=this.car,d=dist(c,p),sight=d<26&&this.line(c,p);
@@ -202,5 +219,5 @@ export class Breakout{
     for(const q of this.particles){q.life-=dt;q.x+=q.vx*dt;q.z+=q.vz*dt;q.y+=q.vy*dt;q.vy-=9*dt;}
     this.particles=this.particles.filter(q=>q.life>0);
   }
-  text(){return {mode:this.mode,coordinates:'x east, z south; fictional compressed Delhi-inspired grid',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},record:this.record,gate:{hp:this.gate.hp},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup})=>({id,x:+x.toFixed(2),z:+z.toFixed(2),hp,stun:+stun.toFixed(2),windup:+windup.toFixed(2)})),car:{x:this.car.x,z:this.car.z,active:this.car.active},score:this.score,crashes:this.crashes,checkpoint:this.checkpoint};}
+  text(){return {mode:this.mode,coordinates:'x east, z south; fictional compressed Delhi-inspired grid',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},record:this.record,gate:{hp:this.gate.hp},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup})=>({id,x:+x.toFixed(2),z:+z.toFixed(2),hp,stun:+stun.toFixed(2),windup:+windup.toFixed(2)})),car:{x:this.car.x,z:this.car.z,active:this.car.active},strikes:this.hits,score:this.score,crashes:this.crashes,checkpoint:this.checkpoint};}
 }

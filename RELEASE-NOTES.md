@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.13: Play review
+
+- Played the previous build in normal browser time, including a held-strike/dodge attempt and a rescue/boarding/fast-turn/brake attempt; documented observations in `PLAYER-REVIEW.md`.
+- Unified repeat-strike input across held Space, mouse, right stick and Strike button. Cleared held inputs on Pause/help/retry/restart and guarded zero-distance aim.
+- Stopped opponents at readable melee distance and added separation, compact condition segments, interruption colour, distinct lead/companion markers and Dodge particles.
+- Added corner-speed assistance, tighter arcade turning and shorter released-input coasting.
+- Brought the initial patrol to the central road and restored patrol/last-seen context at earned vehicle checkpoints.
+- Marked active obstructions and the unsecured recording on the minimap; destination text now names the objective.
+- Retained the same story and original/licensed art. This is a playability pass, not a photorealistic-art or physical-device signoff.
+
 ## v0.12: Breakout
 
 Patch v0.12.1 fixes a roadblock respawning on reboarding and stores/restores the actual boarding position and heading. It also resets input aim on a fresh run. These are tested gameplay fixes, not new character art.

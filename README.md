@@ -1,6 +1,6 @@
 # DISSENT: Breakout
 
-An original **top-down 3D resistance action mission** with mobile dual-stick input. This is v0.12: a replacement game design, not more tasks added to the earlier campaign. Fight, break a fictional police line, rescue a companion, board a volunteer van together and escape through a connected street grid.
+An original **top-down 3D resistance action mission** with mobile dual-stick input. v0.13 improves the action after normal-time browser play: held strikes, clearer character/condition markers, spaced opponents, tighter assisted vehicle turns and pursuit retained at checkpoints. Fight, break a fictional police line, rescue a companion, board a volunteer van together and escape through a connected street grid.
 
 [Play the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · Breakout**. [Controls and winning route](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md) are also available inside the game.
 
@@ -17,7 +17,7 @@ The old three-district game is preserved at [the campaign archive](https://nawaa
 ## Controls
 
 - **Phone:** Left stick moves; its outer edge runs on foot. Right stick aims and repeatedly strikes while held. Dodge and contextual Action are separate buttons. In the van, the left stick steers and accelerates; release it to coast down or hold Brake/right stick to stop.
-- **Desktop:** WASD/arrows move or drive, Shift runs, Space strikes or brakes in the van, Q dodges, E rescues or enters/exits the van. Mouse aims; hold its left button on the world for repeated strikes. P/Escape pauses.
+- **Desktop:** WASD/arrows move or drive, Shift runs, hold Space for repeated strikes or braking in the van, Q dodges, E rescues or enters/exits the van. Mouse aims; hold its left button on the world for repeated strikes. P/Escape pauses.
 - **Guidance:** Gold marks the current objective, green marks the western safe house. The minimap shows streets, people and opponents. The guide pauses gameplay.
 
 ## Story and boundaries
@@ -28,11 +28,13 @@ The current movement's sourced context and disputed-claim distinctions remain in
 
 ## Development and verification
 
-Run `npm ci`, `npx playwright install chromium`, then `npm start`. `npm test` runs eight isolated rules checks; `npm run test:browser` completes the current mission with actual keyboard input and tests pause/help, both routes, capture and retry. `npm run test:mobile` exercises actual touch in phone emulation. `DISSENT_URL` can point either browser suite at the public page. Historical `test:campaign`, `test:tutorial` and other old scripts belong to the archived campaign, not current-game signoff.
+Run `npm ci`, `npx playwright install chromium`, then `npm start`. `npm test` runs eleven isolated rules checks. The browser scripts and their recorded versions/scopes are described in [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md); older passing results must not be relabelled as new-version signoff. `DISSENT_URL` can point browser checks at the public page. Historical `test:campaign`, `test:tutorial` and other old scripts belong to the archived campaign, not current-game signoff.
 
 Original rules are in `docs/breakout-rules.js`, rendering/input in `docs/breakout.js` and interface in `docs/breakout.css`. `render_game_to_text()` exposes inspectable state and `advanceTime(ms)` advances deterministic QA time; QA stepping is not a device FPS measurement.
 
 Read [the replacement design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/BREAKOUT-DESIGN.md), [verification scope](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) and [asset provenance](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/ASSETS.md).
+
+The [play review and resulting changes](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/PLAYER-REVIEW.md) distinguish normal-time playing from deterministic checks and from a human enjoyment study.
 
 ## Honest art status
 
