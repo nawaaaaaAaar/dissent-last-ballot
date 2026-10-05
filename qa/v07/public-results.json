@@ -1,0 +1,34 @@
+{
+  "version": "0.7.1",
+  "frontendCommit": "27c687c12fe5cff36f4959f2d44cd2c5c8e2da2c",
+  "module": "world.js?v=0.7.1",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=27c687c-check&quality=low",
+  "browser": "cloud Chromium",
+  "input": "actual CDP keyboard, mouse and touch with deterministic simulation stepping",
+  "chapter": {
+    "mode": "won",
+    "recorder": true,
+    "barrier": true,
+    "companion": true,
+    "assembly": true,
+    "rescued": ["organiser"],
+    "organiserShelterPosition": {"x": -17.88, "z": 20},
+    "health": 4,
+    "score": 1796,
+    "simulationTime": 41.49,
+    "dialogueConfirmations": 0
+  },
+  "mobileEmulation": {
+    "portrait": [390, 844],
+    "landscape": [844, 390],
+    "touchStart": true,
+    "joystick": true,
+    "dodge": true,
+    "heldRescue": true,
+    "pauseResume": true,
+    "landscapeContentWidth": 844
+  },
+  "physicalPhoneTested": false,
+  "humanEnjoymentTested": false,
+  "hardwarePerformanceBenchmark": false
+}

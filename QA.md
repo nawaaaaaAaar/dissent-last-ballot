@@ -2,6 +2,8 @@
 
 ## v0.7 Break Through
 
+The final public frontend `27c687c` / `world.js?v=0.7.1` was completed in cloud Chromium with actual keyboard and mouse input: an optional rescue, recorder pickup, held breakthrough, Kabir and the assembly produced `won` with score 1796 and four remaining health pips. The organiser reached the courtyard rather than remaining at the rescue marker. Public phone emulation separately passed touch movement, Dodge, held rescue and pause/resume, with portrait/landscape captures. `qa/v07/public-results.json` and `public-*` images retain these observations; simulation time is not a novice completion-time benchmark.
+
 The v0.7.1 follow-up makes helped characters visibly run toward shelter. Its route assertion caught an inconsistent arrival threshold that left an evacuee stopped before turning into the courtyard. Matching that threshold and continuing off-camera evacuation corrected it; the full action/mobile test rerun passed, including the organiser reaching the courtyard.
 
 The supplied game client also exercised movement and jumping in the default action mode (`qa/v07-client/`). Its initial five-second Play wait expired before the models finished loading; the adapted client now waits up to 90 seconds for the deterministic game hook, freezes rendering, then clicks Play. The rerun records `playing`, active pressure and airborne height. This adaptation is a test-loader accommodation, not a claim of fast cold loading.
