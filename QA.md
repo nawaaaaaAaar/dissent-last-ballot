@@ -2,6 +2,12 @@
 
 ## v0.8 three-district campaign
 
+The public frontend commit `80cadd7` loads `world.js?v=0.8.0`. All three campaign missions were completed in cloud Chromium with actual keyboard/mouse input and deterministic stepping. The campus ended with both companions at z=-41.22, within the arrival radius of the player's z=-43 destination; the community mission recorded all three stations and twenty sustain seconds. `qa/v08/public-results.json` and `public-*` captures retain the observed states.
+
+Public mobile emulation separately passed partial-stick walk versus outer-stick run, stamina use, hidden separate Run button, Dodge, pause/resume, camera drag, a held campus rescue, journal/map navigation and switching to the community district. Portrait is 390×844; landscape is 844×390 with no horizontal overflow. Completed districts persisted across reload. The portrait map's notes button requires scrolling: an initial coordinate-only test aimed below the visible modal, then scrolling and repeating opened it. The local Playwright tests scroll controls into view automatically.
+
+The supplied game client also exercised movement and jumping in v0.8; `qa/v08-client/state-0.json` records active play, pressure and an airborne character. This short control check is separate from full campaign coverage.
+
 `npm run test:campaign` exercises actual keyboard, mouse and touch input with deterministic simulation stepping. The campaign checks cover Jantar Mantar completion, both campus companions arriving together, all three community stations and the sustain objective, completed-campaign persistence, district replay, mobile walk/outer-stick run, Dodge, pause/resume, camera drag, map/journal navigation and portrait/landscape fit. The final suite also checks that menu Resume retains the unfinished player's position.
 
 `qa/v08/results.json` and `qa/v08/` captures record this campaign scope. The emergency network recovery is additionally tested in an isolated `ActionGame.damage` unit check; that is not presented as an end-to-end phone combat test. Action and slower-story regressions also passed after the district rebuild, including capture/retry, stamina, held rescue and both legacy handoffs. Their logs are `qa/v08-action-test.log` and `qa/v08-story-test.log`; older regression capture paths were refreshed and should not be mistaken for historical art.

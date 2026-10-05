@@ -1,0 +1,51 @@
+{
+  "version": "0.8.0",
+  "frontendCommit": "80cadd75c9e6857de7a968105622d29922f86bba",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=80cadd7-public&quality=low",
+  "browser": "Cloud Chromium",
+  "input": "Actual keyboard, mouse and CDP touch events with deterministic simulation stepping",
+  "desktop": {
+    "completedAllThreeDistricts": true,
+    "jantar": {"score": 1756, "health": 5, "helped": 0},
+    "jamia": {
+      "score": 1783,
+      "health": 5,
+      "helped": 1,
+      "playerDestination": {"x": 0, "z": -43},
+      "companionsAtFinish": [
+        {"id": "organiser", "x": 0, "z": -41.22},
+        {"id": "companion", "x": 0, "z": -41.22}
+      ]
+    },
+    "shaheen": {
+      "score": 1248,
+      "health": 3,
+      "stations": ["organiser", "aid", "protest"],
+      "settleSeconds": 20,
+      "networkRecoveryAvailable": 1
+    }
+  },
+  "mobileEmulation": {
+    "portrait": {"width": 390, "height": 844},
+    "landscape": {"width": 844, "height": 390},
+    "partialStickTravelOneSecond": 1.37,
+    "outerStickTravelOneSecond": 4.6,
+    "separateRunButtonHidden": true,
+    "staminaConsumed": true,
+    "dodge": true,
+    "pauseResume": true,
+    "cameraDragYaw": 0.21,
+    "heldRescue": true,
+    "heldRescuePosition": {"x": -18, "z": 20},
+    "districtSwitch": true,
+    "journalMapNavigation": true,
+    "portraitMapNotesRequireScrolling": true,
+    "landscapeHorizontalOverflow": false,
+    "campaignRetainedAfterReload": ["jantar", "jamia", "shaheen"]
+  },
+  "harnessObservation": "A coordinate tap initially aimed at the portrait map's notes button below the visible scroll area. Scrolling the modal into view and repeating the interaction opened the journal; local Playwright mobile tests also cover this navigation.",
+  "physicalPhoneTested": false,
+  "safariTested": false,
+  "humanEnjoymentTested": false,
+  "frameRateBenchmark": false
+}
