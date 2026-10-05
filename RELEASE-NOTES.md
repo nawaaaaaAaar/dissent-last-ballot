@@ -1,5 +1,14 @@
 # DISSENT release notes
 
+## v0.10: Signal Run
+
+- Replaced compulsory voter-case quizzes with automatic packet pickups and direct help interactions. Optional cases remain in the journal.
+- Added supplies, packet-chain scoring, jumpable crates, a forward Dodge and an energy/cooldown-based Rally.
+- Replaced unavoidable close-contact damage with signalled officer wind-ups. Rally briefly displaces and stuns pursuers; no injury score is awarded.
+- Added a visible gathering zone for the final hold objective. All three chapters now complete without a mandatory charter panel.
+- Retained the movement's broader accountability, contested-SIR and eligible-voter inclusion demands in the ending.
+- Reused the existing bounded worlds and character assets. This is not a map expansion, photorealistic art overhaul or verified physical-phone release.
+
 ## v0.9: Every Eligible Voter
 
 - Refocused on vote chori, CEC Gyanesh Kumar, SIR and inclusion of eligible voters beyond a leadership change. Sourced primary documents and disputed-claim distinctions are in [CURRENT-MOVEMENT.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md).

@@ -1,6 +1,12 @@
 # DISSENT: The Account
 
-## Current campaign: Every Eligible Voter
+## Current campaign: Signal Run
+
+v0.10 shifts the same fictional movement story into action. Aman carries record packets through pursuit rather than stopping for compulsory case quizzes. Jantar combines collection, a recorder, a fictional breakthrough and Kabir's reunion. Bihar combines collection with an obstacle-aware two-person escort. Bengal combines collection, direct help and a timed gathering hold inside a marked zone.
+
+Automatic pickup, supplies, jumpable crates, readable attack wind-ups, Dodge and Rally give each route moment-to-moment decisions. Helping people still restores health and supports the network. All three chapters finish directly with the broader reform demands; case reading and the charter remain optional. The story does not claim any real official has left office or that a real election has changed.
+
+## v0.9 campaign history: Every Eligible Voter
 
 The v0.9 campaign follows the current vote-chori/SIR movement rather than historical protest chapters. Aman and the team carry a broader demand than Gyanesh Kumar's departure: accountability, ending the contested SIR process, and transparent inclusion/appeal support across affected states.
 

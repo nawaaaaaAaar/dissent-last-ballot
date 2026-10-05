@@ -1,5 +1,15 @@
 # QA and limitations
 
+## v0.10 Signal Run
+
+`npm run test:campaign` passed using actual keyboard, mouse and emulated touch inputs with deterministic simulation stepping. `qa/v10/results.json`, captures and `qa/v10-test.log` retain the scope. All three chapters completed with zero mandatory case reviews and no mandatory charter gate.
+
+Checks cover Rally's energy cost, cooldown, actual displacement and stun; a sprint-jump over a physical crate; live help without a quiz; automatic packets; recorder, breakthrough and reunion; both escort companions arriving; sustain time advancing only inside the gathering zone; full campaign completion; stored chapter progress; replay/reset; deliberate capture and checkpoint retry retaining a packet; damage breaking the chain; optional-case anti-farming; and pause/resume.
+
+Mobile Chromium emulation covers Rally, partial-stick walk versus outer-stick running, a moving Dodge, Jump, pause/resume, district switching and portrait/landscape fit. There were no page errors. This is input/layout coverage, not physical-phone frame-rate or Safari certification.
+
+The current suite is `street-qa.mjs` (`test:campaign` and `test:action`). Earlier campaign/action/story results below are historical, not current signoff. The supplied game client also passes a short movement/jump check; `qa/v10-client/state-0.json` records active action and airborne height. Public deployment verification is recorded separately after publication. Ordinary-player enjoyment, physical iPhone/Android performance and photorealistic art remain unverified.
+
 ## v0.9 Every Eligible Voter
 
 The final public frontend `e9e73e4` loads `world.js?v=0.9.0`. Cloud Chromium completed all nine referrals, the Jantar breakthrough, both Bihar companions arriving, twenty seconds of supported Bengal desks, rejection of a resignation-only charter and the complete three-part hypothetical ending. Incorrect-response feedback is now visible in the final desktop panel. `qa/v09/public-results.json` and `public-*` captures retain the observed scope.

@@ -6,6 +6,10 @@ Refocus on the current vote-chori movement, Gyanesh Kumar, SIR and inclusion of 
 
 QA inventory: nine invented case referrals across three missions; wrong response stays open with feedback; leaving a case does not count; review freezes action; every mission requires all three files; companions and sustain still work; a resignation-only charter is insufficient; all three commitments complete the hypothetical finale; touch case selection and readable portrait/landscape modals; local saves use a new version key; actual public completion and supplied-client movement check before delivery. No real voter data, legal determinations or current-event outcomes are produced.
 
+## v0.10 request: more game
+
+Replace compulsory case panels with live action. QA: automatic packet collection and combo feedback, supplies/energy, real hurdle crossing, moving dodge, Rally energy/cooldown/enemy displacement, individual warning cues, escort group arrival, gathering-zone sustain, campaign completion without quizzes or charter checkbox gate, deliberate capture/retry retains packets, optional case review does not unlock remote live help or permit score farming, pause, touch Rally and portrait/landscape controls. Existing art remains a prototype.
+
 Latest revision request: Use actual Delhi Police barricades, protest context, Delhi route, buses, and related recognisable setting details.
 
 ## Delhi revision

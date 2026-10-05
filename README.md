@@ -1,8 +1,16 @@
 # DISSENT: The Last Ballot
 
-A mobile-first, third-person resistance adventure about the current vote-chori/SIR movement. **v0.9: Every Eligible Voter** connects a Delhi protest to invented Bihar and West Bengal voter-help camps. It is a campaign prototype, not a finished photorealistic release.
+A mobile-first, third-person resistance adventure about the current vote-chori/SIR movement. **v0.10: Signal Run** makes movement, pickups, readable pursuit and live help the main campaign. It is a playable prototype, not a finished photorealistic release.
 
-## Current game: Every Eligible Voter
+## Current game: Signal Run
+
+Collect three record packets in each district while jumping low crates, dodging warnings and managing sprint stamina. Packets collect automatically; consecutive pickups increase the score multiplier, while damage breaks the chain. Optional supplies restore stamina and Rally energy. Rally costs 30 energy, has a six-second cooldown and briefly pushes back/stuns nearby fictional pursuers without awarding injury points.
+
+Jantar Mantar adds the recorder, a held breakthrough and reunion. The invented Bihar camp requires both companions to reach the destination. The invented Bengal camp requires three live help actions and twenty game seconds inside the gathering ring. Case reading is optional in the journal, not a gate to the action. Completing all three chapters directly reaches the ending and its broader reform demands; the charter is optional.
+
+On a phone, use the left joystick (outer edge runs), right-thumb camera drag, Jump, Dodge, Rally and held contextual Action. Desktop adds F for Rally to WASD/arrows, Shift, Space, Q and E. The new browser-local v0.10 campaign key avoids treating earlier completions as current runs. Read [the design decision](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/GAME-FEEL.md) and [current verification](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md).
+
+## v0.9 design history: Every Eligible Voter
 
 The movement's demand is broader than replacing Gyanesh Kumar: leadership accountability, ending the contested SIR process, and inclusion with transparent review across affected states. The campaign names those demands without claiming that electoral-manipulation allegations have been proven or that officials/policies have actually changed.
 
@@ -34,9 +42,9 @@ These are separate authored spaces, not a continuous or survey-accurate Delhi ma
 ## Current controls and verification
 
 - **Phone:** Left thumb moves; pushing the joystick toward its outer edge runs automatically. Right thumb drags the world to turn the camera. Jump, Dodge and the nearby contextual Action button cover the remaining frequent inputs. Hold Action for rescues and gate interactions. City map and pause keep secondary information out of the live controls.
-- **Desktop:** WASD/arrows move, Shift runs, Space jumps, Q dodges, E interacts or holds the nearby action. Drag to turn the camera. The on-screen Run toggle is available on desktop.
+- **Desktop:** WASD/arrows move, Shift runs, Space jumps, Q dodges, F rallies, E interacts or holds the nearby action. Drag to turn the camera. The on-screen Run toggle is available on desktop.
 - **Progress and guidance:** A directional objective and distance identify the current task. The City map contains mission selection and optional people/accounts notes. Pause can review the mission brief; returning to the menu and choosing Resume retains the current unfinished run.
-- **Tests:** `npm run test:campaign` covers the three-mission campaign, companions, persistence/replay/resume and portrait/landscape touch controls. `npm run test:action` and `npm test` retain action and slower-story regressions. Install with `npm ci` and `npx playwright install chromium`, then `npm start`.
+- **Tests:** `npm run test:campaign` runs the current action campaign checks. Earlier standalone action, slower-story and runner scripts are historical and are not current-campaign signoff. Install with `npm ci` and `npx playwright install chromium`, then `npm start`.
 
 The three districts share licensed human meshes, scanned materials and runtime assets. Knit-colour variants, revised crowd clusters, camera collision and animation resets improve presentation; repeated faces, simplified police, basic buildings and missing authored jump/dodge clips remain obvious production gaps. Browser-emulated mobile inputs do not establish physical-phone performance or Safari compatibility. No ordinary-player enjoyment study has yet been conducted; see [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) and [visual review](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/VISUAL-REVIEW.md).
 

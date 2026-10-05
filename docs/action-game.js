@@ -19,6 +19,7 @@ export class ActionGame {
     this.dodge=.48;this.cooldown=2.3;this.h.tone(420,.08);return true;
   }
   target(s) {
+    const packet=this.h.packetTarget?.();if(packet)return packet.id;
     if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'organiser';if(!s.companion)return 'companion';const review=this.h.missingReview?.();if(review)return review;if(!s.tasks.barrier)return 'barrier';return 'assembly';}
     if(this.mission==='hold')return ['organiser','aid','protest'].find(id=>!this.rescued.includes(id))||'assembly';
     if(!s.inventory.recorder)return 'recorder';
@@ -28,8 +29,9 @@ export class ActionGame {
     return 'assembly';
   }
   objective(s) {
-    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'Review Mira’s voter file. Hold ACTION.';if(!s.companion)return 'Regroup Kabir. Keep the referral team close.';if(this.h.missingReview?.())return `Compare the remaining voter files (${this.rescued.length} / 3).`;if(!s.tasks.barrier)return 'Lead both companions to the exit. Hold ACTION.';return 'Deliver the referrals together. Wait for your companions.';}
-    if(this.mission==='hold'){const names={organiser:'appeal file',aid:'inclusion file',protest:'first-time voter file'},id=this.target(s);if(id!=='assembly')return `Review the ${names[id]} (${this.rescued.length} / 3). Choose any order.`;return this.settle<20?`${this.contested?'Clear pressure from the desks':'Keep the desks supported'} · ${Math.ceil(20-this.settle)} seconds`:'Deliver the inclusion-and-review charter.';}
+    const packet=this.h.packetTarget?.();if(packet)return `Collect the record packets (${this.h.packetCount()} / 3). Keep moving.`;
+    if(this.mission==='escort'){if(!this.rescued.includes('organiser'))return 'Regroup Mira. Hold ACTION.';if(!s.companion)return 'Regroup Kabir. Keep the team close.';if(this.h.missingReview?.())return `Compare the remaining voter files (${this.rescued.length} / 3).`;if(!s.tasks.barrier)return 'Lead both companions to the exit. Hold ACTION.';return 'Deliver the packets together. Wait for your companions.';}
+    if(this.mission==='hold'){const names={organiser:'appeal desk',aid:'inclusion desk',protest:'first-time voter desk'},id=this.target(s);if(id!=='assembly')return `Activate the ${names[id]} (${this.rescued.length} / 3).`;return this.settle<20?`${this.contested?'Return to the gold gathering zone':'Hold the gathering · dodge and Rally'} · ${Math.ceil(20-this.settle)} seconds`:'Deliver the packets. The gathering holds.';}
     if(!s.inventory.recorder)return 'Recover the recorder. Keep moving.';
     if(this.h.missingReview?.())return `Compare three consented voter files (${this.rescued.length} / 3). Hold ACTION.`;
     if(!s.tasks.barrier)return 'Reach the line. Hold ACTION to break through.';
@@ -39,6 +41,7 @@ export class ActionGame {
   damage(s) {
     if(this.hurt>0||this.dodge>0||this.finish)return;
     this.health--;this.hurt=1.8;this.score=Math.max(0,this.score-50);this.h.tone(90,.14);
+    this.h.damage?.();
     if(this.health<=0&&this.support>0){this.support--;this.health=2;this.hurt=3;this.h.toast('Network support: people you helped give you another chance.',3);return;}
     if(this.health<=0){this.h.fail();return;}
     this.h.toast('Hit. Dodge or move out of the red warning zone.',2);
@@ -61,10 +64,11 @@ export class ActionGame {
       s.companion=true;this.score+=250;this.h.tone(600,.16);this.h.toast('Kabir is with you. Get to the assembly.',3);return;
     }
     if(e.id==='assembly') {
+      if(this.h.packetTarget?.()){this.h.toast('Collect all three record packets before the handoff.',2);return;}
       if(this.h.missingReview?.()){this.h.toast('Review all three voter files. One resignation is not the whole demand.',3);return;}
       if(this.mission==='break'&&(!s.inventory.recorder||!s.companion)){this.h.toast('Do not leave the recorder or Kabir behind.',2);return;}
       if(this.mission==='escort'&&(!s.tasks.barrier||!s.companion||!this.rescued.includes('organiser')||!this.h.escortReady())){this.h.toast('Wait for both companions. An escort ends together.',2);return;}
-      if(this.mission==='hold'&&this.settle<20){this.h.toast('Support all three stations and sustain the gathering first.',2);return;}
+      if(this.mission==='hold'&&this.settle<20){this.h.toast('Activate all three desks; keep moving inside the gold zone for twenty seconds.',3);return;}
       this.finish=true;this.score+=Math.round(this.health*100+Math.max(0,240-this.time)*3);
       this.h.win();return;
     }
@@ -84,7 +88,7 @@ export class ActionGame {
       this.charge-=dt;this.warning.material.opacity=.2+Math.sin(this.time*18)*.13;this.warning.rotation.z+=dt;
       if(this.charge<=0){if(s.y<.65&&Math.hypot(s.x-this.warning.position.x,s.z-this.warning.position.z)<2.5)this.damage(s);this.warning.visible=false;this.sweep=0;this.charge=0;}
     }
-    if(police.some(a=>Math.hypot(s.x-a.p.group.position.x,s.z-a.p.group.position.z)<1.25))this.damage(s);
+    // Individual officer wind-ups and contact resolution are handled by the world.
     if(this.holding&&near) {
       if(near.id==='barrier'&&!s.tasks.barrier&&(s.inventory.recorder||this.mission==='escort')) {
         this.barrier=Math.min(1,this.barrier+dt/(s.assist?1.8:2.7));
@@ -96,6 +100,7 @@ export class ActionGame {
     }else this.hold=0;
     if(this.mission==='hold'&&this.rescued.length===3){
       this.contested=this.h.stations().some(e=>police.some(a=>Math.hypot(a.p.group.position.x-e.x,a.p.group.position.z-e.z)<2.1));
+      if(this.h.inGathering)this.contested=!this.h.inGathering(s);
       if(!this.contested)this.settle=Math.min(20,this.settle+dt);
     }
   }

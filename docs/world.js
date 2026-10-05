@@ -1,18 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.9.0';
-import {STORY,ITEMS} from './story.js?v=0.9.0';
-import {WorldAudio} from './world-audio.js?v=0.9.0';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.10.0';
+import {STORY,ITEMS} from './story.js?v=0.10.0';
+import {WorldAudio} from './world-audio.js?v=0.10.0';
 import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
-import {ActionGame} from './action-game.js?v=0.9.0';
-import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.9.0';
-import {route} from './navigation.js?v=0.9.0';
-import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.9.0';
+import {ActionGame} from './action-game.js?v=0.10.0';
+import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.10.0';
+import {route} from './navigation.js?v=0.10.0';
+import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.10.0';
+import {StreetPlay} from './street-play.js?v=0.10.0';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.9.0';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.10.0';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -45,7 +46,7 @@ function continueGame(){
 }
 const keys=new Set(),joy={x:0,y:0},actors=[],police=[],trees=[],flags=[],colliders=[],events=[];
 const zoneData=new Map(),collections={actors,police,trees,flags,colliders,events};
-let district='jantar',mapReturn='menu',journalReturn='playing';
+let district='jantar',mapReturn='menu',journalReturn='playing',reviewReturn='playing',street;
 let renderer,scene,camera,player,composer,ssao,sun,treeSource,barriers=[],clock,manual=false,last=0,anim=0,fps=0,frames=0,frameStart=performance.now(),toastTime=0,cameraDrag=null,ambient,action;
 const rng=seed=>()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},rand=rng(5108);
 const objectives=[
@@ -74,6 +75,8 @@ function mode(m){
   $('review-screen').hidden=m!=='review';$('charter-screen').hidden=m!=='charter';
   $('action-hud').hidden=!action?.active||['menu','loading','error','won','caught'].includes(m);
   $('evade').hidden=!action?.active;
+  $('rally-power').hidden=!action?.active;$('street-hud').hidden=!action?.active||m!=='playing';
+  $('pickup-pop').hidden=m!=='playing'||!street?.popTime;
   document.body.classList.toggle('playing',m!=='menu'&&m!=='loading');
   document.body.classList.toggle('action-play',!!action?.active);
 }
@@ -196,7 +199,9 @@ function buildWorld(){
 function addActor(x,z,color,pol=false,options={}){
   const p=human(color,pol,{bag:false,detail:false,...options,skin:['#986748','#a57553','#865b40'][Math.floor(rand()*3)]});
   p.group.position.set(x,0,z);p.group.rotation.y=rand()*6.28;scene.add(p.group);
-  const a={p,x,z,phase:rand()*6.28,police:pol,walking:false,poseClock:0};actors.push(a);if(pol)police.push(a);return a;
+  const a={p,x,z,phase:rand()*6.28,police:pol,walking:false,poseClock:0,stun:0,windup:0,attackCooldown:1};
+  if(pol){a.telegraph=new THREE.Mesh(new THREE.RingGeometry(.62,.78,24),new THREE.MeshBasicMaterial({color:'#ed785c',transparent:true,opacity:.7,side:THREE.DoubleSide,depthWrite:false}));a.telegraph.rotation.x=-Math.PI/2;a.telegraph.position.y=.035;a.telegraph.visible=false;p.group.add(a.telegraph);police.push(a);}
+  actors.push(a);return a;
 }
 function event(id,x,z,title,prompt,color){
   const coords=DISTRICTS[district].coords[id];if(coords)[x,z]=coords;
@@ -293,7 +298,7 @@ function nearest(){
       if(['witness','record'].includes(e.id)||action.mission==='hold'&&['barrier','companion'].includes(e.id))continue;
       if(action.rescued.includes(e.id))continue;
     }
-    if(e.item&&s.items.includes(e.id))continue;
+    if(e.auto||e.item&&s.items.includes(e.id))continue;
     if(e.id==='companion'&&((!s.tasks.barrier&&action?.mission!=='escort')||s.companion))continue;
     if(e.id==='record'&&(!s.tasks.barrier||s.choice!=='archive'))continue;
     if(e.id==='assembly'&&s.choice==='archive')continue;
@@ -304,7 +309,7 @@ function nearest(){
   $('interact').hidden=s.mode!=='playing'||!best;
   if(best)$('interact').textContent=action?.active?
     (best.id==='barrier'?`HOLD · ${Math.round(action.barrier*100)}%`:
-    ['aid','organiser','protest'].includes(best.id)?'HOLD · REVIEW':
+    ['aid','organiser','protest'].includes(best.id)?'HOLD · HELP':
     best.id==='companion'?(coarse?'REGROUP':'GET KABIR MOVING · E'):best.id==='assembly'?(coarse?'HANDOFF':'FINISH THE RUN · E'):coarse?(best.type==='recorder'?'RECOVER':best.type==='water'?'TAKE WATER':'READ'):best.prompt+' · E'):best.prompt+'  ·  E';
 }
 function dialog(e){
@@ -361,18 +366,20 @@ function journal(){
   $('journal-copy').textContent=`AMAN’S JOURNAL\n\nI came to find Kabir. Mira asked me to make myself useful first.\n\nCURRENT TASK\n${$('objective').textContent}\n\nCOMPLETED\n${objectives.filter(([id])=>s.tasks[id]).map(([id])=>STORY[id].name).join(' • ')||'No story encounters completed yet.'}\n\nWater: ${s.inventory.water}/3 • Recorder: ${s.inventory.recorder?'recovered':'not recovered'}\nHandoff: ${s.choice==='archive'?'protected record desk':'public assembly'}\nKabir: ${s.companion?'staying with me':'still separated'}\n\n`+
     (s.notes.map(n=>n.title+'\n'+n.copy).join('\n\n')||'Explore the benches and courtyard for optional story fragments.');
   if(action?.active)$('journal-copy').textContent=`THE VOTE-CHORI / SIR CAMPAIGN\n\n${DISTRICTS[district].brief}\n\nCURRENT TASK\n${$('objective').textContent}\n\nMOVEMENT DEMANDS\n${DEMANDS.map(d=>d.title+': '+d.copy).join('\n\n')}\n\nREVIEWED FILES\n${movement.outcomes.map(o=>o.case+' • '+o.response+' • '+o.status).join('\n')||'No files referred yet.'}\n\nTHE NETWORK\n${campaign.count()} / 3 chapters completed. Help in another chapter grants one emergency health recovery. Names and records are fictional; no real voter data is collected.\n\nRead the sourced movement dossier through the research link. Claims of partisan deletion are disputed; this campaign does not establish guilt, scrap SIR or change electoral rolls.`;
+  $('optional-cases').hidden=!action?.active;
   mode('journal');
 }
 function begin(playAction=false,region='jantar'){
   selectDistrict(playAction?region:'jantar');
   movement.reset();
   action?.reset(playAction,DISTRICTS[district].mission);
+  street?.reset(playAction,district,events,colliders);
   try{localStorage.removeItem(SAVE_KEY);}catch{}
   keys.clear();joy.x=joy.y=0;$('sprint').classList.remove('active');
   Object.assign(s,{x:0,z:31,y:0,vy:0,capture:0,pressure:0,solidarity:0,yaw:0,dialog:null,checkpoint:null});
   Object.assign(s,{items:[],inventory:{water:0,recorder:false},choice:'public',companion:false,protestDone:false,rallyHits:0,notes:[]});
   events.filter(e=>e.item).forEach(e=>e.prop.visible=true);
-  actors.forEach(a=>{a.p.group.position.set(a.x,0,a.z);a.path=[];a.pathClock=0;resetHuman(a.p);});
+  actors.forEach(a=>{a.p.group.position.set(a.x,0,a.z);a.path=[];a.pathClock=0;a.stun=0;a.windup=0;a.attackCooldown=1;if(a.telegraph)a.telegraph.visible=false;resetHuman(a.p);});
   resetHuman(player);anim=0;s.move=0;player.group.position.set(0,0,31);player.group.rotation.y=0;
   const friend=events.find(e=>e.id==='companion');if(friend)friend.a.p.group.position.set(friend.x,0,friend.z);
   for(const k in s.tasks)s.tasks[k]=false;
@@ -380,21 +387,21 @@ function begin(playAction=false,region='jantar'){
   mode('playing');toast(coarse?'Move with the left joystick. Mira waits by the gold ring ahead.':'WASD to move; drag to look. Meet Mira at the gold ring ahead.',6);hud();
   if(playAction){
     action.support=Object.entries(campaign.results).some(([id,result])=>id!==district&&result.helped>0)?1:0;
-    s.pitch=coarse?.20:.30;s.pressure=district==='jantar'?1:0;s.checkpoint={x:0,z:31};
+    s.pitch=coarse?.20:.30;s.pressure=1;s.checkpoint={x:0,z:31};
     if(district==='shaheen')s.tasks.barrier=true;
-    police.forEach((a,i)=>a.p.group.position.set(district==='jantar'?5+i:8+i,0,district==='jantar'?35-i:-37-i));
-    toast(DISTRICTS[district].chapter+'. '+(coarse?'Push the stick farther to run. Right thumb: Dodge, Jump and nearby Action.':'WASD · SHIFT run · SPACE jump · Q dodge · hold E to act.'),6);
+    police.forEach((a,i)=>a.p.group.position.set(5+i,0,37-i));
+    toast(coarse?'Collect 3 packets. Jump hurdles; Rally opens space. Push the stick farther to run.':'Collect 3 packets · SPACE jump · Q dodge · F Rally · E action',5);
     if(!coarse)$('sprint').classList.add('active');
     $('mission-brief-title').textContent=DISTRICTS[district].chapter;$('mission-brief-copy').textContent=DISTRICTS[district].brief;
     hud();map();
   }
 }
-function valid(x,z){
+function valid(x,z,allowJump=true){
   const area=DISTRICTS[district].area.some(([left,right,top,bottom])=>x>=left&&x<=right&&z>=top&&z<=bottom);
   if(!area)return false;
   if(!s.tasks.barrier&&z<-32&&z>-34)return false;
   if(!s.tasks.barrier&&s.z>-32&&z<=-34)return false;
-  for(const c of colliders)if(Math.abs(x-c.x)<c.w/2+.32&&Math.abs(z-c.z)<c.d/2+.32&&!(c.name==='fallen barricade'&&s.y>.65))return false;
+  for(const c of colliders)if(Math.abs(x-c.x)<c.w/2+.32&&Math.abs(z-c.z)<c.d/2+.32&&!(allowJump&&(c.name==='fallen barricade'||c.street)&&s.y>.65))return false;
   return true;
 }
 function step(dt){
@@ -408,6 +415,7 @@ function step(dt){
   if(s.mode==='dialog'){poseHuman(player,0,0);return;}
   let ix=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
   let iz=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
+  if(action?.active&&action.dodge>0&&Math.hypot(ix,iz)<.1){ix=0;iz=1;}
   const mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;}
   s.sprint=(keys.has('ShiftLeft')||keys.has('ShiftRight')||$('sprint').classList.contains('active')||(coarse&&action?.active&&Math.hypot(joy.x,joy.y)>.85))&&(!action?.active||action.sprintAllowed);
   const speed=action?.active&&action.dodge>0?7.5:s.sprint?4.6:action?.active?2.6:1.8;
@@ -439,8 +447,17 @@ function step(dt){
       poseHuman(a.p,s.time*10.5+a.phase,d>.15?1:0);
     }else if(a.police&&s.pressure){
       const p=a.p.group.position,d=Math.max(.1,Math.hypot(s.x-p.x,s.z-p.z));
-      const speed=action?.active?(s.assist?2.0:2.7):(s.assist?1.3:1.7);
-      if(d>1.2){const x=p.x+(s.x-p.x)/d*speed*dt,z=p.z+(s.z-p.z)/d*speed*dt;if(valid(x,z)){p.x=x;p.z=z;}}
+      a.attackCooldown=Math.max(0,a.attackCooldown-dt);
+      if(a.stun>0){a.stun=Math.max(0,a.stun-dt);a.telegraph.visible=false;poseHuman(a.p,s.time*.5,0);continue;}
+      if(action?.active&&a.windup>0){
+        a.windup-=dt;a.telegraph.visible=true;a.telegraph.material.opacity=.35+.3*Math.sin(s.time*18);
+        if(a.windup<=0){a.telegraph.visible=false;a.attackCooldown=2.6;if(d<2.8&&s.y<.65)action.damage(s);}
+        poseHuman(a.p,s.time*2+a.phase,.25);continue;
+      }
+      if(action?.active&&d<2.4&&a.attackCooldown===0){a.windup=.85;a.telegraph.visible=true;continue;}
+      const flank=action?.active&&police.indexOf(a)===2?1.5:0;
+      const dx=s.x+flank-p.x,dz=s.z-p.z,length=Math.max(.1,Math.hypot(dx,dz)),speed=action?.active?(s.assist?2.0:2.7):(s.assist?1.3:1.7);
+      if(d>1.2){const x=p.x+dx/length*speed*dt,z=p.z+dz/length*speed*dt;if(valid(x,z,false)){p.x=x;p.z=z;}}
       a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;poseHuman(a.p,s.time*8+a.phase,.7);
       if(d<1.25&&!action?.active)s.capture+=dt;
     }else if(a.walking){
@@ -457,16 +474,16 @@ function step(dt){
   if(!s.reduced)flags.forEach((f,i)=>{const p=f.geometry.attributes.position;for(let j=0;j<p.count;j++)p.setZ(j,Math.sin(s.time*2+p.getX(j)*4+i)*.055*(p.getX(j)+.6));p.needsUpdate=true;});
   events.forEach(e=>{e.marker.visible=!(e.item?s.items.includes(e.id):s.tasks[e.id])&&Math.hypot(s.x-e.x,s.z-e.z)<25;if(e.id==='companion')e.marker.visible=(s.tasks.barrier||action?.mission==='escort')&&!s.companion;if(e.id==='record')e.marker.visible=s.tasks.barrier&&s.choice==='archive'&&!s.tasks.assembly;if(action?.active&&(e.id==='witness'||e.id==='record'||action.rescued.includes(e.id)))e.marker.visible=action.mission==='hold'&&action.rescued.includes(e.id);if(e.marker.children[0]?.material)e.marker.children[0].material.color.set(action?.mission==='hold'&&action.rescued.includes(e.id)?'#91c697':'#d9af71');});
   nearest();
-  if(action?.active){action.update(dt,s,s.near,police,s.move>0);actionHud();}
+  if(action?.active){street.update(dt,s,action);action.update(dt,s,s.near,police,s.move>0);actionHud();}
   hud();map();
   events.forEach(e=>e.marker.scale.setScalar(e.id===s.target?1.5:1));
 }
 function follow(a,dt){
   const p=a.p.group.position,d=Math.hypot(s.x-p.x,s.z-p.z);a.pathClock=(a.pathClock||0)-dt;
-  if(d>1.8&&a.pathClock<=0){a.path=route(p,{x:s.x,z:s.z},valid);a.pathClock=.65;}
+  if(d>1.8&&a.pathClock<=0){a.path=route(p,{x:s.x,z:s.z},(x,z)=>valid(x,z,false));a.pathClock=.65;}
   const next=a.path?.[0]||{x:s.x,z:s.z},dist=Math.hypot(next.x-p.x,next.z-p.z),speed=action?.mission==='escort'?3.6:4.1;
   a.p.worldSpeed=0;
-  if(d>1.8&&dist>.05){const x=p.x+(next.x-p.x)/dist*Math.min(dist,speed*dt),z=p.z+(next.z-p.z)/dist*Math.min(dist,speed*dt);if(valid(x,z)){p.x=x;p.z=z;a.p.worldSpeed=speed;}a.p.group.rotation.y=Math.atan2(next.x-p.x,next.z-p.z)+Math.PI;if(dist<.3)a.path?.shift();}
+  if(d>1.8&&dist>.05){const x=p.x+(next.x-p.x)/dist*Math.min(dist,speed*dt),z=p.z+(next.z-p.z)/dist*Math.min(dist,speed*dt);if(valid(x,z,false)){p.x=x;p.z=z;a.p.worldSpeed=speed;}a.p.group.rotation.y=Math.atan2(next.x-p.x,next.z-p.z)+Math.PI;if(dist<.3)a.path?.shift();}
   poseHuman(a.p,s.time*10.5+a.phase,a.p.worldSpeed?1:0);
 }
 function hud(){
@@ -503,11 +520,13 @@ function actionWin(){
   s.tasks.assembly=true;mode('won');
   const medal=action.health>=4&&action.rescued.length>=2?'SOLIDARITY':action.health>=3?'DEFIANCE':'SURVIVOR';
   $('ending-title').textContent=campaign.count()===3?'Replacement is not repair.':DISTRICTS[district].chapter+' · COMPLETE';
-  $('ending-copy').textContent=DISTRICTS[district].debrief+` ${campaign.count()} / 3 chapters completed. ${medal} · ${action.score} points. ${movement.reviewed.length} fictional voter files referred. No actual registration or election result changed.`;
+  $('ending-copy').textContent=DISTRICTS[district].debrief+` ${campaign.count()} / 3 chapters completed. ${medal} · ${action.score} points. ${street.collected.length} fictional record packets delivered. No actual registration or election result changed.`;
   $('next-district').hidden=false;$('next-district').textContent=campaign.count()===3?'Explore the city map':'Continue to the next district';
-  if(campaign.count()===3)openCharter();
+  if(campaign.count()===3){movement.mandate=DEMANDS.map(d=>d.id);$('ending-title').textContent='The movement is bigger than one office.';$('ending-copy').textContent=`${action.score} points · ${medal}. You delivered the packets and held the network together. The fictional assembly carries all three demands: Gyanesh Kumar’s exit, ending the contested SIR process, and inclusion with transparent review for every eligible voter. This is not news of actual resignation, repeal or voter restoration.`;}
 }
-function openReview(e){
+function openReview(e,from='playing'){
+  if(movement.reviewed.includes(e.id)){toast('This optional case is already reviewed.',2);return;}
+  reviewReturn=from;
   movement.active=e.id;const entry=CASES[district][e.id];
   keys.clear();joy.x=joy.y=0;action.holding=false;
   $('review-title').textContent=entry.name;
@@ -519,7 +538,7 @@ function reviewAnswer(choice){
   if(s.mode!=='review'||!movement.active)return;
   const result=movement.answer(district,choice);
   $('review-feedback').textContent=result.copy;$('review-feedback').dataset.correct=String(result.correct);
-  if(result.correct){action.help(s,result.id);mode('playing');hud();nearest();toast(result.copy,6);}
+  if(result.correct){action.score+=50;if(reviewReturn==='journal'){const back=journalReturn;mode('playing');journal();journalReturn=back;}else mode('playing');hud();nearest();toast(result.copy,6);}
   else $('review-feedback').scrollIntoView({block:'nearest',behavior:'instant'});
 }
 function openCharter(){
@@ -537,6 +556,11 @@ function finishCharter(){
 function actionFail(){
   mode('caught');$('ending-title').textContent='Caught in the crackdown.';
   $('ending-copy').textContent='The run is not over. Retry from the last checkpoint with recovered items intact. Keep moving when a red zone appears, manage your sprint, and use Dodge to get space.';
+}
+function rallyPower(){
+  if(s.mode!=='playing'||!action?.active)return;
+  if(street.pulse(s,police,(x,z)=>valid(x,z,false))){action.hurt=Math.max(action.hurt,.6);action.stamina=Math.min(100,action.stamina+10);}
+  else toast('Rally needs 30 energy and a ready cooldown. Collect supplies or packets.',2);
 }
 function startCampaign(){
   if(s.mode==='error'){location.reload();return;}
@@ -561,6 +585,7 @@ function render(){
   const menu=s.mode==='menu';
   const target=new THREE.Vector3(s.x,s.y+1.45,s.z);
   const distance=coarse?5.8:6.2;
+  const fov=!s.reduced&&action?.active&&action.dodge>0?57:52;camera.fov+=(fov-camera.fov)*.2;camera.updateProjectionMatrix();
   if(menu){camera.position.set(-3.3,3.0,29.5);camera.lookAt(22,5,-13);}
   else {
     const desired=new THREE.Vector3(s.x+Math.sin(s.yaw)*distance,2.2+s.pitch*4+s.y,s.z+Math.cos(s.yaw)*distance);
@@ -596,7 +621,7 @@ function bindings(){
   document.addEventListener('click',e=>{if(performance.now()-lastTouch<700&&(e.pointerType==='touch'||e.detail>0)){e.preventDefault();e.stopImmediatePropagation();}},true);
   function button(id,fn){$(id).addEventListener('pointerup',e=>{if(e.pointerType==='touch'){lastTouch=performance.now();fn();}});$(id).onclick=e=>{if(e.detail===0||performance.now()-lastTouch>700)fn();};}
   button('start',startCampaign);button('story-start',()=>begin(false));button('pause',pause);button('resume',pause);button('restart',()=>begin(action?.active,district));button('again',()=>begin(action?.active,district));
-  button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;if(action.active){action.health=5;action.hurt=2;action.stamina=100;action.charge=0;action.sweep=0;action.warning.visible=false;}police.forEach((a,i)=>a.p.group.position.set(s.x+4+i*.5,0,s.z+5));mode('playing');toast('Checkpoint restored. Keep going.');});
+  button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;if(action.active){action.health=5;action.hurt=2;action.stamina=100;action.charge=0;action.sweep=0;action.warning.visible=false;}police.forEach((a,i)=>{a.p.group.position.set(s.x+4+i*.5,0,s.z+5);a.windup=0;a.stun=0;a.attackCooldown=1;a.telegraph.visible=false;});mode('playing');toast('Checkpoint restored. Keep going.');});
   button('title',()=>{mode('menu');keys.clear();joy.x=joy.y=0;});
   button('dialog-confirm',complete);button('dialog-back',()=>{s.dialog=null;mode('playing');});
   button('dialog-alt',()=>{s.choice='archive';complete();});
@@ -604,7 +629,8 @@ function bindings(){
   button('rally-input',rallyHit);button('rally-skip',finishRally);button('journal',()=>{if(action?.active||s.mode==='menu')cityMap();else journal();});button('journal-close',journal);
   button('city-map-start',cityMap);button('city-close',cityMap);
   CHOICES.forEach(c=>button('review-'+c.id,()=>reviewAnswer(c.id)));
-  button('review-back',()=>{movement.active=null;mode('playing');});
+  button('review-back',()=>{movement.active=null;mode(reviewReturn);});
+  for(const id of ['organiser','aid','protest'])button('case-'+id,()=>openReview({id},'journal'));
   button('charter-confirm',finishCharter);button('charter-back',()=>{mode('won');});button('reopen-charter',openCharter);
   button('city-journal',journal);
   button('next-district',()=>{if(campaign.count()===3)cityMap();else begin(true,campaign.next());});
@@ -613,6 +639,7 @@ function bindings(){
   $('assist-game').onchange=()=>{s.assist=$('assist-game').checked;$('storymode').checked=s.assist;};
   button('interact',()=>{if(s.near)dialog(s.near);});
   button('evade',()=>{if(s.mode==='playing')action.evade();});
+  button('rally-power',rallyPower);
   $('interact').addEventListener('pointerdown',()=>{if(action?.active&&s.near)action.interact(s,s.near);});
   for(const type of ['pointerup','pointercancel'])$('interact').addEventListener(type,()=>{if(action)action.holding=false;});
   button('jump',()=>{if(s.mode==='playing'&&!s.y)s.vy=5.3;});
@@ -627,6 +654,7 @@ function bindings(){
     if(e.code==='Space'&&s.mode==='playing'){if(!s.y)s.vy=5.3;e.preventDefault();}
     if(e.code==='KeyE'&&!e.repeat){if(s.mode==='playing'&&s.near)dialog(s.near);else if(s.mode==='dialog')complete();else if(s.mode==='rally')rallyHit();}
     if(e.code==='KeyQ'&&!e.repeat&&s.mode==='playing')action.evade();
+    if(e.code==='KeyF'&&!e.repeat)rallyPower();
     if(e.code==='KeyJ'&&!e.repeat)journal();
     if(['Escape','KeyP'].includes(e.code)){pause();e.preventDefault();}
   });
@@ -668,9 +696,14 @@ async function init(){
       scene.environment=gen.fromEquirectangular(sky).texture;scene.environmentIntensity=.55;scene.background=sky;scene.backgroundIntensity=.55;scene.backgroundRotation.y=.9;gen.dispose();
     }
     player=human('#a86137');player.group.position.set(0,0,31);scene.add(player.group);buildDistricts();campaign.load();
-    action=new ActionGame(scene,{toast,review:openReview,missingReview:()=>movement.missing(district),tone:(...args)=>audio.tone(...args),collect:e=>{
+    street=new StreetPlay(scene,{toast,tone:(...args)=>audio.tone(...args),pop:text=>{$('pickup-pop').textContent=text;$('pickup-pop').hidden=false;},hud:v=>{
+      $('street-count').textContent=`PACKETS ${v.collected.length}/3 · CHAIN ×${v.chain||1}`;
+      $('rally-energy').style.width=v.energy+'%';$('rally-power').textContent=v.cooldown>0?'RALLY '+v.cooldown.toFixed(1):coarse?'RALLY':'RALLY · F';
+      $('rally-power').disabled=v.cooldown>0||v.energy<30;$('pickup-pop').hidden=!v.popTime||s.mode!=='playing';
+    }});
+    action=new ActionGame(scene,{toast,packetTarget:()=>street.target(),packetCount:()=>street.collected.length,inGathering:v=>street.inGathering(v),damage:()=>street.damage(),tone:(...args)=>audio.tone(...args),collect:e=>{
       s.items.push(e.id);e.prop.visible=e.marker.visible=false;
-    if(e.type==='recorder'){s.inventory.recorder=true;toast('Recorder secured. Compare the voter files before crossing the line.',3);}
+    if(e.type==='recorder'){s.inventory.recorder=true;toast('Recorder secured. Open the line and find Kabir.',3);}
       else if(e.type==='water'){s.inventory.water++;action.health=Math.min(5,action.health+1);toast('Water recovered. Health restored.',2);}
       else{s.notes.push(e);toast(e.title+' added to the journal.',2);}
       audio.tone(480,.12);
@@ -680,11 +713,11 @@ async function init(){
     quality();mode('menu');$('start').disabled=false;$('story-start').disabled=false;$('start').textContent=campaign.count()?'PLAY · Continue campaign':'PLAY · Start the campaign';$('loading').textContent='Three districts ready • Desktop and touch controls';
     $('continue').hidden=!savedGame();
     window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.9`;};
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.10`;};
     const worldText=window.render_game_to_text;
-    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),district,campaign:campaign.results,electoral:{reviewed:movement.reviewed,outcomes:movement.outcomes,activeCase:movement.active,attempts:movement.attempts,mandate:movement.mandate},party:events.filter(e=>e.id==='companion'||e.id==='organiser').map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),action:{active:action.active,mission:action.mission,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),settle:+action.settle.toFixed(2),contested:action.contested,charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score,support:action.support}});
+    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),district,campaign:campaign.results,street:{packets:street.collected,energy:+street.energy.toFixed(1),cooldown:+street.cooldown.toFixed(2),pulses:street.pulses,chain:street.chain,inGathering:street.inGathering(s),obstacles:colliders.filter(c=>c.street).map(c=>({x:c.x,z:c.z}))},officers:police.map(a=>({windup:+a.windup.toFixed(2),stun:+a.stun.toFixed(2)})),electoral:{reviewed:movement.reviewed,outcomes:movement.outcomes,activeCase:movement.active,attempts:movement.attempts,mandate:movement.mandate},party:events.filter(e=>e.id==='companion'||e.id==='organiser').map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),action:{active:action.active,mission:action.mission,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),settle:+action.settle.toFixed(2),contested:action.contested,charge:+action.charge.toFixed(2),rescued:action.rescued,evacuees:events.filter(e=>action.rescued.includes(e.id)).map(e=>({id:e.id,x:+e.a.p.group.position.x.toFixed(2),z:+e.a.p.group.position.z.toFixed(2)})),barrier:+action.barrier.toFixed(2),score:action.score,support:action.support}});
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
-    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.9`;}}
+    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.10`;}}
     requestAnimationFrame(frame);
   }catch(e){console.error(e);s.mode='error';$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }

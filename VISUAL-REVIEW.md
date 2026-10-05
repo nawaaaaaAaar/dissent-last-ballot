@@ -64,3 +64,8 @@ The ground material also read like timber boarding in the close courtyard view. 
 - **Performance:** Headless software rendering is slow. Deterministic QA proves controls and story behaviour, not physical-phone frame pacing.
 
 The build is a materially revised playable world, not the requested final photorealistic game. A cinematic, extra post-processing or a model's capability claim does not close these remaining production gaps.
+# v0.10 action readability
+
+This pass adds original packet and supply props, low crates, officer anticipation rings, Rally feedback, a gathering boundary, energy/cooldown HUD and restrained Dodge camera response. Existing character and world art is reused; this is not a realism upgrade. Phone HUD positioning was revised to separate the packet counter, warning, toast and action buttons, and ending buttons now have spacing.
+
+Actual gameplay captures are retained in `qa/v10/`. The prototype still has repeated faces, simplified police, sparse architecture/crowds and missing authored jump/dodge animation. A readable arcade ring is deliberately game-like, not a claim of real-world appearance.

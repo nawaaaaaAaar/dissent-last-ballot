@@ -1,5 +1,9 @@
 # DISSENT: every eligible voter
 
+## Current implementation: v0.10
+
+Signal Run retains the researched movement and broader reform demands below, but removes compulsory case panels from the action route. Players carry three fictional record packets per chapter, help people directly, regroup companions and hold the gathering. Cases remain optional in the journal; the ending states the three commitments without a mandatory charter gate. The v0.9 implementation descriptions below are design history, not the current control flow. See [the action design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/GAME-FEEL.md).
+
 This v0.9 revision follows the creator's request to focus on the current electoral-accountability movement, not the earlier Jamia/Shaheen Bagh protest histories. Its playable thesis is “replacement is not repair”: leadership accountability, ending the contested SIR process, and inclusion with transparent review must remain connected. These are movement demands inside a fictional game, not announcements that they have been achieved.
 
 ## Terms and current evidence

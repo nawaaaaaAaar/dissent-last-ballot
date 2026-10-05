@@ -1,5 +1,9 @@
 # DISSENT: making the resistance story playable
 
+## Current v0.10: action before explanation
+
+Signal Run replaces compulsory case comparisons with movement, automatic record-packet pickups, readable officer wind-ups, jumpable crates, Dodge, Rally and direct help. Cases stay optional; three distinct action objectives carry the campaign. See [the implemented game-feel decisions](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/GAME-FEEL.md). The v0.9 compulsory-panel design below is historical.
+
 ## v0.9: make the electoral theme a decision
 
 The current campaign requires comparison of pre-SIR/current invented records and resident accounts. Different outcomes lead to inclusion assistance, preserving a single valid entry, or pending-appeal support. The player must understand those distinctions, not click “restore everyone” regardless of the file. Every chapter requires its three referrals, while action pauses for reading.

@@ -51,3 +51,6 @@ v0.4 imports the credited Quaternius CC0 human base. No Kenney, Mixamo or Three.
 - **Delhi scene assets:** Original approximate geometry and original sign textures. No official endorsement or exact-survey claim.
 - **Bus news photograph:** Consulted privately as a visual reference, not included in the game or repository. The provenance and interpretation limits are documented in `DELHI-REFERENCES.md`.
 - **Protest participants:** Original fictional meshes, not faces or portraits from the reporting.
+# v0.10 original action props
+
+Packet folders, supply bottles, low wooden crates, ground rings, Rally visual feedback and HUD additions are original procedural geometry/UI authored for this project. They reuse the existing material library and original synthesised interaction audio. No new official logos, real voter records, public-figure likenesses or footage were added. Earlier licensed human/world assets and their provenance below remain unchanged.
