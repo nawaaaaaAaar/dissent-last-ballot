@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.14.4';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.0';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
 function check(name,fn){fn();checks.push(name);}
 check('OSM map and georeferenced landmark relationships',()=>{
-  assert.equal(WORLD.roads.length,1269);assert.equal(WORLD.buildings.length,786);
+  assert.equal(WORLD.roads.length,1852);assert.equal(WORLD.buildings.length,785);assert.equal(WORLD.parks.length,124);
   assert(PLACES[1].z<PLACES[0].z&&PLACES[0].z<PLACES[2].z);assert(PLACES[2].x>PLACES[0].x);
   for(const p of PLACES){const route=roadRoute(snap(PLACES[1]),snap(p));assert(route.length>1);assert.equal(route.at(-1).x,snap(p).x);}
 });
 check('exit and retry never teleport an unrescued witness',()=>{
   const g=new City();g.start();g.accept('witness');const old={x:g.friend.x,z:g.friend.z};
-  g.interact();assert(g.van.occupied);g.interact();assert.equal(g.friend.x,old.x);assert.equal(g.friend.z,old.z);
+  Object.assign(g.player,{x:g.van.x,z:g.van.z});g.interact();assert(g.van.occupied);g.interact();assert.equal(g.friend.x,old.x);assert.equal(g.friend.z,old.z);
   g.retry();assert.equal(g.friend.x,old.x);assert.equal(g.friend.z,old.z);
 });
 check('mission replacement requires abandon and charter requires three distinct jobs',()=>{
@@ -47,15 +47,42 @@ check('building footprint and world boundaries block movement',()=>{
   const g=new City();assert(!g.valid(500,0));assert(!g.valid(0,-300));assert(g.valid(snap(PLACES[0]).x,snap(PLACES[0]).z));
 });
 check('boarding retry restores pursuit and variant, not an empty world',()=>{
-  const g=new City();g.start();g.accept('signal');g.record=true;g.interact();assert(g.car.active);const variant=g.mission.variant;g.carHit(100);assert.equal(g.mode,'caught');g.retry();assert(g.car.active);assert.equal(g.mission.variant,variant);assert.equal(g.van.health,100);assert.equal(g.heat,2);
+  const g=new City();g.start();g.accept('signal');g.record=true;Object.assign(g.player,{x:g.van.x,z:g.van.z});g.interact();assert(g.car.active);const variant=g.mission.variant;g.carHit(100);assert.equal(g.mode,'caught');g.retry();assert(g.car.active);assert.equal(g.mission.variant,variant);assert.equal(g.van.health,100);assert.equal(g.heat,2);
 });
 check('rally marker changes and standing at the first point cannot finish',()=>{
   const g=new City();g.start();g.accept('hold');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,g.mission.source);g.hold=7.99;g.update(.05);assert.equal(g.wave,1);const hold=g.hold;g.update(.05);assert.equal(g.hold,hold);assert.notEqual(g.target().x,g.mission.source.x);
 });
 check('cleared return roadblock stays cleared after reboarding and retry',()=>{
-  const g=new City();g.start();g.accept('signal');g.mission.variant=2;g.record=true;g.interact();assert(g.roadblock);assert(g.blockActivated);
+  const g=new City();g.start();g.accept('signal');g.mission.variant=2;g.record=true;Object.assign(g.player,{x:g.van.x,z:g.van.z});g.interact();assert(g.roadblock);assert(g.blockActivated);
   g.interact();g.roadblock=false;g.interact();assert(!g.roadblock);assert(g.van.occupied);
   g.carHit(100);g.retry();assert(!g.roadblock);assert(g.blockActivated);g.interact();g.interact();assert(!g.roadblock);
 });
+check('three-strike combo spends stamina and cannot overspend',()=>{
+  const g=new City();g.start();g.enemies.forEach(e=>e.hp=0);
+  for(let i=1;i<=3;i++){g.player.attackCd=0;assert(g.attack());assert.equal(g.player.combo,i);}
+  assert.equal(g.player.stamina,74);g.player.stamina=2;g.player.attackCd=0;assert(!g.attack());assert.equal(g.player.stamina,2);
+});
+check('perfect dodge cancels a committed close attack',()=>{
+  const g=new City();g.start();g.accept('witness');const e=g.enemies[0];Object.assign(e,{x:g.player.x+1,z:g.player.z,windup:.2});
+  assert(g.dash());assert.equal(e.windup,0);assert(e.stun>1);assert.equal(g.score,20);
+});
+check('courier requires held copying and damage interrupts progress',()=>{
+  const g=new City();g.start();g.accept('signal');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,g.mission.source);
+  g.update(.05);assert.equal(g.copy,0);g.input.interact=true;g.update(.05);assert(g.copy>0);
+  const before=g.copy;g.player.hurt=.5;g.update(.05);assert.equal(g.copy,before);
+  g.player.hurt=0;for(let i=0;i<40;i++)g.update(.05);assert(g.record);
+});
+check('arrival checkpoint preserves encounter rather than CP departure',()=>{
+  const g=new City();g.start();g.accept('witness');Object.assign(g.player,g.mission.source);g.update(.05);
+  const p={x:g.checkpoint.x,z:g.checkpoint.z};g.player.x+=20;g.retry();assert.equal(g.player.x,p.x);assert.equal(g.player.z,p.z);
+});
+check('final rally requires both readers, not timer or lone arrival',()=>{
+  const g=new City();g.start();g.accept('hold');g.wave=2;g.hold=16;g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,g.mission.destination);
+  assert(!g.readyWin());g.readers=[{...g.mission.destination},{...g.mission.destination}];assert(g.readyWin());g.readers[0].x+=20;assert(!g.readyWin());
+});
+check('vehicle route excludes pedestrian-only node links',()=>{
+  const route=roadRoute(snap(PLACES[0],true),snap(PLACES[1],true),{vehicle:true});assert(route.length>2);
+  for(const n of route.slice(0,-1))assert(n.drive);
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
-fs.mkdirSync('qa/v14',{recursive:true});fs.writeFileSync('qa/v14/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));
+fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

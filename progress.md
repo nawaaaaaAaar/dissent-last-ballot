@@ -1,5 +1,13 @@
 Original prompt: Build DISSENT: The Last Ballot as a playable 3D student-resistance runner and make it playable on mobile phones. Push work to GitHub and the public link.
 
+## Strict review request
+
+Gameplay and graphics are both priorities. Start with fresh normal-time public play, rank all requested weaknesses against a finished indie/action game, rework the highest-impact failures, replay end to end and revise again if the result is not materially better. Do not equate feature completion with fun or defer the art pass.
+
+Baseline public v0.14.3 exploration, collisions, foot movement, combat failure/retry, held-strike combat, rescue and return are recorded in STRICT-REVIEW.md. Major findings: actor occlusion, wrongly above-ground underground CP station, empty approach, insufficient tactical combat, sparse streets, generic art/UI and weak audio.
+
+QA inventory: above-ground versus underground data; pedestrian and vehicle routes; actor visibility/cutaway in CP/Jantar/India Gate; close/overview camera; new opening and contextual instruction; combo costs/contact/finisher; shield/flanker/charge tells and limited attack commitment; perfect dodge and stun; arrival/boarding retry; rally's distinct stages and escort; held courier copying and interruption; optional support stops; NPC navigation and crowd motion; streets/façades/roof/park/detail lighting; sound and music mute cycle; map and in-world guidance; controls, pause, save, upgrades and all operations; actual mobile simultaneous input and both orientations; normal-time replay, exploratory off-route drive and failure; public current-source confirmation. Independent enjoyment, physical devices and Safari remain explicit limits, not reasons to accept avoidable rendering or interaction defects.
+
 ## v0.14 active: a connected Delhi and a repeatable game
 
 Latest request: gameplay first, graphics next pass; make people want to return; expand to actual central Delhi including India Gate, Jantar Mantar, CP and verified recent protest approaches.

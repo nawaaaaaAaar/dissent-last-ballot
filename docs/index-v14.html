@@ -8,8 +8,7 @@
 <meta name="description" content="An original mobile-first 3D resistance action city: explore central Delhi, choose rescue, courier and gathering operations, and build a network. Fictional encounters on OSM-derived streets.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./breakout.css?v=0.15.0">
-<link rel="stylesheet" href="./review-art.css?v=0.15.0">
+<link rel="stylesheet" href="./breakout-v14.css?v=0.14.4">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -32,7 +31,7 @@
 <section id="menu" class="screen">
 <div class="title-copy">
 <p class="eyebrow">A resistance action city / v0.14</p>
-<h1>Break the line.<br>Keep the account.</h1>
+<h1>A city.<br>A network.<br>Your next move.</h1>
 <p class="lead">Rescue. Deliver. Hold your ground.<br>Drive between CP, Jantar Mantar and India Gate. Choose missions, earn support, return stronger.</p>
 <button id="start" class="primary" disabled>Loading the city…</button>
 <button id="tutorial" class="secondary">Controls &amp; winning route</button>
@@ -116,7 +115,7 @@
 <p>
 <b>Phone:</b> left stick moves and drives; its outer edge runs on foot. Hold the right stick to aim and repeatedly strike, or hold Strike for nearby aim assist. Dodge gives a short escape burst. In the van, release the left stick to slow down, or hold Brake. Corner assist slows sharp turns.</p>
 <p>
-<b>Desktop:</b> WASD/arrows move or steer. Shift runs; Space aims at the nearest opponent and chains strikes (or brakes in a van). Q dodges, E acts; hold E to copy a dispatch or restore aid. Z switches close/overview camera, P pauses, M opens missions. Mouse aiming is optional. Teal marks Aman; gold marks Kabir. Guards carry shields: flank them or finish three strikes. Expanding red rings warn of attacks. Strikes and dodges spend stamina: disengage to recover.</p>
+<b>Desktop:</b> WASD/arrows move or steer the van. Shift runs, held Space repeatedly strikes (or brakes while driving), Q dodges, E rescues or enters/exits the van. Point with the mouse to aim. P/Escape pauses. Your teal ground ring identifies Aman; Kabir has a gold ring. Nearby opponents have three condition segments, and red circles show incoming attacks.</p>
 <ol>
 <li>Start at CP. Your volunteer van is beside you. Action/E boards it, even before the mission objective is complete. Follow the gold radar route toward the operation. M or Map &amp; Missions opens the full map.</li>
 <li><b>Rescue:</b> exit near Jantar Mantar, evade or interrupt the guards, then Action/E near Kabir. Four strikes open the yellow line; bypassing it is also valid. Bring Kabir back to the van.</li>
@@ -166,7 +165,7 @@
 </section>
 <a class="osm-credit" href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./breakout.js?v=0.15.0">
+<script type="module" src="./breakout-v14.js?v=0.14.4">
 </script>
 </body>
 </html>

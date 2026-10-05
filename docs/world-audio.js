@@ -4,7 +4,8 @@ export class WorldAudio{
     this.enabled=!this.enabled;
     if(this.enabled){
       this.ctx??=new(window.AudioContext||window.webkitAudioContext)();this.ctx.resume();
-    }return this.enabled;
+      this.music??=new Audio('./assets/network-pulse.mp3');this.music.loop=true;this.music.volume=.18;this.music.play().catch(()=>{});
+    }else this.music?.pause();return this.enabled;
   }
   tone(freq=240,duration=.12,level=.025){
     if(!this.enabled)return;

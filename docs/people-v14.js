@@ -3,7 +3,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
 
-let male,female,maleDelhi,femaleDelhi,officer;
+let male,female,maleDelhi,femaleDelhi;
 const wardrobe=new Map(),knitColors=[[113,137,124],[132,113,99],[100,118,141]];
 function knitTexture(source,variant){
   const key=source.uuid+':'+variant;if(wardrobe.has(key))return wardrobe.get(key);
@@ -25,16 +25,16 @@ export async function loadPeople(asset){
   const loader=new GLTFLoader();
   const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loader.loadAsync(asset('male-delhi-animated.glb')),loader.loadAsync(asset('female-delhi-animated.glb')),loadHuman(asset('courier-clothed.glb'))]);
   [male,female,maleDelhi,femaleDelhi]=results;
-  officer=await loader.loadAsync(asset('police-review.glb'));
 }
 export function human(color,police=false,options={}){
-  const source=police?officer:options.localWardrobe?(options.female?femaleDelhi:maleDelhi):(options.female?female:male);
+  if(police)return legacyHuman(color,true,options);
+  const source=options.localWardrobe?(options.female?femaleDelhi:maleDelhi):(options.female?female:male);
   const model=clone(source.scene),group=new THREE.Group();
   group.add(model);model.rotation.y=Math.PI;
   model.traverse(o=>{
     if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;
     const fix=m=>{m=m.clone();m.color.set('#ffffff');m.roughness=.83;m.metalness=0;
-      if(!police&&m.name==='m003_body'&&m.map&&color.toLowerCase()!=='#a86137')m.map=knitTexture(m.map,parseInt(color.slice(-3),16)%3);
+      if(m.name==='m003_body'&&m.map&&color.toLowerCase()!=='#a86137')m.map=knitTexture(m.map,parseInt(color.slice(-3),16)%3);
       if(options.localWardrobe&&m.name.includes('body'))m.color.set(color);
       if(m.name==='Short dark hair')m.color.set('#261b15');
       if(source===female&&m.name==='f004_opacity')m.color.set('#3a2b23');

@@ -77,3 +77,15 @@ Two additional generic MIT-licensed [Microsoft Rocketbox](https://github.com/mic
 `tools/convert-rocketbox.py --delhi` retargets the existing locomotion clips and exports the added avatars. `tools/style-delhi-student.py` removes the source cap and adds original rigged short-hair geometry, and separately bakes dark-hair derivatives of the earlier casual woman's head/opacity textures without tinting the entire face. Editable source includes `male-delhi-animated.blend`, `female-delhi-animated.blend`, `student-delhi-animated.blend` and `female-casual-delhi.blend`; the runtime male derivative uses the short-hair version. Derivative texture PNGs are retained in `art/`. The script needs Blender's `bpy`, NumPy and Pillow; `people.js` varies wardrobe colours.
 
 Aman and the named network are fictional Indian characters through authored setting and story, not inferred ethnicity or scans of real people. Repeated faces, shared locomotion and simplified clothing remain visible limits. The tutorial, walkthrough, sprint module and input tests are project-authored.
+
+## Strict-review visual and audio rework
+
+`police-review.glb` adapts the already licensed Rocketbox casual male, preserving Idle/Walk/Run clips while tinting cloth and adding original bone-parented cap, peak, belt and epaulettes. It is not an identifiable officer or a scanned uniform. Editable `art/police-review.blend` and `tools/build-review-assets.py` are included; Rocketbox MIT attribution remains applicable. Shield geometry and attack poses are original runtime additions. The earlier generic police model is no longer the default city enemy.
+
+`tree-review.glb` is a reduced-detail adaptation of the same credited foliage source described earlier in this file, not a newly acquired tree. The two adaptation scripts and editable `art/tree-review.blend` retain the workflow. Its runtime file is approximately 2 MB rather than the earlier approximately 11 MB tree.
+
+`delhi-facade-atlas.png` and its WebP derivative were generated with GPT Image 2.5 Flare: a fictional two-by-two weathered plaster, brick, shutter and stone texture atlas. The original image is retained. The façades, roof caps, tanks, service tables, original auto-rickshaw approximations and navigation props are actual game geometry. Repeated atlas tiles are visible and are not photogrammetry of particular Delhi buildings.
+
+`dissent-menu-art` and `dissent-victory-art` are generated illustrations of fictional adults, not game-render screenshots, real protest footage or evidence of an incident. They appear on menus only. QA gameplay captures are separately stored under `qa/v15/`.
+
+`network-pulse.mp3` is an original synthesized 32-second instrumental loop composed by `tools/compose-pulse.py`, with the editable generated WAV in `art/`. It contains no sampled commercial music. Runtime footsteps are synthesized noise, with impact and engine tones; there are no recorded voices or realistic protest recordings.

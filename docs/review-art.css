@@ -1,0 +1,8 @@
+/* Generated illustrations frame menus, never stand in for gameplay rendering. */
+#menu{background:linear-gradient(90deg,#10201ff5 10%,#10201faa 46%,#10201f22),url('./assets/dissent-menu-art.webp') center/cover}
+#ending{background:linear-gradient(90deg,#10201fe8,#10201f99),url('./assets/dissent-victory-art.webp') center/cover}
+button{border-radius:9px;transition:background .15s,border-color .15s}
+.objective{background:#152a27e8;border-left:3px solid #efc88f;border-radius:0 9px 9px 0;padding:12px 16px}
+.vitals,.heat,.minimap{border-radius:9px;backdrop-filter:blur(6px)}
+#toast{border-radius:0 9px 9px 0;background:#122b29ed}
+@media(max-width:700px){#menu{background-position:65% center}.objective{padding:8px 10px}.objective strong{font-size:12px}.heat{top:170px}.vitals{bottom:152px}#toast{bottom:252px}}
