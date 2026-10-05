@@ -122,5 +122,9 @@ check('steering across the warned charge can avoid its locked target',()=>{
   const g=patrolScene();g.update(.05);const locked={...g.car.ramTarget};g.input.x=1;
   for(let i=0;i<20;i++)g.update(.05);g.input.x=0;g.input.brake=true;for(let i=0;i<20;i++)g.update(.05);assert.deepEqual(g.car.ramTarget,locked);assert.equal(g.car.contactCooldown,0);assert.equal(g.van.health,100);
 });
+check('lost pursuit stands down and quiet reboarding does not restart it',()=>{
+  const g=patrolScene();g.record=true;g.blockActivated=true;g.car.x=g.player.x+40;g.car.z=g.player.z+40;g.heat=.4;g.hidden=9;
+  g.update(.05);assert.equal(g.car.active,false);g.van.occupied=false;g.interact();assert(g.van.occupied);assert.equal(g.car.active,false);assert(g.heat<.7);
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

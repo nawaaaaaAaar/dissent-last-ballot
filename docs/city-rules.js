@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.3';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.4';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -156,7 +156,7 @@ export class City{
     if(n?.id==='van'){
       if(this.friend.rescued&&dist(this.friend,v)>8){this.say('Kabir is behind. Wait or regroup.');return;}
       v.occupied=true;this.friend.aboard=this.friend.rescued;
-      if(this.record){this.car.active=true;const q=snap({x:v.x-Math.sin(v.yaw)*20,z:v.z-Math.cos(v.yaw)*20});Object.assign(this.car,q,{route:[],routeAge:0});this.heat=Math.max(2,this.heat);if(!this.blockActivated){this.roadblock=this.mission?.variant===2;this.blockActivated=true;}}
+      if(this.record&&(this.heat>=.7||!this.blockActivated)){this.car.active=true;const q=snap({x:v.x-Math.sin(v.yaw)*20,z:v.z-Math.cos(v.yaw)*20});Object.assign(this.car,q,{route:[],routeAge:0});this.heat=Math.max(2,this.heat);if(!this.blockActivated){this.roadblock=this.mission?.variant===2;this.blockActivated=true;}}
       this.saveCheckpoint();this.say(this.record?'Route choice matters. Hide behind blocks to lose pursuit, then reach the green destination.':'Drive to the gold mission marker. You can exit and explore anywhere.',4);
     }
   }
@@ -271,6 +271,7 @@ export class City{
     this.seen=visible;
     if(visible){this.hidden=0;this.heat=Math.min(5,Math.max(this.heat,.8)+dt*.04);this.phase='pursuit';}
     else{this.hidden+=dt;this.phase=this.heat<.7?'clear':'search';if(this.hidden>4)this.heat=Math.max(0,this.heat-dt*.42);}
+    if(this.car.active&&!visible&&this.hidden>8&&this.heat<.7){this.car.active=false;this.car.windup=0;this.car.ram=0;this.say('Pursuit lost. The patrol has stood down; return to the network.',3);}
     const m=this.mission;
     if(m?.type==='rally'){
       const nearby=this.enemies.some(e=>e.hp>0&&dist(e,m.zones[this.wave])<3.5);

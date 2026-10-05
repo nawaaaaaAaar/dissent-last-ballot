@@ -1,5 +1,5 @@
 {
-  "passed": 27,
+  "passed": 28,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -27,6 +27,7 @@
     "trimmed street display has a clear vehicle spawn",
     "patrol following does not inflict passive overlap damage",
     "vehicle charge has a warning and a single hit with recovery",
-    "steering across the warned charge can avoid its locked target"
+    "steering across the warned charge can avoid its locked target",
+    "lost pursuit stands down and quiet reboarding does not restart it"
   ]
 }
