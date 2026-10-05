@@ -289,7 +289,7 @@ async function main() {
 
   if (args.clickSelector) {
     try {
-      await page.waitForFunction(() => typeof window.advanceTime === "function", {timeout: 90000});
+      await page.waitForFunction(() => typeof window.render_game_to_text === "function" && typeof window.advanceTime === "function", null, {timeout: 120000});
       await page.evaluate(() => window.advanceTime(0));
       await page.click(args.clickSelector, { timeout: 5000 });
       await page.waitForTimeout(250);

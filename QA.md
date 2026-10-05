@@ -2,6 +2,12 @@
 
 ## v0.9 Every Eligible Voter
 
+The final public frontend `e9e73e4` loads `world.js?v=0.9.0`. Cloud Chromium completed all nine referrals, the Jantar breakthrough, both Bihar companions arriving, twenty seconds of supported Bengal desks, rejection of a resignation-only charter and the complete three-part hypothetical ending. Incorrect-response feedback is now visible in the final desktop panel. `qa/v09/public-results.json` and `public-*` captures retain the observed scope.
+
+Public phone emulation separately used actual touch travel and a held Bengal case review, rejected an inclusion response for a pending appeal, showed the feedback, and accepted appeal support with a “referred / fictional; not an official registration” outcome. It also passed walk versus outer-stick run, Dodge, pause/resume, camera drag, district switching, persisted chapter completion after reload and landscape fit. This is Chromium emulation, not physical-device testing.
+
+The supplied client first clicked Play too early because its virtual-time shim already defined `advanceTime`. Waiting for the actual game's `render_game_to_text` as well, with the timeout in the correct Playwright argument, corrected the loader check. The rerun in `qa/v09-client/` records active play, police pressure and airborne height. The adapter change is not a claim of fast cold loading.
+
 `npm run test:campaign` passed the nine invented case referrals across Jantar Mantar and the Bihar/West Bengal help-camp chapters. Actual keyboard/click inputs cover record comparison, incorrect-response feedback, leaving without a referral, action-time freeze during review, the breakthrough, both escort companions arriving, desk sustain, rejection of a resignation-only charter, and completion with all three commitments.
 
 The same suite passes completed-chapter persistence, replay/reset and in-session menu Resume. Mobile Chromium emulation covers partial-stick walk/outer-stick run, stamina, Dodge, pause, camera drag, a held file review, incorrect and correct touch responses, map/journal navigation and portrait/landscape fit. `qa/v09/results.json` and captures retain the scope, with no page errors. Emergency network recovery is also covered by an isolated damage-rule check, not presented as a full phone combat test.

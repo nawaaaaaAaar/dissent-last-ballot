@@ -4,6 +4,8 @@
 
 This pass changes the campaign's theme, case decisions, charter and signage using the existing art. The invented Bihar/West Bengal camps reuse earlier authored spaces; they are not new regional scans or geographically authentic models. Review covers readable before/current record panels, touch choices, scrollable charter controls and live-game captures. No new photorealism, wardrobe or facial-animation claim is made.
 
+Actual public captures in `qa/v09/public-*` show the case comparison, visible incorrect-answer feedback, incomplete charter and hypothetical ending, plus portrait/landscape phone layouts. A desktop panel-width override and offscreen feedback were corrected; the final public interaction confirms the feedback is visible. Portrait case panels scroll to their lower choices and disclosure. These captures are engine/browser output, not an AI-generated promotional film.
+
 ## v0.8 district and readability review
 
 `qa/v08/jamia-arrival.png`, `shaheen-arrival.png`, `mobile-campus.png` and `mobile-market-landscape.png` are actual engine captures. The campus has an original arched entrance, two building blocks, a contested exit and routes around obstacles. The community street uses opposing shopfronts, communal mats, stations, canopy and overhead lines. These are reference-inspired, not scans or exact architectural reconstructions.

@@ -1,0 +1,54 @@
+{
+  "version": "0.9.0",
+  "frontendCommit": "e9e73e40d8116929325bbbfe661c58e025d2e673",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=e9e73e4&quality=low",
+  "browser": "Cloud Chromium",
+  "input": "Actual keyboard, mouse and CDP touch events with deterministic stepping",
+  "desktop": {
+    "allNineFictionalReferrals": true,
+    "jantarResponses": ["include", "duplicate", "appeal"],
+    "biharResponses": ["include", "include", "duplicate"],
+    "bengalResponses": ["appeal", "include", "include"],
+    "incorrectAnswerDoesNotComplete": true,
+    "incorrectFeedbackVisible": true,
+    "actionTimeFrozenInReview": true,
+    "campusCompanionsAtFinish": [
+      {"id": "organiser", "x": 0, "z": -41.22},
+      {"id": "companion", "x": 0, "z": -41.22}
+    ],
+    "campusPlayerDestinationZ": -43,
+    "sustainSeconds": 20,
+    "resignationOnlyCharterRejected": true,
+    "finalMandate": ["accountability", "sir", "inclusion"],
+    "finalMode": "won",
+    "campaign": {
+      "jantar": {"score": 1813, "helped": 3},
+      "jamia": {"score": 1896, "helped": 3},
+      "shaheen": {"score": 1249, "helped": 3}
+    }
+  },
+  "mobileEmulation": {
+    "portrait": {"width": 390, "height": 844},
+    "landscape": {"width": 844, "height": 390},
+    "completedChaptersPersistedAfterReload": 3,
+    "actualTouchTravelAndHeldReview": true,
+    "wrongInclusionResponseForPendingAppealRejected": true,
+    "incorrectFeedbackVisible": true,
+    "correctAppealTouchResponse": true,
+    "outcomeLabel": "referred / fictional; not an official registration",
+    "reviewTimePaused": true,
+    "partialStickTravelOneSecond": 1.37,
+    "outerStickTravelOneSecond": 4.6,
+    "runButtonHidden": true,
+    "dodge": true,
+    "pauseResume": true,
+    "cameraDragYaw": 0.21,
+    "landscapeNoHorizontalOverflow": true
+  },
+  "physicalPhoneTested": false,
+  "safariTested": false,
+  "humanEnjoymentTested": false,
+  "performanceBenchmark": false,
+  "realVoterDataUsed": false,
+  "realApplicationsOrMessagesSent": false
+}
