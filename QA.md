@@ -2,13 +2,17 @@
 
 ## v0.10 Signal Run
 
+The public frontend `14744af` loads `world.js?v=0.10.0`. Cloud Chromium completed Jantar, Bihar and Bengal with three packets each, zero case reviews and no mandatory charter. Jantar included direct help, a sprint-jump, recorder, breakthrough and reunion; Bihar arrived with both companions; Bengal held its marked gathering for twenty game seconds and carried all three reform demands into the direct ending. Public scores were 2193, 2687 and 1550. `qa/v10/public-results.json` and `public-*` captures retain the observations.
+
+Public touch checks at 390×844 and 844×390 separately exercised Rally and officer stun, partial-stick walking versus outer-stick running, moving Dodge, Jump, pause/resume and district switching. The completed campaign persisted after reload, and landscape had no horizontal overflow. These are Chromium emulation checks, not physical-phone tests.
+
 `npm run test:campaign` passed using actual keyboard, mouse and emulated touch inputs with deterministic simulation stepping. `qa/v10/results.json`, captures and `qa/v10-test.log` retain the scope. All three chapters completed with zero mandatory case reviews and no mandatory charter gate.
 
 Checks cover Rally's energy cost, cooldown, actual displacement and stun; a sprint-jump over a physical crate; live help without a quiz; automatic packets; recorder, breakthrough and reunion; both escort companions arriving; sustain time advancing only inside the gathering zone; full campaign completion; stored chapter progress; replay/reset; deliberate capture and checkpoint retry retaining a packet; damage breaking the chain; optional-case anti-farming; and pause/resume.
 
 Mobile Chromium emulation covers Rally, partial-stick walk versus outer-stick running, a moving Dodge, Jump, pause/resume, district switching and portrait/landscape fit. There were no page errors. This is input/layout coverage, not physical-phone frame-rate or Safari certification.
 
-The current suite is `street-qa.mjs` (`test:campaign` and `test:action`). Earlier campaign/action/story results below are historical, not current signoff. The supplied game client also passes a short movement/jump check; `qa/v10-client/state-0.json` records active action and airborne height. Public deployment verification is recorded separately after publication. Ordinary-player enjoyment, physical iPhone/Android performance and photorealistic art remain unverified.
+The current suite is `street-qa.mjs` (`test:campaign` and `test:action`). Earlier campaign/action/story results below are historical, not current signoff. The supplied game client also passes a short movement/jump check; `qa/v10-client/state-0.json` records active action and airborne height. Ordinary-player enjoyment, physical iPhone/Android performance and photorealistic art remain unverified. Pursuers still use simplified steering and can be obstructed by world geometry; this is not finished navigation AI.
 
 ## v0.9 Every Eligible Voter
 

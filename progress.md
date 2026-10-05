@@ -46,3 +46,4 @@ Latest revision request: Use actual Delhi Police barricades, protest context, De
 - Resize, portrait/landscape, hidden tab automatic pause, reduced motion, WebGL error state.
 - Observe actual desktop/mobile-emulated screenshots. Do not claim testing on physical iOS/Android hardware.
 - Test with the supplied game client and persistent Playwright. Record findings and limits.
+Public v0.10 signoff: frontend 14744af completed all three chapters with actual input, nine packet pickups, zero case quizzes and no mandatory charter. Public touch Rally, walk/run, Dodge, Jump, pause, persisted progress and portrait/landscape checked. Results and actual captures in qa/v10; physical phones/Safari/enjoyment still unverified.

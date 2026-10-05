@@ -1,0 +1,63 @@
+{
+  "frontend_commit": "14744af8009e132bd5d7e8b9a9eb8237e93052fa",
+  "module": "world.js?v=0.10.0",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=14744af-public",
+  "browser": "Cloud Chromium; keyboard/mouse and emulated touch with deterministic simulation stepping",
+  "pass": true,
+  "jantar": {
+    "mode": "won",
+    "packets": 3,
+    "mandatory_reviews": 0,
+    "recorder": true,
+    "barrier": 1,
+    "companion": true,
+    "score": 2193,
+    "health": 3,
+    "sprint_jump_cleared_crate": true,
+    "live_help_without_quiz": true
+  },
+  "bihar": {
+    "mode": "won",
+    "packets": 3,
+    "mandatory_reviews": 0,
+    "companions_arrived_z": [-41.21, -41.26],
+    "score": 2687,
+    "health": 5
+  },
+  "bengal": {
+    "mode": "won",
+    "packets": 3,
+    "helped": 3,
+    "sustain_seconds": 20,
+    "outside_zone_did_not_progress": true,
+    "score": 1550,
+    "health": 2
+  },
+  "campaign": {
+    "completed": 3,
+    "reviewed_cases": 0,
+    "mandatory_charter_opened": false,
+    "ending_demands": ["accountability", "sir", "inclusion"]
+  },
+  "rally": {
+    "initial_energy": 60,
+    "after_first_use": 30,
+    "cooldown_seconds": 6,
+    "nearby_officers_stunned": 2,
+    "stun_seconds": 3
+  },
+  "mobile_emulation": {
+    "portrait": [390, 844],
+    "landscape": [844, 390],
+    "landscape_scroll_width": 844,
+    "touch_rally": true,
+    "walk_distance": 1.37,
+    "outer_stick_run_distance": 4.6,
+    "moving_dodge": true,
+    "jump_airborne": true,
+    "pause_resume": true,
+    "district_switch": true,
+    "completed_campaign_survived_reload": true
+  },
+  "not_verified": ["Physical iPhone/Android performance", "Safari", "Novice-player enjoyment", "Production-quality realism"]
+}
