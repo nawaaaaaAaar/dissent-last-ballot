@@ -1,5 +1,5 @@
 {
-  "passed": 29,
+  "passed": 30,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -28,6 +28,7 @@
     "patrol following does not inflict passive overlap damage",
     "vehicle charge has a warning and a single hit with recovery",
     "steering across the warned charge can avoid its locked target",
+    "attacks reserve one dodge and release recovers stamina",
     "first-cycle balanced encounters remain one committed attack after an earned job",
     "lost pursuit stands down and quiet reboarding does not restart it"
   ]

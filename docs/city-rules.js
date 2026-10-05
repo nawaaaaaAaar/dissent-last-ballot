@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.7';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.8';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -102,7 +102,7 @@ export class City{
   attack(){
     const p=this.player;if(this.mode!=='playing'||p.attackCd>0||this.van.occupied||p.dash>0)return false;
     const combo=p.comboClock>0?p.combo%3+1:1,cost=combo===3?10:8;
-    if(p.stamina<cost){if(this.message!=='Catch your breath. Dodge or make space.')this.say('Catch your breath. Dodge or make space.',1);return false;}
+    if(p.stamina<cost+18){if(this.message!=='Dodge energy reserved. Release Strike and reposition to recover.')this.say('Dodge energy reserved. Release Strike and reposition to recover.',1.6);return false;}
     p.combo=combo;p.comboClock=.95;p.stamina-=cost;
     p.attack=p.combo===3?.38:.26;p.attackCd=(p.combo===3?.66:.34)*(this.network.upgrades.includes('tempo')?.85:1);p.yaw=Math.atan2(this.input.aimX,this.input.aimZ);this.hits++;
     let hit=false;
@@ -186,7 +186,7 @@ export class City{
     const m=this.mission,c=this.checkpoint;if(!m){this.start();return;}
     const spec=m.id,style=m.style;this.abandon();this.serial--;this.accept(spec,style);this.mission.variant=m.variant;
     this.player.health=6;this.van.health=100;this.player.hurt=2;
-    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.wave=c.wave||0;this.readers=(c.readers||[]).map(r=>({...r}));this.roadblock=c.roadblock;this.blockActivated=!!c.blockActivated;this.checkpoint=c;if(this.wave)this.spawn(this.mission.zones[this.wave],3+this.wave);}
+    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.wave=c.wave||0;this.readers=(c.readers||[]).map(r=>({...r}));this.roadblock=c.roadblock;this.blockActivated=!!c.blockActivated;this.checkpoint=c;if(this.wave)this.spawn(this.mission.zones[this.wave],m.style==='hard'||m.tier>1?3+this.wave:3);}
     if(c?.record&&c.van.occupied){
       this.car.active=true;Object.assign(this.car,snap({x:c.van.x-Math.sin(c.van.yaw)*20,z:c.van.z-Math.cos(c.van.yaw)*20}),{route:[],routeAge:0});
       this.heat=2;this.lastSeen={x:c.x,z:c.z};this.roadblock=c.roadblock;
@@ -225,11 +225,11 @@ export class City{
       if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.35,2,5));v.speed=0;v.hurt=Math.max(v.hurt,2);this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to stop, then steer away from the wall.',1.6);}
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;if(this.friend.aboard){this.friend.x=v.x;this.friend.z=v.z;}
     }else{
-      const sprint=i.sprint&&p.stamina>8&&mag>.1,speed=p.dash>0?15:sprint?6.8:4.6;
+      const sprint=i.sprint&&p.stamina>26&&mag>.1,speed=p.dash>0?15:sprint?6.8:4.6;
       const vx=(p.dash>0?p.dashX:dx)*speed,vz=(p.dash>0?p.dashZ:dz)*speed;
       p.vx+=(vx-p.vx)*Math.min(1,dt*18);p.vz+=(vz-p.vz)*Math.min(1,dt*18);p.speed=this.move(p,p.vx*dt,p.vz*dt)/Math.max(.001,dt);
       if(mag>.1&&p.attack<=0)p.yaw=Math.atan2(dx,dz);
-      p.stamina=clamp(p.stamina+(sprint?-(this.network.upgrades.includes('stamina')?8:12):p.attack>0?0:15)*dt,0,100);
+      p.stamina=clamp(p.stamina+(sprint?-(this.network.upgrades.includes('stamina')?8:12):p.attack>0?0:26)*dt,0,100);
       if(i.attack)this.attack();
       if(this.mission?.type==='courier'&&!this.record&&dist(p,this.mission.source)<3&&i.interact&&p.hurt<=0&&p.attack<=0){
         this.copy=Math.min(1.8,this.copy+dt);

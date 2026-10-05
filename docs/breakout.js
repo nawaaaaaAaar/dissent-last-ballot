@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.7';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.7';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.7';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.8';
+import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?v=0.15.8';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.8';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js?v=0.15.7';
-import {cityArt} from './city-art.js?v=0.15.7';
+import {WorldAudio} from './world-audio.js?v=0.15.8';
+import {cityArt} from './city-art.js?v=0.15.8';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.7';
+const asset=name=>'./assets/'+name+'?v=0.15.8';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
@@ -173,7 +173,26 @@ function build(){
   // CP's colonnades get a recognisable rhythm; underlying footprints are OSM-derived.
   for(let i=0;i<32;i++){const a=i*Math.PI/16; cylinder(stat,M.white,cp.x+Math.sin(a)*22,2,cp.z+Math.cos(a)*22,.32,4);}
   scene.add(mergeStatic(stat));
-  if(treeSource)for(const p of PLACES)for(const s of[-1,1]){const t=treeSource.clone();t.position.set(p.x+s*13,0,p.z+12);t.scale.setScalar(.75);scene.add(t);}
+  if(treeSource){
+    const planted=[];
+    for(const s of WORLD.segments){
+      if(s.walkOnly||Math.hypot(s.a.x-s.b.x,s.a.z-s.b.z)<12)continue;
+      const dx=s.b.x-s.a.x,dz=s.b.z-s.a.z,d=Math.hypot(dx,dz);
+      for(const side of [-1,1]){
+        const p={x:(s.a.x+s.b.x)/2-dz/d*side*5,z:(s.a.z+s.b.z)/2+dx/d*side*5};
+        if(p.x<-120||p.x>134||p.z<-170||p.z>203||!game.valid(p.x,p.z,1)||planted.some(q=>Math.hypot(q.x-p.x,q.z-p.z)<12)||WORLD.segments.some(q=>segmentDistance(p,q.a,q.b)<2.5))continue;
+        planted.push(p);
+      }
+      if(planted.length>=100)break;
+    }
+    treeSource.updateMatrixWorld(true);
+    treeSource.traverse(source=>{
+      if(!source.isMesh)return;
+      const grove=new THREE.InstancedMesh(source.geometry,source.material,planted.length),matrix=new THREE.Matrix4(),rotation=new THREE.Quaternion(),scale=new THREE.Vector3();
+      planted.forEach((p,i)=>{rotation.setFromAxisAngle(new THREE.Vector3(0,1,0),i*2.399);scale.setScalar(.6+(i%4)*.07);matrix.compose(new THREE.Vector3(p.x,0,p.z),rotation,scale).multiply(source.matrixWorld);grove.setMatrixAt(i,matrix);});
+      grove.castShadow=grove.receiveShadow=true;scene.add(grove);
+    });
+  }
   gate=new THREE.Group();for(const x of [-3.3,0,3.3]){const b=barricade();b.position.x=x;gate.add(b);}gate.position.set(0,0,17);scene.add(gate);
   block=new THREE.Group();for(const x of [-3.3,0,3.3]){const b=barricade();b.position.x=x;block.add(b);}block.position.set(-34,0,-17);scene.add(block);
   van=vehicle();scene.add(van.g);enemyCar=vehicle(true);scene.add(enemyCar.g);
@@ -304,12 +323,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.7');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.15.8');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.7',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.8',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

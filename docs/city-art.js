@@ -33,8 +33,10 @@ export async function cityArt(scene,WORLD,PLACES){
   });
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.computeVertexNormals();
   const walls=new THREE.Mesh(geo,facade);walls.material.side=THREE.DoubleSide;walls.castShadow=walls.receiveShadow=true;scene.add(walls,mergeStatic(g));
-  const parkMat=new THREE.MeshStandardMaterial({color:'#68724b',roughness:1});
-  for(const p of WORLD.parks||[]){if(!p.poly?.length)continue;const shape=new THREE.Shape(p.poly.map(v=>new THREE.Vector2(v.x,-v.z)));const m=new THREE.Mesh(new THREE.ShapeGeometry(shape),parkMat);m.rotation.x=-Math.PI/2;m.position.y=.012;scene.add(m);}
+  const grass=await new THREE.TextureLoader().loadAsync('./assets/grass-diff.webp'),grassNormal=await new THREE.TextureLoader().loadAsync('./assets/grass-normal.webp');
+  for(const t of [grass,grassNormal]){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;}grass.colorSpace=THREE.SRGBColorSpace;
+  const parkMat=new THREE.MeshStandardMaterial({map:grass,normalMap:grassNormal,normalScale:new THREE.Vector2(.22,.22),color:'#9ba882',roughness:1});
+  for(const p of WORLD.parks||[]){if(!p.poly?.length)continue;const shape=new THREE.Shape(p.poly.map(v=>new THREE.Vector2(v.x,-v.z)));const geometry=new THREE.ShapeGeometry(shape),uv=geometry.attributes.uv,pos=geometry.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,pos.getX(i)/5,pos.getY(i)/5);const m=new THREE.Mesh(geometry,parkMat);m.rotation.x=-Math.PI/2;m.position.y=.012;m.receiveShadow=true;scene.add(m);}
   const detail=new THREE.Group();
   for(const p of PLACES){
     for(let j=0;j<5;j++){const x=p.x-12+j*5,z=p.z+9;bench(detail,x,z);lamp(detail,x,z+2);cylinder(detail,M.sand,x, .35,z-2,.5,.7);cylinder(detail,M.leaf,x,1.0,z-2,.7,.7);}

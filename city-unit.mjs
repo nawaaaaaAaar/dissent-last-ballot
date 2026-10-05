@@ -122,6 +122,9 @@ check('steering across the warned charge can avoid its locked target',()=>{
   const g=patrolScene();g.update(.05);const locked={...g.car.ramTarget};g.input.x=1;
   for(let i=0;i<20;i++)g.update(.05);g.input.x=0;g.input.brake=true;for(let i=0;i<20;i++)g.update(.05);assert.deepEqual(g.car.ramTarget,locked);assert.equal(g.car.contactCooldown,0);assert.equal(g.van.health,100);
 });
+check('attacks reserve one dodge and release recovers stamina',()=>{
+  const g=new City();g.start();g.player.stamina=26;assert(g.attack());assert.equal(g.player.stamina,18);g.player.attackCd=0;assert(!g.attack());assert(g.dash());g.player.attack=0;g.input.attack=false;g.enemies.forEach(e=>e.hp=0);for(let i=0;i<20;i++)g.update(.05);assert(g.player.stamina>24);
+});
 check('first-cycle balanced encounters remain one committed attack after an earned job',()=>{
   const g=new City();g.start();g.network.total=1;g.accept('hold');g.enemies.forEach((e,i)=>Object.assign(e,{hp:i<3?3:0,role:'rush',x:g.player.x+2,z:g.player.z,cooldown:0,stun:0,windup:0,lunge:0}));
   g.update(.05);assert.equal(g.enemies.filter(e=>e.windup>0||e.lunge>0).length,1);
