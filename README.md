@@ -8,7 +8,7 @@ Read [the ranked review and replay findings](STRICT-REVIEW.md) before treating f
 
 ## Playable loop
 
-- **Choose:** Rescue a witness around Jantar Mantar, carry a dispatch from Tolstoy Marg to the fictional India Gate relay, or secure three gathering points around Sansad Marg.
+- **Choose:** Rescue a witness around Jantar Mantar, copy a dispatch under pressure and carry it from Tolstoy Marg to the fictional India Gate relay, or secure a gathering, restore aid and escort two readers from Sansad Marg.
 - **Act:** Move freely, run with stamina, dodge warned attacks, use directional close-range strikes, break or bypass a fictional barricade, enter/exit a van, drive, hide and protect a companion.
 - **Return:** Earn a medal, best score and support credits. Continue at your current city location instead of rebuilding the world. Three distinct operations unlock the charter journey; the charter begins another network cycle.
 - **Replay:** Different guard approaches, an occasional return-route roadblock, selectable Hard pressure and capped later-cycle guard speed. Buy strike tempo, vehicle reinforcement or running endurance; no purchases or accounts are involved.
@@ -21,11 +21,11 @@ This is not multiplayer, an unlimited mission generator or a GTA-scale city simu
 
 - **Phone:** Left stick moves/drives; its outer edge runs on foot. Hold right stick to aim/strike or use Strike with nearby aim assist. Dodge and contextual Action are separate buttons. Release the stick or hold Brake/right stick to slow the van.
 - **Desktop:** WASD/arrows move/steer, Shift runs, held Space strikes or brakes, Q dodges, E acts/boards/exits, mouse aims, P/Escape pauses, M opens the mission board.
-- **Winning:** Read [HOW-TO-WIN.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md). Hot deliveries cannot win; rescued Kabir must accompany the player. Rally requires moving between all three zones, not holding a button at one point.
+- **Winning:** Read [HOW-TO-WIN.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md). Hot deliveries cannot win; rescued Kabir must accompany the player. Rally ends only when both escorted readers reach the assembly.
 
 ## Map, movement context and fiction
 
-The OSM extraction contains 1,269 selected road ways and 786 footprints from a central-Delhi bounding box. The geometry database is **© OpenStreetMap contributors, ODbL 1.0**; attribution is displayed in game, following [OpenStreetMap’s copyright guidance](https://www.openstreetmap.org/copyright/en-EN). Raw source, extraction script and runtime geometry are retained.
+The OSM extraction contains 1,852 road/path ways, 785 above-ground source footprints and 124 green-space polygons from a central-Delhi bounding box. The displayed city uses 493 adapted footprint parts. The geometry database is **© OpenStreetMap contributors, ODbL 1.0**; attribution is displayed in game, following [OpenStreetMap’s copyright guidance](https://www.openstreetmap.org/copyright/en-EN). Raw source, extraction script and runtime geometry are retained.
 
 Horizontal positions are georeferenced at a uniform compressed scale. Streets are widened, traffic/one-way restrictions and elevation are not simulated, and building heights and monument models are approximate. This is connected central Delhi, not all Delhi or a survey-grade digital twin.
 
@@ -35,7 +35,7 @@ The story carries leadership accountability, ending contested SIR and transparen
 
 ## Development and verification
 
-Run `npm ci`, install Chromium with `npx playwright install chromium`, then `npm start`. `npm test` runs the current city rules checks; `test:breakout` and the old campaign scripts are historical. Current source is `docs/city-rules.js`, `docs/city-data.js`, `docs/breakout.js` and `docs/index.html`. Run `python tools/build-delhi-map.py` to mechanically re-extract the retained OSM data.
+Run `npm ci`, install Chromium with `npx playwright install chromium`, then `npm start`. `npm test` runs the current city rules checks; `test:breakout` and the old campaign scripts are historical. Current source is `docs/city-rules.js`, `docs/city-data.js`, `docs/breakout.js` and `docs/index.html`. Run `npm run build:map` to reproduce both extraction and street-clearance trimming from the retained OSM data.
 
 `render_game_to_text()` exposes inspectable state, including mission, route, network and map provenance. `advanceTime(ms)` provides deterministic QA time, not a physical-device FPS benchmark. The supplied game client and persistent Playwright inspect actual input/rendering; cloud-browser records distinguish normal-time playing from deterministic touch tests.
 

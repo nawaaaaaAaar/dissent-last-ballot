@@ -18,7 +18,7 @@ Rank indicates impact on this game, not a measured universal score.
 |---|---|---|
 | 1 | Controls, feedback and spatial readability | Buildings concealed actors and vehicles; aim state was easily unclear; collisions had weak feedback. Players could not reliably understand their own action. |
 | 2 | Core loop and moment-to-moment fun | Too much empty travel before the first meaningful choice; held strikes were often sufficient. Winning conditions existed, but their presence was not a fun loop. |
-| 3 | Graphics and environment detail | Blank extruded blocks, a washed-out palette, oversized generic HUD panels and simplified police broke the finished-game impression. |
+| 3 | Graphics, models, materials, lighting, animation and effects | Blank extruded blocks, a washed-out palette, oversized generic HUD panels and simplified police broke the finished-game impression. |
 | 4 | Movement, combat and driving | Turns punished exploratory input; repetitive strikes lacked a legible sequence and impact; failures could repeat long travel. |
 | 5 | Enemy and NPC behaviour | Most opponents converged in similar ways; some became obstructed; the crowd was almost entirely static. |
 | 6 | World density and exploration | The larger map increased emptiness as much as scale. Most streets had no people, services or memorable visual cues. |
@@ -30,7 +30,7 @@ Rank indicates impact on this game, not a measured universal score.
 | 12 | Progression, rewards and replayability | Medals and three upgrades created bookkeeping progression, but did not by themselves justify returning. The encounters needed more mastery and situation variety. |
 | 13 | Sound and music | Mostly tones and an engine oscillator; limited place ambience, movement sound or musical pacing. |
 | 14 | Performance, bugs and polish | Browser rendering was usable in this session, but load time, occlusion, collision interpretation and checkpoint friction were major polish failures. Physical devices remained untested. |
-| 15 | Scale | Raw map size was not the primary problem. More kilometres without density or better interactions would make the problem worse. |
+| 15 | Environment detail and scale | Repeated roofs and sparse frontage/park detail offered few memorable spaces. Raw map size was not the primary problem; more kilometres without authored density would make it worse. |
 
 ## Rework priorities
 
@@ -47,6 +47,7 @@ The positioning/crowd-control emphasis is a design reference, not a claim to rep
 ### What changed, and why
 
 - **Combat:** A three-strike stamina chain opens frontal shields on its finisher; flanking offers an alternative. Rush, guard and flank roles have visible committed attack tells. A late dodge creates a counterattack opening. The first operation limits simultaneous committed attacks. These create timing and positioning decisions instead of rewarding stationary held strikes alone.
+- **Recovery and curve:** Further play exposed an immediate gathering spike and exhaustion leaving no dodge. Balanced first-cycle encounters now retain one committed attacker, with smaller aid/escort waves; Hard/later cycles escalate. Attacks and sprinting preserve dodge energy, and release/repositioning recovers it faster. Retry keeps the same balanced wave count rather than silently increasing it.
 - **Mission structure:** Copying a courier dispatch requires a held action and damage interrupts it without erasing earned progress. The gathering mission now progresses from securing space to restoring aid, then leading two visible readers to the assembly. Arrival and stage checkpoints reduce repeated empty travel. These are different demands, not three renamed waiting circles.
 - **Driving and escape:** The van is more compact, turns faster, has a lower arcade top speed and stops faster on release/brake. Wall impacts are gentler. Patrols now telegraph a locked-direction ram, which can miss and requires recovery; passive overlapping no longer drains the vehicle. Losing sight and cooling the search ends the patrol, and quiet reboarding does not recreate it. This makes escape an achievable state, not an endless HUD timer.
 - **City and navigation:** The underground CP station is no longer an above-ground obstruction. Pedestrian paths, green-space polygons and vehicle-only routing are interpreted separately. Nearby foreground upper floors cut away, and street-level chevrons supplement the map. Source geography remains connected, but display footprints are adapted for arcade street clearance.

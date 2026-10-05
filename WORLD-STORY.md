@@ -5,8 +5,8 @@ The current game is a connected, replayable resistance action adventure in geore
 ## Operations and consequences
 
 - **Bring the witness home:** Kabir is separated during a fictional Jantar Mantar crackdown. Interrupt or evade opponents, open or bypass a line, rescue him and return together to CP after losing pursuit. A person and their account survive together.
-- **Restore the signal:** Sana’s dispatch is stranded around Tolstoy Marg. Recover it on foot and reach an invented volunteer relay near India Gate. The city journey and pursuit make the relay a mission, not just a slogan.
-- **Hold the gathering:** Regroup, preserve an aid point and support a reading circle in the Sansad Marg area. Each move changes the active defensive space. Collective participation has a playable cost and a tangible completion state.
+- **Restore the signal:** Sana’s dispatch is stranded around Tolstoy Marg. Hold the copy action on foot while protecting the account; damage interrupts the work. Reach an invented volunteer relay near India Gate after losing pursuit. The city journey makes the relay a mission, not just a slogan.
+- **Hold the gathering:** Secure collective space in the Sansad Marg area, clear and restore an aid point through a held action, then lead two visible readers to the Jantar street assembly on foot. Both must arrive; a lone player crossing the marker does not complete the mission.
 - **Replacement is not repair:** After the three operations, carry the wider reform charter from the India Gate relay toward the Jantar Mantar assembly. It rejects a resignation-only ending: constitutional leadership accountability, ending the contested SIR process, and transparent inclusion/review support for every eligible voter must travel together.
 - **Continue the network:** Earned support funds optional practical upgrades. Scores and medals invite mastery; changed guard approaches and a later pressure tier invite another attempt. There is no final claim that an actual official departed or an election was reversed.
 

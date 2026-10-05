@@ -84,6 +84,8 @@ Aman and the named network are fictional Indian characters through authored sett
 
 `tree-review.glb` is a reduced-detail adaptation of the same credited foliage source described earlier in this file, not a newly acquired tree. The two adaptation scripts and editable `art/tree-review.blend` retain the workflow. Its runtime file is approximately 2 MB rather than the earlier approximately 11 MB tree.
 
+One hundred placements instance this tree along the connected city routes, with approximate 6–8 game-metre height, deterministic spacing and road/building clearance. They are not surveyed real tree positions. The existing credited grass diffuse/normal assets now texture the interpreted green-space polygons rather than leaving them flat-coloured.
+
 `delhi-facade-atlas.png` and its WebP derivative were generated with GPT Image 2.5 Flare: a fictional two-by-two weathered plaster, brick, shutter and stone texture atlas. The original image is retained. The façades, roof caps, tanks, service tables, original auto-rickshaw approximations and navigation props are actual game geometry. Repeated atlas tiles are visible and are not photogrammetry of particular Delhi buildings.
 
 `dissent-menu-art` and `dissent-victory-art` are generated illustrations of fictional adults, not game-render screenshots, real protest footage or evidence of an incident. They appear on menus only. QA gameplay captures are separately stored under `qa/v15/`.
