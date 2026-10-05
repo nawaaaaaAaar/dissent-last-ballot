@@ -1,0 +1,43 @@
+{
+  "frontend_commit": "4466ab18783c9b5f63aba77901ed9063750e5b1c",
+  "module": "world.js?v=0.11.2",
+  "url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=4466ab1-final&quality=low",
+  "browser": "Cloud Chromium; actual keyboard, mouse and emulated touch with deterministic stepping",
+  "pass": true,
+  "tutorial": {
+    "desktop_actions_completed": 7,
+    "phone_touch_actions_completed": 7,
+    "desktop_practice_campaign_records": 0,
+    "phone_practice_preserved_existing_campaign": true,
+    "clean_campaign_start_after_practice": true,
+    "guide_from_pause_freezes_action": true,
+    "guide_returns_to_pause": true
+  },
+  "campaign": {
+    "completed_chapters": 3,
+    "packets_per_chapter": 3,
+    "mandatory_reviews": 0,
+    "jantar_score": 2341,
+    "jantar_health": 4,
+    "bihar_score": 2687,
+    "bihar_companions_arrived_z": [-41.21, -41.26],
+    "bengal_score": 1550,
+    "bengal_health": 2,
+    "bengal_sustain_seconds": 20,
+    "outside_zone_did_not_progress": true,
+    "ending_demands": ["accountability", "sir", "inclusion"]
+  },
+  "cast": {
+    "generic_avatar_bases": 4,
+    "player_story_identity": "Aman / fictional Indian student",
+    "reviewed_hair_material_and_texture_corrections": true,
+    "not_scanned_real_people": true
+  },
+  "mobile_layout": {
+    "portrait": [390, 844],
+    "landscape": [844, 390],
+    "landscape_scroll_width": 844,
+    "full_practice_used_touch_joystick_jump_dodge_rally_pickup_and_held_help": true
+  },
+  "not_verified": ["Physical iPhone/Android performance", "Safari", "Novice-player enjoyment", "Photorealistic production art"]
+}

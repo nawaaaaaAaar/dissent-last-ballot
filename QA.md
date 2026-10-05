@@ -2,11 +2,15 @@
 
 ## v0.11 Learn the Route
 
+The final public frontend `4466ab1` loads `world.js?v=0.11.2`. Cloud Chromium completed all seven practice actions by keyboard and then all three campaign chapters, with three packets per chapter, zero required case reviews, both Bihar companions arriving and twenty game seconds inside the Bengal zone. The ending carried all three demands. Public scores were 2341, 2687 and 1550.
+
+Public phone emulation separately completed all seven practice actions by actual touch: partial-stick movement, outer-stick sprint, Jump, Dodge, Rally, packet pickup and a held help. Practice preserved existing completed campaign records and the fresh-start button reset the active run. Pause-to-guide-to-pause froze action correctly. Portrait is 390×844; landscape is 844×390 without horizontal overflow. `qa/v11/public-results.json` and `public-*` captures retain the final scope.
+
 The local action campaign suite passed all three chapters, Rally/displacement/cooldown, physical hurdle jump, zero required quizzes, two-person escort, zone-only sustain, persistence, replay, capture/retry, optional-case anti-farming and phone controls/layouts with no page errors. `qa/v11/results.json` and `v11-test.log` retain the scope.
 
 The tutorial suite passed all seven actual-input practice steps without pursuit or recorded campaign completion, a clean campaign start afterwards, guide freeze/return from Pause, phone guide/practice/exit/start, and sprint exhaustion/recovery rules. `qa/v11/tutorial-results.json` and `v11-tutorial-test.log` retain these checks. The supplied client separately records active movement and jumping in `qa/v11-client/`.
 
-Public visual review caught the custom hair material being overwritten with white by the common material normalisation. The material now explicitly retains its dark colour, and the earlier casual woman's head/hair textures have a separate baked derivative rather than a whole-face tint. Final public verification follows this material-only correction. Physical-phone performance, Safari, novice enjoyment and production-quality realism remain unverified.
+Public visual review caught the custom hair material being overwritten with white by common material normalisation, residual source cap faces and a texture-node match based on image name rather than filepath. Those were corrected and checked in the final public render. Repeated high-quality reloads exhausted a cloud WebGL context; a fresh browser restored rendering, and final campaign/phone verification used low graphics. This is not proof of real-device memory or frame-rate targets. Physical-phone performance, Safari, novice enjoyment and production-quality realism remain unverified.
 
 ## v0.10 Signal Run
 
