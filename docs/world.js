@@ -1,20 +1,20 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.11.1';
-import {STORY,ITEMS} from './story.js?v=0.11.1';
-import {WorldAudio} from './world-audio.js?v=0.11.1';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.11.2';
+import {STORY,ITEMS} from './story.js?v=0.11.2';
+import {WorldAudio} from './world-audio.js?v=0.11.2';
 import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
-import {ActionGame} from './action-game.js?v=0.11.1';
-import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.11.1';
-import {route} from './navigation.js?v=0.11.1';
-import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.11.1';
-import {StreetPlay} from './street-play.js?v=0.11.1';
-import {wantsSprint,SPRINT_RULES} from './sprint-controller.js?v=0.11.1';
+import {ActionGame} from './action-game.js?v=0.11.2';
+import {DISTRICTS,campaign,buildDistrict} from './districts.js?v=0.11.2';
+import {route} from './navigation.js?v=0.11.2';
+import {CASES,CHOICES,DEMANDS,movement} from './electoral-story.js?v=0.11.2';
+import {StreetPlay} from './street-play.js?v=0.11.2';
+import {wantsSprint,SPRINT_RULES} from './sprint-controller.js?v=0.11.2';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.11.1';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.11.2';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};

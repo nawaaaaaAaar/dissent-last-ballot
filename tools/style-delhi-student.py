@@ -15,7 +15,13 @@ bpy.context.scene.frame_set(0)
 base=next(o for o in bpy.data.objects if o.type=='MESH')
 arm=next(o for o in bpy.data.objects if o.type=='ARMATURE')
 bm=bmesh.new();bm.from_mesh(base.data)
-faces=[f for f in bm.faces if sum((base.matrix_world@v.co).z for v in f.verts)/len(f.verts)>1.746]
+uv=bm.loops.layers.uv.active
+faces=[]
+for f in bm.faces:
+    u=sum(loop[uv].uv.x for loop in f.loops)/len(f.loops)
+    v=sum(loop[uv].uv.y for loop in f.loops)/len(f.loops)
+    cap_uv=(.115<u<.90 and .20<v<.37) or (u>.70 and v<.30)
+    if f.material_index==1 and cap_uv:faces.append(f)
 bmesh.ops.delete(bm,geom=faces,context='FACES');bm.to_mesh(base.data);bm.free()
 vertices=[];faces=[];segments=32;rings=9
 for r in range(rings):
@@ -25,7 +31,7 @@ for r in range(rings):
         wave=.0015*math.sin(angle*12+t*7)
         vertices.append((.092*math.cos(t)*math.cos(angle),
                          -.015+.112*math.cos(t)*math.sin(angle),
-                         1.736+.077*math.sin(t)+wave))
+                         1.713+.100*math.sin(t)+wave))
 for r in range(rings-1):
     for i in range(segments):
         a=r*segments+i;b=r*segments+(i+1)%segments
@@ -66,7 +72,7 @@ for kind in ['head','opacity']:
     for mat in bpy.data.materials:
         if mat.name!=f'f004_{kind}':continue
         for node in mat.node_tree.nodes:
-            if node.type=='TEX_IMAGE' and node.image and '_color' in node.image.name:node.image=image
+            if node.type=='TEX_IMAGE' and node.image and '_color' in node.image.filepath:node.image=image
 arm=next(o for o in bpy.data.objects if o.type=='ARMATURE')
 base=next(o for o in bpy.data.objects if o.type=='MESH')
 bpy.ops.object.select_all(action='DESELECT')
