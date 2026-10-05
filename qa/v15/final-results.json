@@ -1,0 +1,45 @@
+{
+  "baseline": {
+    "version": "0.14.3",
+    "normal_browser_time": true,
+    "exploration_combat_failure_retry_rescue_return": true,
+    "completed_win": false
+  },
+  "full_cycle_replay": {
+    "version": "0.15.10",
+    "commit": "39f757228cf37b03b9dac0041c7818946d9e9422",
+    "public_commit_pinned_host": "https://rawcdn.githack.com/nawaaaaaAaar/dissent-last-ballot/39f757228cf37b03b9dac0041c7818946d9e9422/docs/index.html?quality=low",
+    "normal_browser_time": true,
+    "browser_state_injection": false,
+    "advanceTime": false,
+    "assistance": "Manually selected observed/map-derived road waypoints with actual CDP mouse/touch input; ordinary keyboard fighting and a late dodge. Agent-led review, not unaided human enjoyment research.",
+    "results": [
+      {"mission": "witness", "medal": "GOLD", "score": 1541, "health": 6, "van": 100},
+      {"mission": "hold", "medal": "SILVER", "score": 1411, "health": 3, "van": 100},
+      {"mission": "signal", "medal": "GOLD", "score": 1433, "health": 6, "van": 100},
+      {"mission": "charter", "medal": "SILVER", "score": 1411, "health": 6, "van": 88}
+    ],
+    "cycle": 2,
+    "total_jobs": 4,
+    "credits": 9,
+    "upgrades": ["tempo"],
+    "observations": [
+      "Rescue return used actual touch and did not restart cooled pursuit.",
+      "A timed dodge opened the shield at the gathering aid stage.",
+      "Held touch restored aid and both readers reached the assembly.",
+      "Courier copying survived one interrupting injury.",
+      "The charter took one warned ram hit, escaped and completed on a different western route."
+    ]
+  },
+  "isolated_rule_checks": 30,
+  "presentation_patch": {
+    "changes": ["Ending scroll reset", "Compact landscape results", "Off-centre landscape toast", "Smaller landscape objective", "Closer on-foot view with wider driving retained"],
+    "final_public_recheck": "pending"
+  },
+  "limits": [
+    "Physical iPhone/Android hardware and Safari unverified.",
+    "Independent first-time-player enjoyment and retention unverified.",
+    "A background-tab cloud FPS reading was invalid as a game-performance conclusion; active-tab checks observed about 60 FPS in several scenes, not a device guarantee.",
+    "Faces, authored combat animation, autonomous crowds, traffic and detailed landmark/frontage geometry remain below the finished-game quality target."
+  ]
+}

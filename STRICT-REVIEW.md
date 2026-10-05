@@ -93,4 +93,6 @@ Vegetation initially produced a worrying one-FPS observation, but follow-up iden
 
 The courier result exposed a retained-scroll-position bug that clipped the next heading in a short landscape viewport. The presentation patch resets scroll for every outcome and adds a compact landscape result layout. It changes presentation, not the four replayed operations' game rules.
 
+Landscape gameplay captures also showed the story toast covering the player. The final presentation pass moves that text aside, reduces the objective panel and brings the on-foot camera closer, while retaining the wider driving view. This is a readability revision, not a claim of a new character-animation library.
+
 My assessment is **materially better, but not finished-game approval**. The next review should concentrate on authored combat/traversal performance and reactive encounter/city behaviour, followed by observed first-time-player sessions. More credits, markers or districts would not resolve the remaining gap.
