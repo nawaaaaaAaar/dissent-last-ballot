@@ -1,5 +1,9 @@
 # Asset provenance
 
+## v0.13 play-feedback pass
+
+Condition segments, lead/companion ground markers, map obstruction indicators and revised input/AI/steering are original code. The lead uses the existing licensed casual avatar with the previously credited knit texture recolour; Kabir uses the existing kurta derivative. No new scans, likenesses, news photographs or external textures are added. These changes improve recognition, not ethnic authenticity or production-quality character art.
+
 ## v0.12 Breakout
 
 The new city layout, van and patrol-vehicle geometry, vehicle control, collision/navigation rules, melee, HUD, two-stick input, original synthetic engine tone and mission are authored in `breakout.js`, `breakout-rules.js` and `breakout.css`. No GTA/Mini Militia code, models, textures, audio or trademarks are used as game assets.

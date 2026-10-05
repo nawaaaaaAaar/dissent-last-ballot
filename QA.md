@@ -4,7 +4,15 @@
 
 Normal-time review of v0.12.2 used actual browser keyboard input without `advanceTime`: walking, held Space, Dodge, movement/pausing and a separate barrier/rescue/recording/boarding/two-turn/brake attempt. Holding Space for 2.2 seconds produced one hit, while officers could overlap at zero distance. The fast turn/brake attempt ended at x40.34/z-38.33, beyond the intended eastern junction. `PLAYER-REVIEW.md` separates deliberate action from time spent exposed between tool calls.
 
-Eleven isolated checks pass, including the added melee stopping distance, corner-speed/released-input braking and nearby patrol/last-seen restoration tests. The supplied game client verified held Space produces repeated damage in `qa/v13-client/`, leaving opponents on condition 1 and 2 without player damage. Earlier public completion records below belong to v0.12; current public signoff is recorded separately after verification.
+Eleven isolated checks pass, including the added melee stopping distance, corner-speed/released-input braking and nearby patrol/last-seen restoration tests. The supplied game client verified held Space produces repeated damage in `qa/v13-client/` and `qa/v13-client-final/`. Earlier public completion records below belong to v0.12 and are not current-version signoff.
+
+The deployed preview was replayed in normal browser time without `advanceTime`. The same 2.2-second held-Space window produced five strikes, stopped on release and left one opponent disabled and another on condition 1. The repeated fast-turn/brake attempt stayed closer to the eastern road at x37.55/z-35.96. These tool-driven observations are not a controlled human steering benchmark. The first v0.13 hot safe-house arrival remained visible and lost van condition; it is explicitly not counted as a win.
+
+After separating fast visible patrol pursuit from slower last-seen searching, the final v0.13.1 mission completed in normal browser time in the deployed preview: health 6, van 100%, heat 0.69, companion and recording aboard, score 2167. No positions, health or objective flags were edited.
+
+Public frontend `fcc93c2` was confirmed as v0.13.1. Actual phone-emulated touch produced five held-button strikes and stopped on release; pause/help/return froze time correctly. The public run rescued Kabir, picked up the recording, boarded together, failed from driving into a building, restored the boarding checkpoint with a nearby patrol, then drove and parked unseen to win. Separate simultaneous movement/aim touch pointers produced four strikes and opponent condition 3 to 1, and release stopped them. Portrait 390×844 and landscape 844×390 have no horizontal overflow.
+
+`qa/v13/results.json` and the named captures distinguish normal-time preview play, public deterministic touch checks and isolated rules. Physical phones, Safari, ordinary-player enjoyment and final realistic character/environment art remain unverified.
 
 ## v0.12 Breakout
 

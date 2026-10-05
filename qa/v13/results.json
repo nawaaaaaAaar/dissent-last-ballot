@@ -1,0 +1,68 @@
+{
+  "version": "0.13.1",
+  "public_frontend": "fcc93c2",
+  "public_url": "https://nawaaaaaaaar.github.io/dissent-last-ballot/?v=fcc93c2-phone&quality=low",
+  "isolated_rules": {"passed": true, "checks": 11},
+  "normal_time_review": {
+    "baseline_version": "0.12.2",
+    "method": "Actual cloud-browser keyboard events and wall-clock waits, without advanceTime",
+    "held_space_seconds": 2.2,
+    "baseline_damage": "One opponent on condition 2; other initial opponent on 3",
+    "baseline_fast_turn_position": {"x":40.34,"z":-38.33},
+    "initial_idle_capture": "Character was left exposed between browser-tool inspections; not counted as a deliberate playthrough loss"
+  },
+  "normal_time_replay": {
+    "location": "deployed preview, same source version as final public build",
+    "version": "0.13.0",
+    "held_space_seconds": 2.2,
+    "strikes": 5,
+    "released_stopped_strikes": true,
+    "fast_turn_position": {"x":37.55,"z":-35.96},
+    "first_hot_safe_house_attempt": {"won":false,"seen":true,"van_condition":40}
+  },
+  "normal_time_final_mission": {
+    "location": "deployed preview",
+    "version": "0.13.1",
+    "method": "Actual keyboard events and wall-clock waits, without deterministic time stepping or position/health edits",
+    "mode": "won",
+    "game_seconds": 26.47,
+    "health": 6,
+    "van_condition": 100,
+    "heat": 0.69,
+    "seen": false,
+    "companion_aboard": true,
+    "recording": true,
+    "score": 2167
+  },
+  "public_touch": {
+    "method": "Actual CDP touch events with deterministic time stepping; not a physical phone",
+    "held_strike_seconds": 2.2,
+    "strikes": 5,
+    "released_stopped_strikes": true,
+    "opponent_conditions_after": [0,1,3,3,3],
+    "pause_guide_return_freezes_time": true,
+    "rescue_recording_joint_boarding": true,
+    "nearby_initial_patrol": {"x":-4,"z":-4},
+    "collision_caused_vehicle_failure": true,
+    "retry_restored_people_recording_condition_and_nearby_patrol": true,
+    "portrait": [390,844],
+    "landscape": [844,390],
+    "final_mode": "won",
+    "game_seconds_after_retry": 16.43,
+    "van_condition": 100,
+    "heat": 0.69,
+    "seen": false,
+    "score_after_retry": 1587,
+    "horizontal_overflow": false
+  },
+  "public_dual_touch": {
+    "movement_pointer_held_while_adding_aim_pointer": true,
+    "strikes": 4,
+    "opponent_condition_before": 3,
+    "opponent_condition_after": 1,
+    "released_stopped_strikes": true,
+    "player_health": 5,
+    "horizontal_overflow": false
+  },
+  "limits": ["Assistant review, not human enjoyment study", "No physical-phone test", "Safari untested", "Not FPS benchmark", "Not production-quality realistic art"]
+}

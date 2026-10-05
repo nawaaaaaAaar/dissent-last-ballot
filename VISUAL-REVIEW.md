@@ -1,5 +1,11 @@
 # DISSENT visual review
 
+## v0.13 play-feedback review
+
+Normal-time play made it difficult to identify the lead among overlapping officers. The lead now has a contrasting existing casual outfit and a teal ground ring; Kabir has a gold ring. Opponents maintain striking distance, separate from each other and show three nearby condition segments, with a brief colour change during interruption. Public phone combat and dual-stick captures show actual rendering of these changes.
+
+The map marks obstructions and the unsecured recording without introducing another large mission panel. Portrait/landscape captures retain accessible controls and no horizontal overflow. Police meshes, faces, cloth, procedural combat motion and sparse streets still do not reach the required realistic-art target. This is a playability/recognition revision, not a custom Indian character or environment overhaul.
+
 ## v0.12 replacement review
 
 Actual local gameplay inspection found unreadable light text over pale roofs, an overly distant camera, large blank bright roof surfaces, backward-facing vehicles and empty green expanses. The replacement adds dark objective backing/header contrast, a tighter top-down camera, textured roof surfaces/parapets, corrected vehicle orientation and subdued paving. Static world geometry is merged by material; crowds are culled and updated at a lower cadence.

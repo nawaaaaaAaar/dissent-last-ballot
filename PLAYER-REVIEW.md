@@ -20,6 +20,10 @@ The first stationary inspection also ended in capture while the world continued 
 
 ## Scope
 
+Replaying the revised controls in normal time produced five strikes during the same held window and stopped on release. The repeated turn/brake attempt ended nearer the eastern road at x37.55/z-35.96. These tool-driven comparisons are observations, not a controlled human benchmark. The first hot arrival did not win; the final v0.13.1 normal-time mission did, with Kabir and the recording aboard, van condition 100% and heat 0.69.
+
+The public v0.13.1 build separately passed actual touch combat, pause/guide, rescue, boarding, collision failure and checkpoint retry, driving and parked victory. Simultaneous movement/aim pointers were checked too. The normal-time mission was played in the deployed preview; it is not mislabelled as a physical-phone or human-player test.
+
 The same rescue/recording/escape mission and electoral-resistance narrative remain. This pass does not add errands, more districts, a gun system or an untested claim of photorealistic graphics. Character art, authored combat motion, city density, physical-phone testing and first-time-player enjoyment remain open work.
 
 The source and captures are available in [the repository](https://github.com/nawaaaaaAaar/dissent-last-ballot). Verification and remaining limits are recorded in [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md); the previous design direction is preserved in [the Breakout brief](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/BREAKOUT-DESIGN.md).
