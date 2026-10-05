@@ -1,60 +1,28 @@
-# DISSENT: how to play and win
+# DISSENT: Breakout: how to play and win
 
-Open [the game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **Learn to play & win**, then **Practise the controls**. The seven-step lesson has no pursuit. It teaches movement, sprinting, jumping, dodging, Rally, packet pickup and a held help action. Start a fresh campaign afterwards; leave Story assist checked for the first attempt.
+Open [the game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and select **PLAY · Breakout**. The optional title guide explains the controls and freezes play when opened from Pause. This walkthrough describes v0.12, not the archived three-chapter campaign.
 
-## Controls and survival
+## Get through the crackdown
 
-- **Phone:** Left joystick moves, its outer edge runs. Drag the world with your right thumb to turn the camera. Use Jump, Dodge, Rally and the nearby contextual Action button.
-- **Desktop:** WASD/arrows move, Shift runs, Space jumps, Q dodges, F rallies, E acts. Drag to turn the camera. P/Escape pauses.
-- **Packets:** Walk over the three gold-ringed packet props. No button press is needed. Follow the direction arrow and distance; collection updates the counter.
-- **Actions:** Stay close. Hold Action/E for one second to help. With Story assist, hold it for roughly two seconds at a barrier until the progress completes. A quick tap is not enough for a held action.
-- **Survival:** Move out of red circles before the strike. Dodge protects you briefly. Rally costs 30 energy and has a six-second cooldown, so use it when pursuers are near. Supplies restore stamina and energy; helping restores one health. Walk between sprint bursts to recover stamina.
-- **Retry:** Capture offers a checkpoint retry, retaining recovered items within the current tab. Reloading does not restore an unfinished action run. Completed chapter results save in this browser when storage is available.
+- **Move toward the gold objective:** On desktop use W/up from your starting position; on a phone push the left stick upward. Shift or the phone stick's outer edge runs. Keep an eye on stamina.
+- **Handle opponents:** Their red circles show an attack winding up. Dodge out with Q/Dodge, or strike toward them to interrupt. Mouse/right stick aims. Three successful hits disable one fictional opponent; missed strikes still have a short cooldown.
+- **Open or bypass the yellow line:** Stop close to it and strike four times. Each hit produces debris, and the line falls when its condition reaches zero. Alternatively, go around the building blocks through a side road. The animation is an abstract game interaction, not a real-world method.
 
-## Jantar Mantar: Signal Run
+## Bring Kabir and the recording
 
-1. Head along the road. The first packet is on the right, just beyond the low crate. Jump while running or go around the crate.
-2. Cross left into the gathering courtyard for the second packet. Return to the road for the third packet beside the recorder.
-3. Press Action/E beside the recorder. Follow the marker south to the yellow line. Stay near the interaction ring and hold Action until the barrier opens.
-4. Find Kabir just beyond the line and press Action. Continue south to the assembly, approach its marker and press Action to complete the chapter.
+- **Rescue Kabir:** Follow the gold objective just beyond the line. Nearby guards must be disabled or lured away. When RESCUE KABIR appears, press E or tap Action. If it refuses, the toast tells you why.
+- **Pick up Sana's recording:** Walk over the gold circle beside him. The recording collects automatically; no quiz or document panel is required.
+- **Board together:** Head toward the volunteer van at the central crossing. Kabir follows Aman, but running too far ahead can leave him behind. Wait until he is close, then use ENTER VAN/E. Boarding requires the rescue, recording and companion proximity.
 
-Optional help near the entrance restores health. Rally is useful before stopping for a held action. You need all three packets, the recorder and Kabir; simply reaching the destination will not win.
+## Escape in the van
 
-## Bihar: Leave Together
+- **Steer in the direction you want to travel:** The left stick/WASD chooses world direction and accelerates. Steering is arcade-style, not a wheel-and-pedal simulation. Slow before corners; sharp turns at full speed can push you into buildings.
+- **Choose a route:** The short western road gains a roadblock. You can exit and clear it through the game strike interaction, or take the longer east road. A reliable bypass is east at the central crossing, up the eastern road, west along the far crossing, then up the western road to the green circle.
+- **Lose pursuit:** Buildings hide you; open roads expose you. SEARCH means you are unseen, not already safe. Heat starts falling after four unseen seconds. Keep driving around blocks if pursuers catch sight of you again.
+- **Park to win:** Reach the green western safe-house circle with Kabir and the recording aboard, heat below one bar and low speed. Release movement or hold Brake/Space. If the search is still active, remain hidden or take another loop; touching the circle alone does not win.
 
-1. Take the packet at the left-front gathering beside Mira. Hold Action to regroup her.
-2. Cross to Kabir on the right, collect the second packet and press Action to regroup him.
-3. Use the east lane around the camp buildings to reach the third packet south of the blocks. Lead both companions towards the exit.
-4. Wait for them to catch up, then hold Action at the exit. Walk through to the southern handoff, wait for both companions again and press Action.
+## Recover from mistakes
 
-Arriving alone does not count. This is an invented camp, not an actual Bihar map; the companions follow obstacle-aware routes and may take longer than you to get around a building.
+Medkits restore health and stamina on foot. Health reaching zero or the van being disabled ends the attempt. Retry restores the latest rescue/boarding checkpoint within this tab; before either checkpoint, it starts a fresh attempt. Reloading clears this active run.
 
-## Bengal: Hold the Gathering
-
-1. Collect the packets and hold Action at the left-front, right-middle and left-rear help stations. You can choose the order.
-2. Enter the large gold circle at the southern gathering. Keep moving inside it for twenty game seconds, dodging warnings and using Rally when pressured.
-3. The timer stops progressing outside the circle. Once it reaches twenty seconds, approach the assembly within the circle and press Action.
-
-Completing all three chapters reaches the campaign ending. Case files and the charter remain optional; neither is required to win. The ending carries the fictional movement's demands, not a claim of actual resignation, SIR repeal or voter restoration.
-
-## Sprint source code
-
-The reusable [sprint controller](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/docs/sprint-controller.js) is also used by the game. Its running speed is 4.6 versus walking speed 2.6 game units per second. Sprint drains 18 stamina per second, walking/resting recovers 13, exhaustion stops sprint at 5 and permits it again at 30.
-
-```js
-import {wantsSprint, sprintAllowed, updateStamina, SPRINT_RULES}
-  from './sprint-controller.js';
-
-const state = {stamina: 100, exhausted: false};
-// Every simulation step, dt is seconds:
-const requested = wantsSprint({
-  shift: keys.has('ShiftLeft'),
-  touch: isTouchDevice,
-  stickMagnitude: Math.hypot(stick.x, stick.y)
-});
-const sprinting = requested && sprintAllowed(state);
-const speed = sprinting ? SPRINT_RULES.runSpeed : SPRINT_RULES.walkSpeed;
-updateStamina(state, dt, sprinting, isActuallyMoving);
-```
-
-This is the running mechanic, not an infinite-stamina cheat or an entire standalone runner game. Current graphics, navigation and phone-performance limits remain documented in [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md).
+The ending score rewards remaining health, van condition and speed. There is no guaranteed route that avoids every opponent and no requirement to disable everyone. Preserving people and the recording is the objective. The fictional ending carries the movement's broader reform demands; it does not alter actual voter rolls or report an actual resignation.

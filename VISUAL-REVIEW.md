@@ -1,5 +1,11 @@
 # DISSENT visual review
 
+## v0.12 replacement review
+
+Actual local gameplay inspection found unreadable light text over pale roofs, an overly distant camera, large blank bright roof surfaces, backward-facing vehicles and empty green expanses. The replacement adds dark objective backing/header contrast, a tighter top-down camera, textured roof surfaces/parapets, corrected vehicle orientation and subdued paving. Static world geometry is merged by material; crowds are culled and updated at a lower cadence.
+
+This is a readability and systems pass using earlier licensed art, not final high-graphics approval. Uniforms and police anatomy remain basic, vehicle surfaces lack authored wear/interiors, streets lack convincing lived-in density, faces repeat and melee is a procedural gesture rather than an authored motion set. No screenshot or successful gameplay test establishes photorealism, physical-phone performance or enjoyment.
+
 ## v0.9 scope
 
 This pass changes the campaign's theme, case decisions, charter and signage using the existing art. The invented Bihar/West Bengal camps reuse earlier authored spaces; they are not new regional scans or geographically authentic models. Review covers readable before/current record panels, touch choices, scrollable charter controls and live-game captures. No new photorealism, wardrobe or facial-animation claim is made.

@@ -1,5 +1,17 @@
 # QA and limitations
 
+## v0.12 Breakout
+
+The current root is the new top-down mission; archived campaign results below do not test it. Seven isolated rule checks pass: barrier/cooldown, aimed melee interruption and opponent condition, dodge cost/invulnerability, rescue/boarding prerequisites, occlusion/search/win conditions, vehicle acceleration/braking/destruction and valid barricade-detour navigation.
+
+Local Chromium completed the mission with actual keyboard inputs, not rule-state teleportation: four barrier strikes, rescue, recording pickup, companion boarding, four directional driving segments, heat loss and parked victory. It also checked pause/help freezing and returning, fresh capture and retry with restored health. `qa/v12/local-results.json` and `local-test.log` retain the scope and have no page errors. The supplied game client separately captured movement and strike state in `qa/v12-client/`.
+
+Iteration found a path-grid edge crossing the thin line, an unsuitable initial van heading and vehicle-model forward-direction mismatch; these were corrected. An initial automated driving controller oscillated around waypoint targets and lost the van; deliberate directional segments with braking completed the route. The controller failure is not counted as a passing run.
+
+Phone-emulated Chromium separately completed the mission through actual touch, including right-stick melee damage, Dodge, four barrier strikes, rescue/recording, boarding, vehicle destruction from a real drive into a building, boarding-checkpoint retry, four driving segments and parked victory. Portrait 390×844 and landscape 844×390 were captured without horizontal overflow. `qa/v12/mobile-results.json` and `mobile-test.log` retain the scope. Review found overlapping panels and a resize-cleared deterministic render; both were revised rather than passing the initial captures as final.
+
+Public verification is recorded separately once completed. Deterministic stepping is not FPS measurement. Physical phones, Safari, first-time-player enjoyment, higher-fidelity combat/crowd animation and production realism remain open requirements.
+
 ## v0.11 Learn the Route
 
 The final public frontend `4466ab1` loads `world.js?v=0.11.2`. Cloud Chromium completed all seven practice actions by keyboard and then all three campaign chapters, with three packets per chapter, zero required case reviews, both Bihar companions arriving and twenty game seconds inside the Bengal zone. The ending carried all three demands. Public scores were 2341, 2687 and 1550.

@@ -1,12 +1,15 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.11.2",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
-  "description": "Explorable third-person protest-world chapter with mobile controls",
+  "description": "Top-down 3D resistance action mission with driving and mobile dual-stick controls",
   "scripts": {
     "start": "python -m http.server 5173 --directory docs",
-    "test": "node world-qa.mjs",
+    "test": "node breakout-unit.mjs",
+    "test:breakout": "node breakout-unit.mjs",
+    "test:browser": "node breakout-qa.mjs",
+    "test:mobile": "node breakout-mobile-qa.mjs",
     "test:action": "node street-qa.mjs",
     "test:action:historical": "node action-qa.mjs",
     "test:campaign": "node street-qa.mjs",

@@ -1,5 +1,11 @@
 # Asset provenance
 
+## v0.12 Breakout
+
+The new city layout, van and patrol-vehicle geometry, vehicle control, collision/navigation rules, melee, HUD, two-stick input, original synthetic engine tone and mission are authored in `breakout.js`, `breakout-rules.js` and `breakout.css`. No GTA/Mini Militia code, models, textures, audio or trademarks are used as game assets.
+
+The four generic licensed adult avatar derivatives, simplified CC0 police, Poly Haven road/tree/HDR assets and earlier generated limewash material are reused under the licences below. Aman and Kabir are authored fictional Indian characters, not scanned or identified people. The van is an original approximation, not a vehicle scan. The original grid and observatory-inspired prop are not an exact Jantar Mantar model. There is no opening film in the new default mode and no generated image presented as gameplay.
+
 ## v0.9 movement revision
 
 The new voter files, case-comparison panels, feedback, reform charter, text and revised signage are original code/content. Existing models, scanned materials, clothing variants and authored geometry are reused under the licences below. Bihar/West Bengal help-camp labels do not imply that the geometry was scanned or photographed there. No real electoral rolls, news photographs, signatures, voter identifiers or public-official likenesses are incorporated.

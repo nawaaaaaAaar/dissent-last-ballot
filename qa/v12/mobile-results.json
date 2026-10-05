@@ -1,0 +1,477 @@
+{
+  "passed": true,
+  "errors": [],
+  "log": [
+    {
+      "name": "Touch rescue",
+      "state": {
+        "mode": "playing",
+        "coordinates": "x east, z south; fictional compressed Delhi-inspired grid",
+        "time": 7.92,
+        "player": {
+          "x": 0,
+          "z": 8.16000000000041,
+          "yaw": 3.141592653589793,
+          "health": 6,
+          "stamina": 63.119999999999926,
+          "hurt": 0,
+          "dash": 0,
+          "dashCd": 0,
+          "attack": 0,
+          "attackCd": 0
+        },
+        "van": {
+          "x": 10,
+          "z": -4,
+          "yaw": 1.5707963267948966,
+          "speed": 0,
+          "health": 100,
+          "hurt": 0,
+          "occupied": false
+        },
+        "friend": {
+          "x": 2,
+          "z": 7,
+          "rescued": true,
+          "aboard": false,
+          "routeAge": 0.8,
+          "route": [],
+          "yaw": -1.0452125332431328
+        },
+        "record": false,
+        "gate": {
+          "hp": 0
+        },
+        "heat": 1.93,
+        "seen": true,
+        "hidden": 0,
+        "phase": "pursuit",
+        "roadblock": false,
+        "objective": "RECOVER THE RECORDING · walk over the gold marker",
+        "target": {
+          "x": -2,
+          "z": 6
+        },
+        "near": null,
+        "enemies": [
+          {
+            "id": 0,
+            "x": 0.16,
+            "z": 17.98,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 1,
+            "x": -0.19,
+            "z": 17.21,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 2,
+            "x": 0.64,
+            "z": 13.83,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 3,
+            "x": -1.5,
+            "z": 11.98,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 4,
+            "x": 34,
+            "z": -6,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          }
+        ],
+        "car": {
+          "x": 0,
+          "z": 36,
+          "active": false
+        },
+        "score": 400,
+        "crashes": 0,
+        "checkpoint": {
+          "x": 2,
+          "z": 7,
+          "gate": 0,
+          "record": false,
+          "rescued": true
+        },
+        "quality": "low",
+        "rendering": {
+          "calls": 72,
+          "triangles": 92466
+        },
+        "avatarModels": 4
+      }
+    },
+    {
+      "name": "Touch boarding",
+      "state": {
+        "mode": "playing",
+        "coordinates": "x east, z south; fictional compressed Delhi-inspired grid",
+        "time": 18.78,
+        "player": {
+          "x": 10,
+          "z": -4,
+          "yaw": 1.5707963267948966,
+          "health": 6,
+          "stamina": 100,
+          "hurt": 0,
+          "dash": 0,
+          "dashCd": 0,
+          "attack": 0,
+          "attackCd": 0
+        },
+        "van": {
+          "x": 10,
+          "z": -4,
+          "yaw": 1.5707963267948966,
+          "speed": 0,
+          "health": 100,
+          "hurt": 0,
+          "occupied": true
+        },
+        "friend": {
+          "x": 10,
+          "z": -4,
+          "rescued": true,
+          "aboard": true,
+          "routeAge": 0.36666666666666586,
+          "route": [
+            {
+              "x": 8,
+              "z": -2
+            }
+          ],
+          "yaw": 2.93384476892729
+        },
+        "record": true,
+        "gate": {
+          "hp": 0
+        },
+        "heat": 2.6,
+        "seen": true,
+        "hidden": 0,
+        "phase": "pursuit",
+        "roadblock": true,
+        "objective": "BREAK LINE OF SIGHT · use buildings and side streets",
+        "target": {
+          "x": -34,
+          "z": -48
+        },
+        "near": {
+          "id": "exit",
+          "label": "EXIT VAN"
+        },
+        "enemies": [
+          {
+            "id": 0,
+            "x": 9.14,
+            "z": -1.93,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 1,
+            "x": 9.27,
+            "z": -2.28,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 2,
+            "x": 9.22,
+            "z": -2.24,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 3,
+            "x": 9.18,
+            "z": -2.16,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 4,
+            "x": 34,
+            "z": -6,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          }
+        ],
+        "car": {
+          "x": 0,
+          "z": 36,
+          "active": true
+        },
+        "score": 600,
+        "crashes": 0,
+        "checkpoint": {
+          "x": 10,
+          "z": -4,
+          "gate": 0,
+          "record": true,
+          "rescued": true,
+          "vehicle": true
+        },
+        "quality": "low",
+        "rendering": {
+          "calls": 75,
+          "triangles": 76098
+        },
+        "avatarModels": 4
+      }
+    },
+    {
+      "name": "Touch vehicle failure and checkpoint",
+      "state": {
+        "mode": "playing",
+        "coordinates": "x east, z south; fictional compressed Delhi-inspired grid",
+        "time": 0,
+        "player": {
+          "x": 10,
+          "z": -4,
+          "yaw": 1.5707963267948966,
+          "health": 6,
+          "stamina": 100,
+          "hurt": 2,
+          "dash": 0,
+          "dashCd": 0,
+          "attack": 0,
+          "attackCd": 0
+        },
+        "van": {
+          "x": 10,
+          "z": -4,
+          "yaw": 1.5707963267948966,
+          "speed": 0,
+          "health": 100,
+          "hurt": 0,
+          "occupied": true
+        },
+        "friend": {
+          "x": 10,
+          "z": -4,
+          "rescued": true,
+          "aboard": true
+        },
+        "record": true,
+        "gate": {
+          "hp": 0
+        },
+        "heat": 2.4,
+        "seen": true,
+        "hidden": 0,
+        "phase": "pursuit",
+        "roadblock": true,
+        "objective": "BREAK LINE OF SIGHT · use buildings and side streets",
+        "target": {
+          "x": -34,
+          "z": -48
+        },
+        "near": {
+          "id": "exit",
+          "label": "EXIT VAN"
+        },
+        "enemies": [
+          {
+            "id": 0,
+            "x": -4,
+            "z": 8,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 1,
+            "x": 0,
+            "z": 10,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 2,
+            "x": 4,
+            "z": 12,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 3,
+            "x": -4,
+            "z": 14,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 4,
+            "x": 0,
+            "z": 16,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          }
+        ],
+        "car": {
+          "x": 0,
+          "z": 36,
+          "active": true
+        },
+        "score": 0,
+        "crashes": 0,
+        "checkpoint": {
+          "x": 10,
+          "z": -4,
+          "gate": 0,
+          "record": true,
+          "rescued": true,
+          "vehicle": true
+        },
+        "quality": "low",
+        "rendering": {
+          "calls": 64,
+          "triangles": 43724
+        },
+        "avatarModels": 4
+      }
+    },
+    {
+      "name": "Touch mission complete",
+      "state": {
+        "mode": "won",
+        "coordinates": "x east, z south; fictional compressed Delhi-inspired grid",
+        "time": 10.15,
+        "player": {
+          "x": -36.90124410771252,
+          "z": -48.00017657401537,
+          "yaw": 3.1752542700243573,
+          "health": 6,
+          "stamina": 100,
+          "hurt": 0,
+          "dash": 0,
+          "dashCd": 0,
+          "attack": 0,
+          "attackCd": 0
+        },
+        "van": {
+          "x": -36.90124410771252,
+          "z": -48.00017657401537,
+          "yaw": 3.1752542700243573,
+          "speed": 3.746766803846678,
+          "health": 100,
+          "hurt": 0,
+          "occupied": true
+        },
+        "friend": {
+          "x": -36.90124410771252,
+          "z": -48.00017657401537,
+          "rescued": true,
+          "aboard": true
+        },
+        "record": true,
+        "gate": {
+          "hp": 0
+        },
+        "heat": 0.17,
+        "seen": false,
+        "hidden": 9.38,
+        "phase": "clear",
+        "roadblock": true,
+        "objective": "REACH THE WESTERN SAFE HOUSE · park inside the green circle",
+        "target": {
+          "x": -34,
+          "z": -48
+        },
+        "near": {
+          "id": "exit",
+          "label": "EXIT VAN"
+        },
+        "enemies": [
+          {
+            "id": 0,
+            "x": 10,
+            "z": 4.38,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 1,
+            "x": 11.57,
+            "z": 5.66,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 2,
+            "x": 13.92,
+            "z": 5.57,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 3,
+            "x": -5,
+            "z": 5,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          },
+          {
+            "id": 4,
+            "x": 17.79,
+            "z": 1.58,
+            "hp": 3,
+            "stun": 0,
+            "windup": 0
+          }
+        ],
+        "car": {
+          "x": 17.314103300060324,
+          "z": -4,
+          "active": true
+        },
+        "score": 1600,
+        "crashes": 0,
+        "checkpoint": {
+          "x": 10,
+          "z": -4,
+          "gate": 0,
+          "record": true,
+          "rescued": true,
+          "vehicle": true
+        },
+        "quality": "low",
+        "rendering": {
+          "calls": 56,
+          "triangles": 159276
+        },
+        "avatarModels": 4
+      }
+    }
+  ]
+}

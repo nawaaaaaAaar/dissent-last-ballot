@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.12: Breakout
+
+- Replaced the default task-led campaign with one top-down 3D action mission. The previous game remains at `chapter-v11.html`.
+- Added directional close-range strikes, opponent attack interruption, knockback, condition and a stamina-based short dodge.
+- Added a four-hit breakable line and a clear-or-draw-away rescue, companion following and joint boarding requirement.
+- Added an original drivable volunteer van, pursuing patrol vehicle, condition loss, braking/coasting, enter/exit and boarding retry.
+- Added connected side streets, building occlusion, last-seen search, heat decay, a western roadblock and an unseen/slow parked finish.
+- Added dual-stick phone input, repeat-strike aiming, contextual Action, desktop keyboard/mouse input, minimap and in-game guide.
+- Reused licensed art; tightened camera, roof detail, shadows and HUD contrast after actual-render review. This is not a completed realism pass, physical-phone signoff or production release.
+
 ## v0.11: Learn the Route
 
 - Added an optional seven-action safe practice lesson and a scrollable winning guide, accessible from the title and Pause.
