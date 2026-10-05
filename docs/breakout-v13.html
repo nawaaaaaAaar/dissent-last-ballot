@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DISSENT | City of Accounts</title>
+<title>DISSENT | Breakout</title>
 <meta name="theme-color" content="#14201e">
 <meta name="description" content="An original top-down 3D resistance action mission: fight, rescue, drive and escape. Fictional Delhi-inspired encounters.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./breakout.css?v=0.14.0">
+<link rel="stylesheet" href="./breakout-v13.css?v=0.13.1">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -19,20 +19,19 @@
 <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
 <path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/>
 </svg>
-<span>DISSENT<small>CITY OF ACCOUNTS / DELHI</small>
+<span>DISSENT<small>BREAKOUT / DELHI-INSPIRED</small>
 </span>
 </a>
 <nav>
-<button id="missions">Map &amp; Missions</button>
 <button id="sound">Sound off</button>
 <button id="pause" hidden>Pause</button>
 </nav>
 </header>
 <section id="menu" class="screen">
 <div class="title-copy">
-<p class="eyebrow">A resistance action city / v0.14</p>
-<h1>A city.<br>A network.<br>Your next move.</h1>
-<p class="lead">Rescue. Deliver. Hold your ground.<br>Drive between CP, Jantar Mantar and India Gate. Choose missions, earn support, return stronger.</p>
+<p class="eyebrow">A resistance action mission / v0.13 · Play review</p>
+<h1>Break out.<br>Bring them home.</h1>
+<p class="lead">Fight. Rescue. Drive. Escape.<br>One neighbourhood. Two routes. No one left behind.</p>
 <button id="start" class="primary" disabled>Loading the city…</button>
 <button id="tutorial" class="secondary">Controls &amp; winning route</button>
 <p id="loading" role="status">Preparing the 3D engine…</p>
@@ -43,7 +42,7 @@
 </select>
 </label>
 <p class="disclosure">Original fictional game, not a reconstruction of real violence. The electoral movement context is sourced separately; allegations are disputed. Systems prototype, not finished photorealistic art.</p>
-<a class="quiet" href="./breakout-v13.html">Archive: small-world Breakout</a> · <a class="quiet" href="./concept.html">Research &amp; provenance</a>
+<a class="quiet" href="./chapter-v11.html">Archive: earlier campaign</a> · <a class="quiet" href="./concept.html">Research &amp; provenance</a>
 </div>
 </section>
 <section id="hud" hidden>
@@ -75,7 +74,7 @@
 <div class="minimap">
 <canvas id="map" width="144" height="144">
 </canvas>
-<small>DELHI · LOCAL RADAR</small>
+<small>FICTIONAL STREET GRID</small>
 </div>
 </section>
 <div id="toast" role="status" aria-live="polite">
@@ -102,27 +101,26 @@
 <div class="panel">
 <p class="eyebrow">Your place is held</p>
 <h2>Paused.</h2>
-<p>Follow the gold route on the radar. Map &amp; Missions shows the whole city and your active operation. Your network progress stays when you choose another job.</p>
+<p>Rescue Kabir, recover the recording, board the volunteer van together, lose the pursuit and park in the western safe-house circle.</p>
 <button id="resume" class="primary">Resume</button>
 <button id="pause-help" class="secondary">Controls &amp; route</button>
-<button id="restart" class="secondary">Abandon &amp; choose a job</button>
+<button id="restart" class="secondary">Restart mission</button>
 </div>
 </section>
 <section id="help-screen" class="modal" hidden>
 <div class="panel">
 <p class="eyebrow">Play before reading</p>
-<h2>Learn the city.<br>Build the network.</h2>
+<h2>Five verbs.<br>One way home.</h2>
 <p>
 <b>Phone:</b> left stick moves and drives; its outer edge runs on foot. Hold the right stick to aim and repeatedly strike, or hold Strike for nearby aim assist. Dodge gives a short escape burst. In the van, release the left stick to slow down, or hold Brake. Corner assist slows sharp turns.</p>
 <p>
 <b>Desktop:</b> WASD/arrows move or steer the van. Shift runs, held Space repeatedly strikes (or brakes while driving), Q dodges, E rescues or enters/exits the van. Point with the mouse to aim. P/Escape pauses. Your teal ground ring identifies Aman; Kabir has a gold ring. Nearby opponents have three condition segments, and red circles show incoming attacks.</p>
 <ol>
-<li>Start at CP. Your volunteer van is beside you. Action/E boards it, even before the mission objective is complete. Follow the gold radar route toward the operation. M or Map &amp; Missions opens the full map.</li>
-<li><b>Rescue:</b> exit near Jantar Mantar, evade or interrupt the guards, then Action/E near Kabir. Four strikes open the yellow line; bypassing it is also valid. Bring Kabir back to the van.</li>
-<li><b>Courier:</b> exit and walk over the gold dispatch at Tolstoy Marg or India Gate. Protect it and drive to the green destination. India Gate is a fictional network relay, not a claim of a current protest there.</li>
-<li><b>Rally:</b> arrive on foot and stay in the gathering circle for 24 cumulative seconds. Three waves interrupt you. Dodge out of red warning circles, strike to interrupt, and return to the zone. Leaving pauses progress rather than erasing it.</li>
-<li>For deliveries, lose sight of pursuers until heat is below one bar, then slow down at the destination. Gold medals reward keeping health and avoiding vehicle crashes, not a destruction tally.</li>
-<li>After a win, choose another job. Finish the three different operations to unlock the charter run. Repeating jobs changes guard approaches. Support credits buy strike tempo, van protection or running endurance. The next network cycle continues after the charter.</li>
+<li>Move up the central street toward the gold objective. Strike nearby fictional opponents or dodge their red wind-up circles. The yellow line can be broken with four strikes, or bypassed through a side street.</li>
+<li>Approach Kabir and clear or draw away his nearby guards, then press Action/E. Walk over the recording beside him.</li>
+<li>Reach the volunteer van at the central crossing. Wait for Kabir, then press Action/E to board together.</li>
+<li>Drive around the blocks. The west road is shorter but gains a roadblock; the east route is longer. Buildings block enemy sight. When SEARCH appears, keep out of sight until heat falls below one bar.</li>
+<li>Reach the green safe-house circle in the west, slow down and park. The mission only ends if Kabir and the recording are aboard and pursuit is lost.</li>
 </ol>
 <p>Medkits restore health. On-foot health and vehicle condition can fail independently. Retry restores the latest rescue/boarding checkpoint within this tab. There are no mandatory case quizzes and no real personal records.</p>
 <button id="help-close" class="primary">Back</button>
@@ -138,33 +136,12 @@
 <div id="results">
 </div>
 <button id="retry" class="primary">Retry checkpoint</button>
-<button id="again" class="secondary">Choose the next operation</button>
+<button id="again" class="secondary">Play a fresh run</button>
 <a class="quiet" href="./concept.html">Movement context &amp; limits</a>
 </div>
 </section>
-<section id="city-screen" class="modal" hidden>
-<div class="panel city-panel">
-<p class="eyebrow">A connected central-Delhi world</p>
-<h2>Choose your next move.</h2>
-<p id="network-status"></p>
-<canvas id="city-map" width="420" height="420" aria-label="Central Delhi map with India Gate, Jantar Mantar, Connaught Place and route"></canvas>
-<p class="map-credit">© <a href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">OpenStreetMap contributors</a> · ODbL 1.0. North is up. Uniform 0.14 scale; streets widened for play. This is central Delhi, not the entire city. Monument art and encounters are fictional approximations.</p>
-<p id="board-note"></p>
-<label class="setting">Pressure <select id="difficulty"><option value="balanced">Balanced</option><option value="hard">Hard · faster guards</option></select></label>
-<div id="contracts"></div>
-<h3>Support upgrades</h3>
-<div id="upgrades"></div>
-<h3>Keep your network</h3>
-<p>Progress stays in this tab. Export a save code and keep a copy to restore on another visit or phone.</p>
-<textarea id="save-code" aria-label="Network save code" rows="3" placeholder="Paste your exported save code here"></textarea>
-<div class="save-buttons"><button id="export-save">Export code</button><button id="import-save">Restore code</button></div>
-<button id="board-close" class="primary">Return</button>
-<button id="explore" class="secondary">Free roam / abandon active job</button>
-</div>
-</section>
-<a class="osm-credit" href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./breakout.js?v=0.14.0">
+<script type="module" src="./breakout-v13.js?v=0.13.1">
 </script>
 </body>
 </html>
