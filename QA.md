@@ -30,6 +30,14 @@ The final tree rendering is spatially chunked. The one-FPS cloud observation was
 
 The result panel retained its previous scroll position during later victories and clipped the heading at 844×390. The follow-up presentation patch resets its scroll and uses a compact short-viewport layout; game rules are unchanged. Final presentation/layout rechecks are recorded after deployment below.
 
+### Final public deployment and presentation recheck
+
+GitHub Pages successfully deployed source commit `349ac7bf68a26749f833c87913f1b41a974743ff`. The public root was loaded fresh and reported v0.15.13. High-graphics keyboard movement, strikes and dodge were exercised, and an actual gameplay capture was inspected.
+
+Final phone emulation used 390×844 and 844×390. Simultaneous real touch pointers moved the character and produced three strikes; both layouts had zero horizontal overflow. Remaining stationary under normal-time attacks then caused capture, without health or failure-state injection. The landscape failure heading and both recovery actions fitted the viewport, with result scroll reset to zero. Captures are retained under `qa/v15/public1513-*`. This checks final presentation, not a second full campaign or physical-phone performance.
+
+The four-operation replay above remains applicable to the core rules: comparison with v0.15.10 shows only a versioned import change in `city-rules.js`. The subsequent patch adjusts camera and presentation. Final images still show simplified building geometry, sparse authored activity and repeated characters; they are not evidence of finished-game art.
+
 ## v0.14 City of Accounts
 
 This is a connected-city and gameplay-loop revision, not a final graphics approval. The raw OpenStreetMap extract and derivative map are retained, with 1,269 road ways and 786 building footprints. Those are data features, not 1,269 distinct named streets or 786 authored interiors. Geography is uniformly compressed, roads widened, building heights approximated and traffic rules simplified.

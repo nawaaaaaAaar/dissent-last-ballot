@@ -34,7 +34,15 @@
   "isolated_rule_checks": 30,
   "presentation_patch": {
     "changes": ["Ending scroll reset", "Compact landscape results", "Off-centre landscape toast", "Smaller landscape objective", "Closer on-foot view with wider driving retained"],
-    "final_public_recheck": "pending"
+    "final_public_recheck": {
+      "version": "0.15.13",
+      "source_commit": "349ac7bf68a26749f833c87913f1b41a974743ff",
+      "github_pages_workflow": "success",
+      "desktop": "High graphics; actual keyboard movement, strikes and dodge; gameplay capture inspected.",
+      "phone_emulation": "390x844 and 844x390; simultaneous actual movement/aim touches produced three strikes and movement; no horizontal overflow. Normal-time exposure to attacks caused capture; landscape heading and both recovery actions fitted the viewport, result scroll reset to zero.",
+      "rules_since_full_cycle": "Only versioned import changed in city-rules.js; later edits are presentation and camera changes.",
+      "hardware_scope": "Cloud Chromium emulation, not physical phones or Safari."
+    }
   },
   "limits": [
     "Physical iPhone/Android hardware and Safari unverified.",

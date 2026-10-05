@@ -96,3 +96,9 @@ The courier result exposed a retained-scroll-position bug that clipped the next 
 Landscape gameplay captures also showed the story toast covering the player. The final presentation pass moves that text aside, reduces the objective panel and brings the on-foot camera closer, while retaining the wider driving view. This is a readability revision, not a claim of a new character-animation library.
 
 My assessment is **materially better, but not finished-game approval**. The next review should concentrate on authored combat/traversal performance and reactive encounter/city behaviour, followed by observed first-time-player sessions. More credits, markers or districts would not resolve the remaining gap.
+
+## Published build and final presentation check
+
+The public GitHub Pages root is verified at v0.15.13 after successful deployment of commit `349ac7bf68a26749f833c87913f1b41a974743ff`. Subsequent changes to the replayed v0.15.10 core rules are limited to versioned imports; the final patch is camera and presentation.
+
+The final root was exercised with keyboard movement, strikes and dodge at High graphics, then with simultaneous movement/aim touches in 390×844 and 844×390 phone emulation. Both phone layouts had no horizontal overflow. An ordinary-time capture verified that the short landscape result heading and retry/operation buttons fit, with scroll reset. These are actual controls and rendered captures, not generated promotional images; physical phones, Safari and independent enjoyment remain unverified.
