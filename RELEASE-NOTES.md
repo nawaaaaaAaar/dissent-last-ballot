@@ -7,6 +7,7 @@
 - Stopped opponents at readable melee distance and added separation, compact condition segments, interruption colour, distinct lead/companion markers and Dodge particles.
 - Added corner-speed assistance, tighter arcade turning and shorter released-input coasting.
 - Brought the initial patrol to the central road and restored patrol/last-seen context at earned vehicle checkpoints.
+- Separated visible vehicle pursuit from slower last-seen searching after the live escape review; reaching the safe house while visible still cannot win.
 - Marked active obstructions and the unsecured recording on the minimap; destination text now names the objective.
 - Retained the same story and original/licensed art. This is a playability pass, not a photorealistic-art or physical-device signoff.
 

@@ -209,7 +209,7 @@ export class Breakout{
     if(this.car.active){
       const c=this.car,d=dist(c,p),sight=d<26&&this.line(c,p);
       if(sight){visible=true;this.lastSeen={x:p.x,z:p.z};}
-      c.speed=this.chase(c,sight?p:this.lastSeen,dt,11,1.1)/Math.max(.001,dt);
+      c.speed=this.chase(c,sight?p:this.lastSeen,dt,sight?10:6,1.1)/Math.max(.001,dt);
       if(v.occupied&&d<2.9&&v.hurt===0)this.carHit(12);
     }
     this.seen=visible;

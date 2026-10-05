@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {Breakout,WORLD} from './breakout-rules.js?v=0.13.0';
+import {Breakout,WORLD} from './breakout-rules.js?v=0.13.1';
 import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.12.0';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
 import {WorldAudio} from './world-audio.js';
@@ -251,7 +251,7 @@ async function init(){
     $('start').disabled=false;$('start').textContent='PLAY · Breakout';$('loading').textContent='The city is ready. Keyboard and dual-stick touch controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.13.0',quality:$('quality').value,rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.13.1',quality:$('quality').value,rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · BREAKOUT / 0.13 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);
