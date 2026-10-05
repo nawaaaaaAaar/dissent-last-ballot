@@ -21,4 +21,5 @@ export class WorldAudio{
     const src=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();src.buffer=b;f.type='lowpass';f.frequency.value=600;g.gain.value=.055;
     src.connect(f).connect(g).connect(c.destination);src.start();
   }
+  update(heat,mode){if(this.music)this.music.volume=this.enabled&&mode==='playing'?Math.min(.24,.11+heat*.025):.035;}
 }

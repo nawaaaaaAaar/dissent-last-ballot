@@ -23,7 +23,7 @@ function knitTexture(source,variant){
 }
 export async function loadPeople(asset){
   const loader=new GLTFLoader();
-  const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loader.loadAsync(asset('male-delhi-animated.glb')),loader.loadAsync(asset('female-delhi-animated.glb')),loadHuman(asset('courier-clothed.glb'))]);
+  const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loader.loadAsync(asset('male-delhi-animated.glb')),loader.loadAsync(asset('female-delhi-animated.glb'))]);
   [male,female,maleDelhi,femaleDelhi]=results;
   officer=await loader.loadAsync(asset('police-review.glb'));
 }
@@ -51,7 +51,7 @@ export function poseHuman(p,t,running=0,gesture=0){
   if(!p.rocket)return legacyPose(p,t,running,gesture);
   const drive=typeof running==='number'?running:running?1:0;
   const divisor=p.poseTimeDivisor||(drive>.85?10.5:drive>.1?7.5:.75);
-  const dt=p.lastTime===null?.016:Math.min(.1,Math.max(.005,Math.abs(t-p.lastTime)/divisor));p.lastTime=t;
+  const dt=p.lastTime===null?.016:Math.min(.1,Math.max(0,Math.abs(t-p.lastTime)/divisor));p.lastTime=t;
   const speed=p.worldSpeed??(drive>.85?4.6:drive>.1?1.8:0);
   const target=drive>.1?(speed>2.5?'Run':'Walk'):'Idle';
   for(const name of ['Idle','Walk','Run']){
@@ -64,7 +64,7 @@ export function poseHuman(p,t,running=0,gesture=0){
 }
 export function resetHuman(p){
   if(!p?.rocket)return;
-  p.lastTime=null;p.worldSpeed=0;p.blend={Idle:1,Walk:0,Run:0};
+  p.lastTime=null;p.lastPosition=null;p.worldSpeed=0;p.blend={Idle:1,Walk:0,Run:0};
   for(const [name,a]of Object.entries(p.actions)){a.reset().play();a.enabled=name==='Idle';a.setEffectiveWeight(name==='Idle'?1:0);a.setEffectiveTimeScale(1);}
   p.mixer.update(0);
 }

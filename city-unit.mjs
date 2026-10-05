@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.0';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.1';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -83,6 +83,15 @@ check('final rally requires both readers, not timer or lone arrival',()=>{
 check('vehicle route excludes pedestrian-only node links',()=>{
   const route=roadRoute(snap(PLACES[0],true),snap(PLACES[1],true),{vehicle:true});assert(route.length>2);
   for(const n of route.slice(0,-1))assert(n.drive);
+});
+check('frontal shield blocks early strikes, finisher opens it',()=>{
+  const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);
+  const e=g.enemies[0];Object.assign(e,{hp:4,role:'guard',x:g.player.x,z:g.player.z+1,yaw:Math.PI,guardBreak:0});g.input.aimX=0;g.input.aimZ=1;
+  g.attack();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();assert.equal(e.hp,2);assert(e.guardBreak>1);
+});
+check('volunteer service is consumed once per operation',()=>{
+  const g=new City();g.start();g.accept('signal');g.enemies.forEach(e=>e.hp=0);const s=g.supports[0];Object.assign(g.player,{x:s.x,z:s.z,health:2,stamina:0});g.van.x+=100;g.van.health=40;
+  g.interact();assert(s.used);assert.equal(g.player.health,4);assert.equal(g.van.health,75);assert.equal(g.score,40);g.interact();assert.equal(g.score,40);
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

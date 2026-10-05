@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.0';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.1';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -45,7 +45,7 @@ export class City{
     WORLD.record={...this.mission.source};WORLD.safe={...this.mission.destination};
     const source=this.mission.source;
     this.gate={x:source.x,z:source.z+8,w:8,hp:spec.type==='rescue'?4:0,fall:spec.type==='rescue'?0:1};
-    const returnRoute=roadRoute(source,this.mission.destination);
+    const returnRoute=roadRoute(snap(source,true),snap(this.mission.destination,true),{vehicle:true});
     this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;this.blockActivated=false;
     this.mission.zones=[source,snap({x:source.x+14,z:source.z-6}),snap({x:source.x-14,z:source.z+9})];
     this.spawn(source,spec.type==='rally'?3:spec.type==='rescue'?this.network.total?4:3:3);
@@ -110,7 +110,7 @@ export class City{
       if(e.role==='guard'&&frontal&&p.combo<3&&e.guardBreak<=0){
         hit=true;this.burst(e.x,e.z,'gold',5);this.say('Shield facing you: flank it or finish a three-strike combo.',1.5);continue;
       }
-      e.hp-=p.combo===3?2:1;e.stun=p.combo===3?1.1:.36;e.windup=0;e.lunge=0;e.cooldown=.7;e.guardBreak=p.combo===3?1.5:e.guardBreak;
+      e.hp=Math.max(0,e.hp-(p.combo===3?2:1));e.stun=p.combo===3?1.1:.36;e.windup=0;e.lunge=0;e.cooldown=.7;e.guardBreak=p.combo===3?1.5:e.guardBreak;
       this.move(e,Math.sin(p.yaw)*(p.combo===3?1.7:.45),Math.cos(p.yaw)*(p.combo===3?1.7:.45));hit=true;this.hitStop=.045;this.burst(e.x,e.z,'teal',p.combo===3?12:7);this.heat=Math.max(1,this.heat+.15);
       if(e.hp<=0)this.score+=60;
     }

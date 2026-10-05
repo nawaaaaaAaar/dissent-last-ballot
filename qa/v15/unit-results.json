@@ -1,0 +1,26 @@
+{
+  "passed": 21,
+  "checks": [
+    "OSM map and georeferenced landmark relationships",
+    "exit and retry never teleport an unrescued witness",
+    "mission replacement requires abandon and charter requires three distinct jobs",
+    "winning grants once, supports replay and medal best",
+    "hot delivery and missing companion cannot complete rescue",
+    "support upgrade costs, duplicate rejection, stamina and reinforcement",
+    "save roundtrip, malformed input and version validation",
+    "three jobs unlock charter and completed charter advances cycle",
+    "rally requires time in zone on foot, outside pauses, not resets",
+    "building footprint and world boundaries block movement",
+    "boarding retry restores pursuit and variant, not an empty world",
+    "rally marker changes and standing at the first point cannot finish",
+    "cleared return roadblock stays cleared after reboarding and retry",
+    "three-strike combo spends stamina and cannot overspend",
+    "perfect dodge cancels a committed close attack",
+    "courier requires held copying and damage interrupts progress",
+    "arrival checkpoint preserves encounter rather than CP departure",
+    "final rally requires both readers, not timer or lone arrival",
+    "vehicle route excludes pedestrian-only node links",
+    "frontal shield blocks early strikes, finisher opens it",
+    "volunteer service is consumed once per operation"
+  ]
+}

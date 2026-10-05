@@ -1,19 +1,19 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.0';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.0';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.12.0';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.1';
+import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.1';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.1';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js';
-import {cityArt} from './city-art.js?v=0.15.0';
+import {WorldAudio} from './world-audio.js?v=0.15.1';
+import {cityArt} from './city-art.js?v=0.15.1';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.0';
+const asset=name=>'./assets/'+name+'?v=0.15.1';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
-let art,actionHeld=false;
+let art,actionHeld=false,actionHoldOnly=false;
 let wideCamera=false,routeMarks=[],readerModels=[];
 let manual=false,last=0,clock=0,fps=0,frames=0,frameStart=performance.now(),mouseAim=false,helpReturn='menu',engineTone,engineGain,brakeHeld=false,aimBrake=false,crowdClock=0,mouseStrike=false,stickStrike=false,buttonStrike=false,routeClock=0,guideRoute=[];
 const particleMeshes=[],medModels=[],crowd=[],enemyModels=[];
@@ -36,7 +36,7 @@ function finish(){
   $('results').innerHTML=`<span>SCORE<br><b>${Math.round(game.score)}</b></span><span>JOB TIME<br><b>${Math.floor(game.elapsed/60)}:${String(Math.floor(game.elapsed%60)).padStart(2,'0')}</b></span><span>NETWORK<br><b>${game.network.total} jobs</b></span>`;
 }
 function clearInput(){keys.clear();sticks.move={x:0,z:0};game.input.attack=game.input.interact=false;actionHeld=false;mouseStrike=stickStrike=buttonStrike=aimBrake=brakeHeld=false;}
-function start(){clearInput();mouseAim=false;game.start();game.accept('witness');routeClock=0;step(0);poses.forEach(resetHuman);if(!audio.enabled)toggleAudio();syncPanels();render();}
+function start(){clearInput();mouseAim=false;game.start();game.accept('witness');game.say('Kabir is ahead. Move, use short strikes, dodge the red sector. Gold marks the next goal.',4);routeClock=0;step(0);poses.forEach(resetHuman);if(!audio.enabled)toggleAudio();syncPanels();render();}
 function help(){helpReturn=game.mode;clearInput();setMode('help');}
 function pause(){if(game.mode==='paused')setMode('playing');else if(game.mode==='playing'){clearInput();setMode('paused');}}
 function toggleAudio(){
@@ -63,8 +63,8 @@ button('import-save',()=>{const ok=game.load($('save-code').value);board();$('bo
 $('contracts').addEventListener('click',e=>{const b=e.target.closest('[data-contract]');if(!b||b.disabled)return;if(helpReturn==='menu')game.start();if(game.accept(b.dataset.contract,$('difficulty').value)){clearInput();setMode('playing');routeClock=0;}});
 $('upgrades').addEventListener('click',e=>{const b=e.target.closest('[data-upgrade]');if(b&&game.upgrade(b.dataset.upgrade))board();});
 button('retry',()=>{clearInput();mouseAim=false;game.retry();poses.forEach(resetHuman);syncPanels();render();});
-button('action',()=>{game.interact();syncPanels();});
-$('action').addEventListener('pointerdown',()=>actionHeld=true);
+button('action',()=>{if(!actionHoldOnly)game.interact();actionHoldOnly=false;syncPanels();});
+$('action').addEventListener('pointerdown',()=>{actionHeld=true;actionHoldOnly=['copy','aid'].includes(game.nearby()?.id);});
 for(const event of ['pointerup','pointercancel','pointerleave'])$('action').addEventListener(event,()=>actionHeld=false);
 button('strike',()=>{aimNearest();game.attack();audio.tone(230,.08);});
 $('strike').addEventListener('pointerdown',()=>{buttonStrike=!game.van.occupied;mouseAim=false;});
@@ -138,15 +138,18 @@ function build(){
   const paving=new THREE.MeshStandardMaterial({map:M.cream.map,color:'#a3a393',roughness:.95});
   ground(paving,5,15,300,420,0);
   const stat=new THREE.Group();
-  const positions=[],uvs=[];
+  const positions=[],uvs=[],caps=new Set();
   for(const s of WORLD.segments){
     const dx=s.b.x-s.a.x,dz=s.b.z-s.a.z,d=Math.hypot(dx,dz),nx=-dz/d*s.width/2,nz=dx/d*s.width/2;
     const corners=[[s.a.x+nx,s.a.z+nz],[s.a.x-nx,s.a.z-nz],[s.b.x-nx,s.b.z-nz],[s.b.x+nx,s.b.z+nz]];
     for(const i of [0,2,1,0,3,2]){const[x,z]=corners[i];positions.push(x,.025,z);uvs.push(x/4,z/4);}
     // Rounded joins close the triangular holes between bent street segments.
-    for(const p of[s.a,s.b])for(let j=0;j<12;j++){
-      const a=j*Math.PI/6,b=(j+1)*Math.PI/6,r=s.width/2;
-      for(const q of[[p.x,p.z],[p.x+Math.cos(b)*r,p.z+Math.sin(b)*r],[p.x+Math.cos(a)*r,p.z+Math.sin(a)*r]]){positions.push(q[0],.025,q[1]);uvs.push(q[0]/4,q[1]/4);}
+    if(!s.walkOnly)for(const p of[s.a,s.b]){
+      const key=p.x+','+p.z;if(caps.has(key))continue;caps.add(key);
+      for(let j=0;j<8;j++){
+        const a=j*Math.PI/4,b=(j+1)*Math.PI/4,r=s.width/2;
+        for(const q of[[p.x,p.z],[p.x+Math.cos(b)*r,p.z+Math.sin(b)*r],[p.x+Math.cos(a)*r,p.z+Math.sin(a)*r]]){positions.push(q[0],.025,q[1]);uvs.push(q[0]/4,q[1]/4);}
+      }
     }
   }
   const rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));rg.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));rg.computeVertexNormals();
@@ -195,7 +198,7 @@ function quality(){
 }
 function resize(){const w=innerWidth,h=innerHeight,span=wideCamera?36:coarse?26:25;renderer?.setSize(w,h);if(camera){camera.left=-span*w/h/2;camera.right=span*w/h/2;camera.top=span/2;camera.bottom=-span/2;camera.updateProjectionMatrix();}}
 window.addEventListener('resize',()=>{resize();render();});
-function pose(p,e,dt,drive=0){p.group.position.set(e.x,0,e.z);p.group.rotation.y=(e.yaw||0)+Math.PI;p.worldSpeed=drive;poseHuman(p,game.time*7.5,drive>3?1:drive>.1?.6:0);}
+function pose(p,e,dt,drive=0){const speed=p.lastPosition&&dt>0?Math.min(15,Math.hypot(e.x-p.lastPosition.x,e.z-p.lastPosition.z)/dt):drive;p.lastPosition={x:e.x,z:e.z};p.poseTimeDivisor=7.5;p.group.position.set(e.x,0,e.z);p.group.rotation.y=(e.yaw||0)+Math.PI;p.worldSpeed=speed;poseHuman(p,game.time*7.5,speed>3?1:speed>.1?.6:0);}
 function drawMap(){
   const c=$('map').getContext('2d'),n=144,span=90,point=p=>[(p.x-game.player.x)/span*n+n/2,(p.z-game.player.z)/span*n+n/2];
   paintMap(c,n,point,false);
@@ -239,6 +242,7 @@ function step(dt){
     if(before!==game.mode&&['won','caught'].includes(game.mode)){finish();audio.tone(game.mode==='won'?590:100,.5);}
   }
   clock+=dt;
+  audio.update(game.heat,game.mode);
   if(player){
     const moving=Math.hypot(game.input.x,game.input.z)>.1&&game.mode==='playing';
     player.group.visible=!game.van.occupied;pose(player,game.player,dt,game.mode==='playing'?game.player.speed||0:0);
@@ -290,12 +294,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.0');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.15.1');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.0',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.1',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

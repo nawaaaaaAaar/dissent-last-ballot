@@ -8,8 +8,8 @@
 <meta name="description" content="An original mobile-first 3D resistance action city: explore central Delhi, choose rescue, courier and gathering operations, and build a network. Fictional encounters on OSM-derived streets.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./breakout.css?v=0.15.0">
-<link rel="stylesheet" href="./review-art.css?v=0.15.0">
+<link rel="stylesheet" href="./breakout.css?v=0.15.1">
+<link rel="stylesheet" href="./review-art.css?v=0.15.1">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
@@ -31,12 +31,13 @@
 </header>
 <section id="menu" class="screen">
 <div class="title-copy">
-<p class="eyebrow">A resistance action city / v0.14</p>
+<p class="eyebrow">A resistance action city / strict-review rework</p>
 <h1>Break the line.<br>Keep the account.</h1>
 <p class="lead">Rescue. Deliver. Hold your ground.<br>Drive between CP, Jantar Mantar and India Gate. Choose missions, earn support, return stronger.</p>
 <button id="start" class="primary" disabled>Loading the city…</button>
 <button id="tutorial" class="secondary">Controls &amp; winning route</button>
 <p id="loading" role="status">Preparing the 3D engine…</p>
+<p class="quiet">Illustrated cover. The playable city is real-time 3D, not this image.</p>
 <label class="setting">Graphics <select id="quality">
 <option value="auto">Auto</option>
 <option value="low">Mobile / low</option>
@@ -120,12 +121,12 @@
 <ol>
 <li>Start at CP. Your volunteer van is beside you. Action/E boards it, even before the mission objective is complete. Follow the gold radar route toward the operation. M or Map &amp; Missions opens the full map.</li>
 <li><b>Rescue:</b> exit near Jantar Mantar, evade or interrupt the guards, then Action/E near Kabir. Four strikes open the yellow line; bypassing it is also valid. Bring Kabir back to the van.</li>
-<li><b>Courier:</b> exit and walk over the gold dispatch at Tolstoy Marg or India Gate. Protect it and drive to the green destination. India Gate is a fictional network relay, not a claim of a current protest there.</li>
-<li><b>Rally:</b> arrive on foot and secure three different gathering points: regroup, aid, then the reading circle. Each takes eight cumulative seconds in its green zone. When the marker moves, you must reposition. Dodge red warning circles, strike to interrupt, and return to the zone. Leaving pauses progress rather than erasing it.</li>
+<li><b>Courier:</b> exit at Tolstoy Marg or India Gate and hold Action/E at the gold dispatch for 1.8 seconds. Damage interrupts copying; progress is retained. Protect it and reach the green destination. India Gate is a fictional relay, not a claim of a current protest there.</li>
+<li><b>Rally:</b> secure the first gathering for eight cumulative seconds with guards outside the circle. At the second point, clear space and hold Action/E for 2.8 seconds to restore aid. Then collect the two readers and lead both to the Jantar assembly on foot. Arriving alone does not finish the operation.</li>
 <li>For deliveries, lose sight of pursuers until heat is below one bar, then slow down at the destination. Gold medals reward keeping health and avoiding vehicle crashes, not a destruction tally.</li>
 <li>After a win, choose another job. Finish the three different operations to unlock the charter run. Repeating jobs changes guard approaches. Support credits buy strike tempo, van protection or running endurance. The next network cycle continues after the charter.</li>
 </ol>
-<p>Medkits restore health. On-foot health and vehicle condition can fail independently. Retry restores the latest rescue/boarding checkpoint within this tab. Some repeat runs put a red roadblock along the suggested route: bypass it, or exit and strike it open. There are no mandatory case quizzes and no real personal records.</p>
+<p>Medkits restore health. Volunteer support restores stamina, health and van condition once per job after you break pursuit. Retry restores arrival, rescue, mission-stage or boarding checkpoints within this tab. Some repeats add a roadblock: bypass it or use an abstract arcade strike. There are no real personal records or mandatory case quizzes.</p>
 <button id="help-close" class="primary">Back</button>
 </div>
 </section>
@@ -166,7 +167,7 @@
 </section>
 <a class="osm-credit" href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./breakout.js?v=0.15.0">
+<script type="module" src="./breakout.js?v=0.15.1">
 </script>
 </body>
 </html>
