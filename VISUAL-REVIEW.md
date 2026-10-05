@@ -1,5 +1,13 @@
 # DISSENT visual review
 
+## v0.14: gameplay-first city expansion
+
+The map now follows OSM roads and footprints instead of a invented grid. Actual rendered review shows recognisable CP ring-road geometry and the correct relative placement of Jantar Mantar and India Gate; it also exposes very plain block masses, coarse original monument models, little frontage detail and repeated generic characters. Geography is improved; photorealistic art is not.
+
+The full-map panel, local radar, mobile controls, active gathering ring and mission-state headings are reviewed through actual browser captures. Long display headings received explicit word spacing after phone review. Existing materials and actors are reused; this is not a new Indian character scan or a finished monument model.
+
+The next pass should author faces/clothing and interaction clips, replace generic extrusions with accurate street frontage, improve landmark silhouette/detail and populate the gathering with purposeful crowd behaviour. Physical-phone performance and Safari must be checked separately. Do not treat the attached gameplay images as promotional evidence of a realism target already reached.
+
 ## v0.13 play-feedback review
 
 Normal-time play made it difficult to identify the lead among overlapping officers. The lead now has a contrasting existing casual outfit and a teal ground ring; Kabir has a gold ring. Opponents maintain striking distance, separate from each other and show three nearby condition segments, with a brief colour change during interruption. Public phone combat and dual-stick captures show actual rendering of these changes.

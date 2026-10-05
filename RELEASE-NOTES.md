@@ -1,5 +1,16 @@
 # DISSENT release notes
 
+## v0.14: City of Accounts
+
+- Replaced the 112-unit fictional grid with connected OSM-derived central Delhi, including CP, Jantar Mantar and India Gate. Retained raw data, extraction script, database attribution and licence.
+- Added a mission board, rescue/courier/three-point gathering operations, an unlocked charter run, continuing network cycles, medals/bests, support credits, optional upgrades and export/restore save codes.
+- Added road-network guidance to the local radar and a labelled full map. Street-area mission anchors are approximate; event encounters and relays are fictional.
+- Preserved mobile dual-stick combat, vehicle boarding/exiting, directional driving, braking, line-of-sight search, damage and checkpoints.
+- Normal-time play caught unrescued Kabir being moved when exiting the van; fixed both exit and retry. Retry now restores a nearby pursuit instead of emptying the chase.
+- Touch review caught a stationary held-Strike rally completion; changed it to three separate eight-second gathering points that require repositioning.
+- Repeats change guard approaches; one return variant adds a roadblock. Later cycles slightly increase guard speed, capped at tier three.
+- Gameplay is the priority. Character/facade/combat-animation realism, physical phones, Safari and independent enjoyment remain unfinished. Earlier v0.13 results below are historical, not relabelled as new signoff.
+
 ## v0.13: Play review
 
 - Played the previous build in normal browser time, including a held-strike/dodge attempt and a rescue/boarding/fast-turn/brake attempt; documented observations in `PLAYER-REVIEW.md`.

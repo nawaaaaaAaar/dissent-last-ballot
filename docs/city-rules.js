@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.2';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.14.3';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -6,7 +6,7 @@ export const CONTRACTS=[
   {id:'witness',type:'rescue',title:'Bring the witness home',from:'jantar',to:'cp',reward:2,story:'Kabir carries testimony from the gathering. Get him out, keep the account safe, and build a route back to the network.'},
   {id:'signal',type:'courier',title:'Restore the signal',from:'tolstoy',to:'gate',reward:2,story:'Sana’s dispatch must reach a volunteer relay. Route choice and losing pursuit matter more than knocking everyone down.'},
   {id:'hold',type:'rally',title:'Hold the gathering',from:'sansad',to:'jantar',reward:3,story:'Reach the gathering and hold its space while people regroup. Resistance means preserving a place where accounts can be heard.'},
-  {id:'charter',type:'courier',title:'Replacement is not repair',from:'gate',to:'jantar',reward:4,story:'The network’s charter demands constitutional accountability, an end to contested SIR, and transparent inclusion support for every eligible voter. Carry it back to the assembly.'},
+  {id:'charter',type:'courier',title:'Replacement is not repair',from:'gate',to:'jantar',reward:4,story:'The charter demands Gyanesh Kumar’s departure through constitutional processes, an end to contested SIR, and transparent inclusion support for every eligible voter. Carry it back to the assembly.'},
 ];
 export class City{
   constructor(){
@@ -38,6 +38,7 @@ export class City{
     this.gate={x:source.x,z:source.z+8,w:8,hp:spec.type==='rescue'?4:0,fall:spec.type==='rescue'?0:1};
     const returnRoute=roadRoute(source,this.mission.destination);
     this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;
+    this.mission.zones=[source,snap({x:source.x+14,z:source.z-6}),snap({x:source.x-14,z:source.z+9})];
     this.spawn(source,spec.type==='rally'?3:spec.type==='rescue'?4:2);
     this.car.active=false;this.heat=0;this.checkpoint=null;this.mode='playing';
     this.say(spec.story,7);return true;
@@ -138,7 +139,7 @@ export class City{
     if(this.mode!=='playing'||!this.mission)return;
     const m=this.mission;
     const medal=this.player.health>=5&&this.crashes===0?'GOLD':this.player.health>=3?'SILVER':'BRONZE';
-    this.score+=Math.round(this.player.health*100+this.van.health*2+Math.max(0,480-this.elapsed));
+    this.score=Math.round(this.score+this.player.health*100+this.van.health*2+Math.max(0,480-this.elapsed));
     this.network.total++;this.network.credits+=m.reward+(medal==='GOLD'?1:0);
     if(!this.network.completed.includes(m.id))this.network.completed.push(m.id);
     this.network.bests[m.id]=Math.max(this.network.bests[m.id]||0,this.score);
@@ -166,19 +167,19 @@ export class City{
       const s=JSON.parse(atob(code.trim())),n=s.network;
       if(s.version!==1||!n||!Array.isArray(n.completed)||!Array.isArray(n.upgrades)||!Number.isInteger(n.credits)||n.credits<0||n.credits>100000||!Number.isInteger(n.total)||n.total<0||!Number.isInteger(n.cycle)||n.cycle<1||n.cycle>1000||typeof n.bests!=='object')return false;
       const bests={};for(const c of CONTRACTS)if(Number.isFinite(n.bests[c.id])&&n.bests[c.id]>=0)bests[c.id]=n.bests[c.id];
-      this.network={completed:n.completed.filter(id=>CONTRACTS.some(c=>c.id===id)),upgrades:n.upgrades.filter(id=>['tempo','reinforce','stamina'].includes(id)),credits:n.credits,total:n.total,cycle:n.cycle,bests};return true;
+      this.network={completed:[...new Set(n.completed.filter(id=>CONTRACTS.some(c=>c.id===id)))],upgrades:[...new Set(n.upgrades.filter(id=>['tempo','reinforce','stamina'].includes(id)))],credits:n.credits,total:n.total,cycle:n.cycle,bests};return true;
     }catch{return false;}
   }
   objective(){
     const m=this.mission;if(!m)return 'EXPLORE DELHI · open Missions to join the network';
-    if(m.type==='rally')return `HOLD THE GATHERING · ${Math.floor(this.hold)} / 24 s · wave ${this.wave+1}`;
+    if(m.type==='rally')return `${['REGROUP','PROTECT THE AID POINT','HOLD THE READING CIRCLE'][this.wave]} · ${Math.floor(this.hold)%8} / 8 s · ${this.wave+1} OF 3`;
     if(!this.record&&!this.van.occupied&&dist(this.player,m.source)>35&&dist(this.player,this.van)<6)return 'BOARD THE VAN · travel to '+PLACES.find(p=>p.id===m.from).name.toUpperCase();
     if(!this.record)return m.type==='rescue'?'RESCUE KABIR · clear or evade guards at Jantar Mantar':'RECOVER THE DISPATCH · step out of the van at the gold marker';
     if(m.type==='rescue'&&!this.van.occupied)return 'REGROUP AT THE VAN · bring Kabir with you';
     if(this.heat>=.7)return this.seen?'BREAK SIGHT · use the city blocks':'STAY HIDDEN · let the search cool';
     return 'DELIVER TO '+PLACES.find(p=>p.id===m.to).name.toUpperCase();
   }
-  target(){return this.mission?(this.mission.type==='rally'?this.mission.source:!this.record?this.mission.source:this.mission.type==='rescue'&&!this.van.occupied?this.van:this.mission.destination):PLACES[0];}
+  target(){return this.mission?(this.mission.type==='rally'?this.mission.zones[this.wave]:!this.record?this.mission.source:this.mission.type==='rescue'&&!this.van.occupied?this.van:this.mission.destination):PLACES[0];}
   update(dt){
     if(this.mode!=='playing')return;dt=Math.min(.05,dt);this.time+=dt;if(this.mission)this.elapsed+=dt;this.messageTime=Math.max(0,this.messageTime-dt);
     const p=this.player,v=this.van,i=this.input,mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));
@@ -221,9 +222,9 @@ export class City{
     else{this.hidden+=dt;this.phase=this.heat<.7?'clear':'search';if(this.hidden>4)this.heat=Math.max(0,this.heat-dt*.42);}
     const m=this.mission;
     if(m?.type==='rally'){
-      if(!v.occupied&&dist(p,m.source)<10){this.hold+=dt;this.score+=dt*10;}
+      if(!v.occupied&&dist(p,m.zones[this.wave])<5){this.hold+=dt;this.score+=dt*10;}
       const wave=Math.min(2,Math.floor(this.hold/8));
-      if(wave>this.wave){this.wave=wave;this.spawn(m.source,3+wave);this.say('Another wave. Dodge, interrupt, and keep the gathering together.');this.saveCheckpoint();}
+      if(wave>this.wave){this.wave=wave;this.spawn(m.zones[wave],3+wave);this.say('Point secured. Move to '+(wave===1?'the aid point':'the reading circle')+' before the next hold.');this.saveCheckpoint();}
     }
     if(this.readyWin())this.win();
     if(this.gate.hp<=0)this.gate.fall=Math.min(1,this.gate.fall+dt*2);

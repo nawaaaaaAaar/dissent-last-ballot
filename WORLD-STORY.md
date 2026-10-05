@@ -1,23 +1,19 @@
-# DISSENT: Breakout: story carried by play
+# DISSENT: City of Accounts
 
-This is the current v0.12 single-mission story. Earlier three-chapter material is retained in `WORLD-STORY-v11.md`, not presented as newly playable city content.
+The current game is a connected, replayable resistance action adventure in georeferenced central Delhi. Aman builds a network by preserving people, accounts and collective space; the political narrative travels through the consequences of playable operations rather than mandatory file quizzes.
 
-Aman joins a fictional gathering in a compressed Delhi-inspired neighbourhood. The crackdown begins before he can reach Kabir. Sana's recording is nearby; it must reach the support network with its witnesses, not replace them.
+## Operations and consequences
 
-## Break the separation
+- **Bring the witness home:** Kabir is separated during a fictional Jantar Mantar crackdown. Interrupt or evade opponents, open or bypass a line, rescue him and return together to CP after losing pursuit. A person and their account survive together.
+- **Restore the signal:** Sana’s dispatch is stranded around Tolstoy Marg. Recover it on foot and reach an invented volunteer relay near India Gate. The city journey and pursuit make the relay a mission, not just a slogan.
+- **Hold the gathering:** Regroup, preserve an aid point and support a reading circle in the Sansad Marg area. Each move changes the active defensive space. Collective participation has a playable cost and a tangible completion state.
+- **Replacement is not repair:** After the three operations, carry the wider reform charter from the India Gate relay toward the Jantar Mantar assembly. It rejects a resignation-only ending: constitutional leadership accountability, ending the contested SIR process, and transparent inclusion/review support for every eligible voter must travel together.
+- **Continue the network:** Earned support funds optional practical upgrades. Scores and medals invite mastery; changed guard approaches and a later pressure tier invite another attempt. There is no final claim that an actual official departed or an election was reversed.
 
-Players can fight to interrupt nearby crackdown units, dodge and run, break the yellow line or go around through another street. Kabir cannot be rescued with guards standing over him. Clearing space or drawing them away makes the rescue possible. The on-foot checkpoint is earned by that rescue.
+## Reference and fiction
 
-## Leave together
+The October 2 protest reference is Jantar Mantar and its reported approaches, including Sansad Marg; Tolstoy Marg appears in protest-related accounts in [The Tribune’s October 3 reporting](https://www.tribuneindia.com/news/delhi/over-1k-detained-in-delhi-as-protesters-demand-cecs-exit/amp). CP and India Gate serve fictional network roles, not unsupported claims of current vote-chori gatherings at those landmarks.
 
-The recording is recovered by direct contact. Kabir follows Aman toward a volunteer van. The vehicle will not start the escape with the person missing or the recording unsecured; regrouping is a play condition, not a line of dialogue.
+Street and footprint geometry is OpenStreetMap-derived, with attribution and the ODbL licence ([OpenStreetMap copyright guidance](https://www.openstreetmap.org/copyright/en-EN)). Distances are compressed, roads widened and monument art approximate. This is not a live movement map, an exact incident reconstruction, or a digital twin of all Delhi.
 
-## Do not bring pursuit home
-
-Once both are aboard, the patrol vehicle pursues them and a western roadblock constrains the shorter route. Buildings hide the van; exposed streets can renew sight. The player chooses turns, manages damage and waits for the search to clear before parking at the safe house. Vehicle disablement restores the earned boarding checkpoint on retry.
-
-## The network continues
-
-The ending connects the saved people/account to broader electoral inclusion and accountability, not a magical overthrow animation. It carries Gyanesh Kumar's departure through constitutional processes, ending the contested SIR process and transparent support for eligible voters beyond a resignation-only response. This hypothetical ending does not report an actual resignation, policy repeal, voter restoration or reversal of any election.
-
-Characters, clashes, records, rescue and outcome are invented. The state crackdown is the antagonist within that fiction; the current political context and official response are separately sourced in [CURRENT-MOVEMENT.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md). There is no real-person boss fight, assault spectacle or realistic sabotage tutorial.
+The movement research, allegations/responses and eligible-voter distinctions remain in [CURRENT-MOVEMENT.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md). The fictional network's demands do not become factual assertions about the Commission's conduct or policy outcomes. The previous small-world storyline is retained in `WORLD-STORY-v13.md`.

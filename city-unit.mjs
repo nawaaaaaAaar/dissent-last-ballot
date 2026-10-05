@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.14.2';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.14.3';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -48,6 +48,9 @@ check('building footprint and world boundaries block movement',()=>{
 });
 check('boarding retry restores pursuit and variant, not an empty world',()=>{
   const g=new City();g.start();g.accept('signal');g.record=true;g.interact();assert(g.car.active);const variant=g.mission.variant;g.carHit(100);assert.equal(g.mode,'caught');g.retry();assert(g.car.active);assert.equal(g.mission.variant,variant);assert.equal(g.van.health,100);assert.equal(g.heat,2);
+});
+check('rally marker changes and standing at the first point cannot finish',()=>{
+  const g=new City();g.start();g.accept('hold');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,g.mission.source);g.hold=7.99;g.update(.05);assert.equal(g.wave,1);const hold=g.hold;g.update(.05);assert.equal(g.hold,hold);assert.notEqual(g.target().x,g.mission.source.x);
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v14',{recursive:true});fs.writeFileSync('qa/v14/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

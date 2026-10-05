@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.14.2';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.14.2';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.14.3';
+import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.14.3';
 import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.12.0';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
 import {WorldAudio} from './world-audio.js';
@@ -28,7 +28,7 @@ function finish(){
   $('ending-kicker').textContent=game.mode==='won'?'THE NETWORK HOLDS':'THE RUN WAS INTERRUPTED';
   $('ending-title').textContent=game.mode==='won'?`${game.result.medal} · ${game.result.title}`:'Try another route.';
   $('ending-copy').textContent=game.mode==='won'?
-    `Operation complete. ${game.network.credits} support credits are available. Choose another job, improve your medal, or explore the city. The fictional network demands constitutional accountability, ending contested SIR, and transparent inclusion support for every eligible voter. This is not news of actual resignation, repeal or voter restoration.`:
+    `Operation complete. ${game.network.credits} support credits are available. Choose another job, improve your medal, or explore the city. The fictional network demands Gyanesh Kumar’s departure through constitutional processes, ending contested SIR, and transparent inclusion support for every eligible voter. This is not news of actual resignation, repeal or voter restoration.`:
     game.message+' Recovered recording and rescue/boarding checkpoints are retained within this tab, not after reload.';
   $('results').innerHTML=`<span>SCORE<br><b>${Math.round(game.score)}</b></span><span>JOB TIME<br><b>${Math.floor(game.elapsed/60)}:${String(Math.floor(game.elapsed%60)).padStart(2,'0')}</b></span><span>NETWORK<br><b>${game.network.total} jobs</b></span>`;
 }
@@ -207,7 +207,7 @@ function hud(){
   const next=guideRoute.find(q=>Math.hypot(q.x-p.x,q.z-p.z)>4)||t;
   $('direction').style.transform=`rotate(${Math.atan2(next.x-p.x,-(next.z-p.z))}rad)`;
   $('health').textContent='HEALTH '+Array.from({length:6},(_,i)=>i<p.health?'●':'○').join('');
-  $('stamina').style.width=p.stamina+'%';$('vehicle-status').textContent=game.van.occupied?`VAN ${Math.round(game.van.health)}% · ${Math.round(game.van.speed*3)} GAME km/h`:'ON FOOT · '+(game.friend.rescued?'KABIR WITH YOU':'FIND KABIR');
+  $('stamina').style.width=p.stamina+'%';$('vehicle-status').textContent=game.van.occupied?`VAN ${Math.round(game.van.health)}% · ${Math.round(game.van.speed*3)} GAME km/h`:'ON FOOT · '+(game.friend.rescued?'KABIR WITH YOU':game.mission?.type==='rescue'?'FIND KABIR':game.mission?.type==='rally'?'STAND TOGETHER':game.record?'DISPATCH SECURED':'EXPLORE');
   $('phase').textContent=game.phase.toUpperCase();$('heat-note').textContent=game.seen?'They can see you':game.heat<.7?'Route to safety is clear':`Out of sight · ${game.hidden.toFixed(0)} seconds`;
   $('heat-bars').innerHTML=Array.from({length:5},(_,i)=>`<i class="${i<Math.ceil(game.heat)?'on':''}"></i>`).join('');
   const n=game.nearby();$('action').hidden=!n||game.mode!=='playing';$('action').textContent=n?.label||'ACTION';
@@ -246,8 +246,8 @@ function step(dt){
     for(const [model,e] of [[van,game.van],[enemyCar,game.car]]){model.g.position.set(e.x,0,e.z);model.g.rotation.y=e.yaw+Math.PI;model.wheels.forEach(w=>w.rotation.y+=e.speed*dt/.43);}
     enemyCar.g.visible=game.car.active;recorder.visible=recordRing.visible=game.mission?.type==='courier'&&!game.record;
     recorder.position.set(WORLD.record.x,0,WORLD.record.z);recordRing.position.set(WORLD.record.x,.04,WORLD.record.z);
-    const zone=game.mission?.type==='rally'?game.mission.source:WORLD.safe;
-    safeRing.position.set(zone.x,.04,zone.z);safeRing.scale.setScalar(game.mission?.type==='rally'?2.1:1);safeRing.visible=!!game.mission&&(game.record||game.mission.type==='rally');
+    const zone=game.mission?.type==='rally'?game.target():WORLD.safe;
+    safeRing.position.set(zone.x,.04,zone.z);safeRing.scale.setScalar(1);safeRing.visible=!!game.mission&&(game.record||game.mission.type==='rally');
     medModels.forEach((m,i)=>m.visible=!game.supplies[i].taken);
     const t=game.target();arrow.position.set(t.x,3+.15*Math.sin(clock*3),t.z);arrow.visible=game.mode==='playing';
     safeRing.material.opacity=.5+.25*Math.sin(clock*2);
@@ -274,13 +274,13 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.14.2');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.14.3');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.14.2',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · BREAKOUT / 0.13 · ${renderer.info.render.calls} draws`;};
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.14.3',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:4});
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);
   }catch(e){$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=true;console.error(e);}

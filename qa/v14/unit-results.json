@@ -1,0 +1,17 @@
+{
+  "passed": 12,
+  "checks": [
+    "OSM map and georeferenced landmark relationships",
+    "exit and retry never teleport an unrescued witness",
+    "mission replacement requires abandon and charter requires three distinct jobs",
+    "winning grants once, supports replay and medal best",
+    "hot delivery and missing companion cannot complete rescue",
+    "support upgrade costs, duplicate rejection, stamina and reinforcement",
+    "save roundtrip, malformed input and version validation",
+    "three jobs unlock charter and completed charter advances cycle",
+    "rally requires time in zone on foot, outside pauses, not resets",
+    "building footprint and world boundaries block movement",
+    "boarding retry restores pursuit and variant, not an empty world",
+    "rally marker changes and standing at the first point cannot finish"
+  ]
+}

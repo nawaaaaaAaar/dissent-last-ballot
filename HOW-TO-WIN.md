@@ -1,28 +1,40 @@
-# DISSENT: Breakout: how to play and win
+# DISSENT: how to play and win
 
-Open [the game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and select **PLAY · Breakout**. The optional title guide explains the controls and freezes play when opened from Pause. This walkthrough describes the v0.13 action mission, not the archived three-chapter campaign.
+Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · City of accounts**. You begin at Connaught Place with the witness-rescue operation active and a volunteer van beside you. This guide describes v0.14, not the archived small-world mission.
 
-## Get through the crackdown
+## Controls
 
-- **Move toward the gold objective:** On desktop use W/up from your starting position; on a phone push the left stick upward. Shift or the phone stick's outer edge runs. Keep an eye on stamina.
-- **Handle opponents:** Your teal ring identifies Aman; Kabir has a gold ring. Opponent condition is shown in three segments, and red circles show an attack winding up. Dodge out with Q/Dodge, or hold Space/Strike to repeatedly interrupt nearby opponents. Mouse/right stick gives directional aim. Three successful hits disable one fictional opponent; missed strikes still have a short cooldown.
-- **Open or bypass the yellow line:** Stop close to it and strike four times. Each hit produces debris, and the line falls when its condition reaches zero. Alternatively, go around the building blocks through a side road. The animation is an abstract game interaction, not a real-world method.
+- **Phone:** Left stick moves or drives. Its outer edge runs on foot. The right stick aims and repeatedly strikes while held; the separate Strike button gives nearby aim assistance. Dodge makes a short burst. Action enters/exits the van or rescues Kabir. Release movement to slow the van; hold Brake or the right stick to stop faster.
+- **Desktop:** WASD/arrows move or steer, Shift runs, held Space strikes or brakes in the van, Q dodges, E interacts. Mouse aims; hold its left button on the world to strike repeatedly. P/Escape pauses. M opens Map & Missions.
+- **Navigation:** Gold is the objective and suggested street route. Green is a delivery destination or the active gathering zone. Red circles warn of incoming attacks; red bars on the radar show barriers. The small radar follows you; the mission board shows the full central-Delhi area.
+- **Driving:** You steer in world directions, not tank controls. Ease the stick toward the centre before tight turns and release/brake before parking. The route is guidance, not autopilot. A red roadblock may require a side route or an on-foot arcade strike.
 
-## Bring Kabir and the recording
+## The first operation: bring the witness home
 
-- **Rescue Kabir:** Follow the gold objective just beyond the line. Nearby guards must be disabled or lured away. When RESCUE KABIR appears, press E or tap Action. If it refuses, the toast tells you why.
-- **Pick up Sana's recording:** Walk over the gold circle beside him. The recording collects automatically; no quiz or document panel is required.
-- **Board together:** Head toward the volunteer van at the central crossing. Kabir follows Aman, but running too far ahead can leave him behind. Wait until he is close, then use ENTER VAN/E. Boarding requires the rescue, recording and companion proximity.
+Enter the van beside you with Action/E. Drive south and southwest from CP toward the Jantar Mantar marker, following the radar route rather than cutting diagonally across buildings. Brake near the marker and exit.
 
-## Escape in the van
+Approach Kabir. Interrupt nearby guards with strikes, dodge the red warning circles, or draw the guards away from him. If Action says he is still guarded, clear or lure the remaining nearby opponent and try again. The yellow line can be opened with four strikes, but going around it is valid.
 
-- **Steer in the direction you want to travel:** The left stick/WASD chooses world direction and accelerates. Steering is arcade-style, not a wheel-and-pedal simulation. Corner assist slows large heading changes; release the stick or use Brake before tight turns. Collisions can still disable the van.
-- **Choose a route:** The short western road gains a roadblock. You can exit and clear it through the game strike interaction, or take the longer east road. A reliable bypass is east at the central crossing, up the eastern road, west along the far crossing, then up the western road to the green circle.
-- **Lose pursuit:** Buildings hide you; open roads expose you. SEARCH means you are unseen, not already safe. Heat starts falling after four unseen seconds. Keep driving around blocks if pursuers catch sight of you again.
-- **Park to win:** Reach the green western safe-house circle with Kabir and the recording aboard, heat below one bar and low speed. Release movement or hold Brake/Space. If the search is still active, remain hidden or take another loop; touching the circle alone does not win.
+Use Action/E near Kabir once it is safe. His testimony is secured as part of the rescue; there is no separate compulsory case quiz. Return to your van and wait for him to catch up before boarding.
 
-## Recover from mistakes
+Drive back toward CP. The patrol follows while it can see you; buildings block sight. Stay hidden until the heat is below one bar, then slow down inside the green destination circle. Arriving while still pursued is not a win.
 
-Medkits restore health and stamina on foot. Health reaching zero or the van being disabled ends the attempt. Retry restores the latest rescue/boarding checkpoint within this tab; before either checkpoint, it starts a fresh attempt. Reloading clears this active run.
+## Other operations
 
-The ending score rewards remaining health, van condition and speed. There is no guaranteed route that avoids every opponent and no requirement to disable everyone. Preserving people and the recording is the objective. The fictional ending carries the movement's broader reform demands; it does not alter actual voter rolls or report an actual resignation.
+- **Restore the signal:** Drive to Tolstoy Marg. Exit and walk over the gold dispatch. Reboard, choose a route toward the fictional India Gate relay, lose pursuit and stop at the green destination. You may also deliver on foot, but walking the full distance is slower.
+- **Hold the gathering:** Drive to the Sansad Marg area and exit. Secure the regroup point for eight seconds on foot inside its green circle. The marker then moves to the aid point and finally the reading circle, each with its own eight-second hold and incoming opponents. Reposition between stages; holding Strike at the first point cannot finish the job.
+- **Replacement is not repair:** Complete the three distinct operations to unlock this charter run from India Gate back toward Jantar Mantar. Retrieve the dispatch on foot, protect it, lose pursuit and deliver it. Completion begins the next network cycle; it is a fictional story outcome, not news of actual policy change.
+
+## Keep playing without restarting the world
+
+After a win, choose **Choose the next operation**. You retain your location, van and earned network progress. Replay a job for a better score/medal or choose another job. Guard approaches vary, one return-route variant adds a roadblock, and later cycles slightly increase guard speed.
+
+Gold requires healthy completion without vehicle crashes; silver and bronze still count. Support credits buy Strike tempo, Reinforced van or Running endurance. These are optional, permanent network upgrades within your saved progress. Medkits near the three major landmarks restore condition once per operation.
+
+Open Map & Missions to explore or abandon an active job. Only one job runs at a time. An interrupted mission can be retried from its last earned rescue/boarding checkpoint; capture and vehicle failure do not delete network upgrades.
+
+## Save your progress for another visit or phone
+
+Open Map & Missions, choose **Export code**, and copy the code somewhere safe. On your next visit, paste it in the save box and press **Restore code**. It transfers completed-job progress, credits, upgrades and best scores, not your current position or active checkpoint.
+
+No automatic cross-device account or browser-storage save is promised. Do not close the tab without exporting if you want to keep newly earned progress. All records and encounters are invented; the map is compressed central Delhi with widened roads, not a real-world navigation tool.
