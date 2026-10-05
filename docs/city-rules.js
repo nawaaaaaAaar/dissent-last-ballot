@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.5';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.6';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -218,11 +218,11 @@ export class City{
     const p=this.player,v=this.van,i=this.input,mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));
     for(const k of['hurt','dash','dashCd','attack','attackCd','comboClock'])p[k]=Math.max(0,p[k]-dt);v.hurt=Math.max(0,v.hurt-dt);this.hitStop=Math.max(0,this.hitStop-dt);
     if(v.occupied){
-      let corner=0;if(mag>.12){const desired=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,desired));v.yaw+=turn(v.yaw,desired)*Math.min(1,dt*8);}
-      const desired=i.brake?0:mag*20*(corner>.35?Math.max(.27,Math.cos(corner)):1);
-      v.speed+=(desired-v.speed)*Math.min(1,dt*(i.brake?9:mag<.1?5:corner>.65?4.5:2));
+      let corner=0;if(mag>.12){const desired=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,desired));v.yaw+=turn(v.yaw,desired)*Math.min(1,dt*12);}
+      const desired=i.brake?0:mag*14*(corner>.35?Math.max(.22,Math.cos(corner)):1);
+      v.speed+=(desired-v.speed)*Math.min(1,dt*(i.brake?12:mag<.1?10:corner>.65?7:3.5));
       const travel=this.move(v,Math.sin(v.yaw)*v.speed*dt,Math.cos(v.yaw)*v.speed*dt,1.05);
-      if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.55,2,10));this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to coast, or Brake before the corner.',1.6);}
+      if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.35,2,5));v.speed=0;v.hurt=Math.max(v.hurt,2);this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to stop, then steer away from the wall.',1.6);}
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;if(this.friend.aboard){this.friend.x=v.x;this.friend.z=v.z;}
     }else{
       const sprint=i.sprint&&p.stamina>8&&mag>.1,speed=p.dash>0?15:sprint?6.8:4.6;
