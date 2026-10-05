@@ -1,5 +1,16 @@
 # DISSENT release notes
 
+## Strict-review rework
+
+- Reviewed the live game against a finished indie action standard, ranking all fifteen requested areas in `STRICT-REVIEW.md`, before changing it.
+- Reworked the opening, stamina-limited three-strike combat, shield openings, distinct opponent roles, readable committed attacks and late-dodge counterplay. Attacks and sprinting preserve dodge energy; release/repositioning recovers the meter faster.
+- Replaced passive vehicle contact damage with a warned, locked-direction ram and recovery. A cooled escape ends the patrol. Tuned the compact van's steering, braking, speed and wall impacts after failed normal-time and touch drives.
+- Changed gathering stages into securing space, held aid restoration and escorting two visible readers. Added held courier copying with damage interruption, arrival/stage checkpoints and useful one-use community support.
+- Corrected the underground CP station and separated pedestrian/vehicle routing. Adapted display footprints for usable street clearance, retaining original source geometry and honest geographic limits.
+- Added textured façade geometry, roofs/tanks, street signs, services, original autorickshaws, textured parks, 100 instanced street trees, animated ambient participants, textured rigged police, warmer lighting and camera cutaways. Menu/ending paintings are explicitly illustrations, not gameplay renders.
+- Added original synthesized music and movement/impact feedback, compact HUD and accessible close/overview view.
+- Actual failures led to further revisions, not just a version bump. See `QA.md` for version-specific replay scope. Realism, autonomous city life and independent player enjoyment still fall short; the art work is delivered now rather than postponed.
+
 ## v0.14: City of Accounts
 
 - Replaced the 112-unit fictional grid with connected OSM-derived central Delhi, including CP, Jantar Mantar and India Gate. Retained raw data, extraction script, database attribution and licence.

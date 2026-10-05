@@ -1,5 +1,9 @@
 # DISSENT: how to play and win
 
+The strict-review update reserves enough energy for one Dodge when you attack or sprint. If “Dodge energy reserved” appears, release Strike and move to recover rather than continuing to hold it. Balanced first-cycle encounters permit only one committed attack at a time; Hard and later cycles escalate this pressure.
+
+To end a vehicle pursuit, keep moving until you break sight, then remain unseen while the search cools. “Pursuit lost” means the patrol has stood down; you can return to the relay without that same patrol automatically restarting. The arcade van now brakes more quickly on release and has a lower top speed. Do not repeatedly push into a wall: release, turn away and accelerate again.
+
 Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · City of accounts**. The strict-review rework begins near the fictional Jantar street gathering, with the witness operation active. The observatory itself is a landmark, not the witness's standing position. This guide describes the default reworked city, not the archived versions.
 
 ## Controls

@@ -1,5 +1,15 @@
 # DISSENT visual review
 
+## Strict-review playable art pass
+
+The new art is in the playable renderer: textured plaster/brick/shutter/stone façades, roofs and tanks, separate paving and asphalt, scanned grass surfaces, 100 instanced licensed-tree adaptations, street signs, benches, lamps, support tents, original autorickshaws and animated ambient participants. Police use textured rigged human meshes with original uniform accessories. Warmer lighting and foreground-floor cutaways replace blank occluding masses as the default presentation.
+
+Actual capture review caught too-small newly instanced trees; their scale was corrected to roughly 6–8 game metres, with spacing and road/building clearance. This is authored approximate placement, not a claim about every real Delhi tree. Park textures and pedestrian materials were revised after the CP lawn looked like a broken asphalt grid.
+
+The high-quality target is still not met. Surface atlases do not supply accurate Delhi shopfront geometry; several trimmed footprint pieces remain awkward, landmark models are coarse approximations, crowds repeat faces and movements, and combat animation is additive rather than fully authored contact-timed performance. The current direction is more coherent and detailed, but should not be described as photorealistic, a scan reconstruction or finished production art.
+
+Generated title and ending illustrations are clearly labelled and excluded from visual-quality evidence. Use actual gameplay captures under `qa/v15/` and the final browser-client folders when comparing with the baseline.
+
 ## v0.14: gameplay-first city expansion
 
 The map now follows OSM roads and footprints instead of a invented grid. Actual rendered review shows recognisable CP ring-road geometry and the correct relative placement of Jantar Mantar and India Gate; it also exposes very plain block masses, coarse original monument models, little frontage detail and repeated generic characters. Geography is improved; photorealistic art is not.

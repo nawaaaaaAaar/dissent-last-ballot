@@ -35,7 +35,7 @@ Rank indicates impact on this game, not a measured universal score.
 ## Rework priorities
 
 - **Readable city first:** Correct the underground footprint, add pedestrian routes and a camera cutaway, and make navigation visible in the world rather than only on a tiny radar.
-- **A better encounter:** Put the opening near the first action, replace repetitive instant strikes with an animated stamina-limited sequence, distinguish opponent roles and limit simultaneous committed attacks.
+- **A better encounter:** Put the opening near the first action, replace repetitive unrestricted strikes with a stamina-limited sequence and additive attack poses, distinguish opponent roles and limit simultaneous committed attacks. Damage still uses an arcade trigger rather than a fully authored animation-contact pipeline.
 - **Different mission demands:** Separate copying under pressure, securing a gathering, aid support and escort instead of relying on repeated idle timers.
 - **Grounded visual direction:** Warm stone, brick and plaster façades, dark window recesses, roofs, paving, tree-lined streets, service spaces and clearer character silhouettes. Generated menu art is labelled illustration and never used as evidence of playable graphics.
 - **Recovery and purpose:** Arrival checkpoints, useful voluntary support stops, concise character context and rewards tied to mastery rather than destruction totals.
@@ -44,4 +44,27 @@ The positioning/crowd-control emphasis is a design reference, not a claim to rep
 
 ## Replay and remaining weaknesses
 
-Implementation and replay observations will be appended here only after the revised build is played. Unit tests, controlled simulations, normal-time exploratory play and public deployment verification will remain distinct.
+### What changed, and why
+
+- **Combat:** A three-strike stamina chain opens frontal shields on its finisher; flanking offers an alternative. Rush, guard and flank roles have visible committed attack tells. A late dodge creates a counterattack opening. The first operation limits simultaneous committed attacks. These create timing and positioning decisions instead of rewarding stationary held strikes alone.
+- **Mission structure:** Copying a courier dispatch requires a held action and damage interrupts it without erasing earned progress. The gathering mission now progresses from securing space to restoring aid, then leading two visible readers to the assembly. Arrival and stage checkpoints reduce repeated empty travel. These are different demands, not three renamed waiting circles.
+- **Driving and escape:** The van is more compact, turns faster, has a lower arcade top speed and stops faster on release/brake. Wall impacts are gentler. Patrols now telegraph a locked-direction ram, which can miss and requires recovery; passive overlapping no longer drains the vehicle. Losing sight and cooling the search ends the patrol, and quiet reboarding does not recreate it. This makes escape an achievable state, not an endless HUD timer.
+- **City and navigation:** The underground CP station is no longer an above-ground obstruction. Pedestrian paths, green-space polygons and vehicle-only routing are interpreted separately. Nearby foreground upper floors cut away, and street-level chevrons supplement the map. Source geography remains connected, but display footprints are adapted for arcade street clearance.
+- **Playable art:** A new façade atlas adds plaster, brick, shutters and stone to actual game geometry. Roofs and tanks, street signs, benches, lamps, volunteer spaces, original autorickshaws and animated ambient participants add identifiable spaces. Police now use textured rigged human assets with original uniform accessories. Smaller tree assets, warmer lighting, clearer attack sectors and character markers improve consistency and readability. Pale paths are distinct from asphalt.
+- **Presentation and sound:** The HUD is more compact, close/overview camera modes are accessible on phones, character context is delivered during actions, and original synthesized music, footsteps and impact sounds supplement the engine tone. Generated menu/ending paintings are labelled illustrations, not evidence of game graphics.
+
+### What the replays exposed
+
+The first revised rescue completed in normal browser time with Kabir and the account aboard, but that alone was not accepted as signoff. Further replays exposed a witness standing inside the observatory, an obstructed van placement, a rush attack that stopped short, expensive duplicated road caps, premature corner guidance and road/footprint mismatches. These were revised.
+
+The courier was reached and its held copy action was exercised through actual input. An attack interrupted copying at 83%; a later hold completed it. A subsequent drive failed, and retry retained the secured dispatch. This is evidence for that interaction and recovery, not a completed current courier mission.
+
+The later public rescue opened the shield encounter with a finisher and rescued Kabir without defeating every opponent. Its extraction then failed because the patrol could repeatedly drain the van during tight turns. The replacement warned ram was replayed: turns avoided multiple charges, a stationary arrival took one 12-condition hit, and an outer CP route broke sight. A separate phone-emulated drive still failed after overshooting a corner. These failures prompted further braking, steering and impact tuning; they are not relabelled as successful tests.
+
+### Remaining quality gap
+
+This is still below a finished indie action game's quality bar. Faces and outfits repeat; combat uses additive poses rather than a full authored choreography library; companions and crowds have limited autonomy; the city has no believable traffic simulation or authored interiors. Delhi landmarks are original approximations, not scans. There are only three reusable operation types, so medals and upgrades cannot establish long-term retention by themselves. Audio lacks convincing location recordings, voices and a developed score.
+
+Street interpretation and driving remain sensitive areas despite the corrections. Physical phones, Safari and independent first-time-player enjoyment are unverified. Software-rendered local Chromium was much slower than the cloud browser, so its timings are not used as a phone-performance claim.
+
+The next highest-impact work is **authored encounter spaces and reactive NPC behaviour, supported by proper contact-timed combat and traversal animation**. That would add meaningful choices and convincing human action, rather than another layer of mission markers or reward counters.

@@ -1,5 +1,25 @@
 # QA and limitations
 
+## Strict review rework: current scope
+
+The current source is the strict-review rework, not the historical v0.14 signoff below. Read `STRICT-REVIEW.md` for the ranked fifteen-area assessment, observed failures and design decisions.
+
+The current derivative retains 1,852 road/path ways, 785 above-ground source footprints and 124 green-space polygons. The displayed city uses 493 adapted footprint parts, with holes retained and street-clearance cuts; source footprints are preserved separately. These are database features, not authored interiors or an exact digital twin. Negative-layer/zero-above-ground underground station geometry is excluded. Vehicle guidance excludes pedestrian-only links.
+
+Fresh public baseline v0.14.3 was explored in ordinary browser time: collisions, unsuccessful foot navigation, fighting, capture/retry, rescue and return. It was not a completed baseline win. Normal-time controls and manually selected waypoint-assisted travel are identified separately from isolated tests; no browser positions, health, credits or objective flags were edited.
+
+Replays after the initial rework exposed and corrected obstructed witness/van placement, short rush reach, expensive road joins, animation timing, premature corner guidance, street/footprint clearance, unfair passive patrol contact, never-ending cooled pursuit, brittle driving, difficulty escalation and exhaustion removing the escape option. Failed driving attempts and incomplete courier/gathering runs are retained rather than counted as wins.
+
+The v0.15.6 core rescue completed in normal time on a publicly served pinned GitHub build: fight, rescue, recording, companion boarding, escape beyond CP, cooled search, patrol stand-down and return. It ended GOLD, score 1,543, player health 6 and vehicle condition 100. Travel used manually selected road waypoints through actual input; the return used CDP touch pointers. This is agent-assisted play, not an unaided player study or speedrun. The later changes keep that mission structure while reserving dodge energy and smoothing subsequent encounters.
+
+Earlier phone-emulated v0.15.4 checks exercised simultaneous move/aim touches, held strikes, camera toggle and 390×844 / 844×390 layouts without horizontal overflow. Its drive failed after a corner overshoot, which triggered handling revisions; it is not a passed complete mobile run. Physical iPhone/Android devices and Safari remain unverified.
+
+Thirty isolated rule checks pass in `qa/v15/unit-results.json`, including shield/finisher, dodge, energy reserve/recovery, held copying/interruption, stage checkpoints, both-reader completion, vehicle routes, one-use support, failure abandonment, passive-contact removal, warned charges/counter-steering, first-cycle commitment limits and cooled-pursuit stand-down/reboarding. Rule tests stage state and do not measure fun.
+
+The supplied deterministic browser client separately exercised movement and strikes on the final source; its captures/state files are under `qa/v15-final158-client/` and subsequent final-client folders. Deterministic stepping is not a frame-rate or enjoyment measurement. Cloud gameplay observed approximately 45–60 FPS in several scenes after loading; local software-rendered Chromium was much slower. Neither establishes a physical-phone performance guarantee.
+
+Final replay and deployment observations are appended below after verification. Older sections are retained as history, not current-version claims.
+
 ## v0.14 City of Accounts
 
 This is a connected-city and gameplay-loop revision, not a final graphics approval. The raw OpenStreetMap extract and derivative map are retained, with 1,269 road ways and 786 building footprints. Those are data features, not 1,269 distinct named streets or 786 authored interiors. Geography is uniformly compressed, roads widened, building heights approximated and traffic rules simplified.

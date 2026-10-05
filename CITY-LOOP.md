@@ -1,5 +1,7 @@
 # DISSENT: a city and a reason to return
 
+Current design supersedes the original three waiting circles: the gathering now requires securing its space, holding an aid action, then escorting two readers to the assembly. Courier copying is held and interruptible. Combat, driving, pursuit, art and city interpretation have been substantially reworked after play review; see [the strict review](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/STRICT-REVIEW.md) and [current QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md). The historical plan below explains the network loop, not final-art approval or proof of retention.
+
 v0.14 is a gameplay-first iteration. The goal is a short-session resistance action adventure that remains playable after one win, not a mission checklist disguised as a city. The substantial character, animation and environment-art pass is deliberately deferred.
 
 ## The design decision
