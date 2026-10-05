@@ -1,5 +1,13 @@
 # DISSENT: making the resistance story playable
 
+## v0.8: choose the game before adding features
+
+The current identity is a mobile-first third-person resistance adventure with three bounded explorable districts. The complete further research, source distinctions, mobile rationale and implementation decisions are in [DISSENT: what game are we making?](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md). The history below records earlier iterations, not proof that the current game has passed human enjoyment testing.
+
+Breakthrough, two-person escort and community sustain demand different decisions. Shared movement, health, stamina, dodge and held interactions reduce relearning; objective direction and mission review clarify the critical path. Helping people has a later mechanical consequence through one emergency recovery, not merely a score label.
+
+The phone interface prioritises two thumbs: outer joystick runs, camera drag aims the view, contextual Action changes with the nearby task, and secondary notes are behind the map. Three authored areas provide a varied campaign without pretending that a small project has produced a fully populated seamless Delhi.
+
 ## v0.7 correction: action before exposition
 
 The creator's response to v0.6 was “Make it game actually.” Its mechanics passed functional tests, but too much of the experience still consisted of walking to markers and confirming dialogue. The default mode is now a short action chapter: immediate pursuit → recorder recovery → held barricade interaction → Kabir → assembly, with optional hold-to-help rescues along the way.

@@ -1,12 +1,14 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "private": true,
+  "type": "module",
   "description": "Explorable third-person protest-world chapter with mobile controls",
   "scripts": {
     "start": "python -m http.server 5173 --directory docs",
     "test": "node world-qa.mjs",
     "test:action": "node action-qa.mjs",
+    "test:campaign": "node campaign-qa.mjs",
     "test:runner": "node run-qa.mjs"
   },
   "dependencies": {

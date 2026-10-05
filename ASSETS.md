@@ -1,5 +1,12 @@
 # Asset provenance
 
+## v0.8 authored districts and texture variations
+
+- **District geometry:** Campus blocks, symbolic arched entrance, market façades, canopy, mats, bunting, stations and layout are project-authored in `docs/districts.js`. They reuse the credited surface materials below. No new news photographs, real participant portraits or survey data are incorporated.
+- **Clothing palette derivatives:** `docs/people.js` makes three cached colour variations from the selected Rocketbox male body's existing knit texture. Existing texture detail and separate face materials are retained; this is a runtime derivative under the source MIT licence, not newly scanned clothing or a new human asset.
+- **Gameplay and interface:** District campaign records, companion navigation, support objectives, map, mobile controls and camera collision are original code. Existing avatar, tree, HDR and scanned-material provenance remains unchanged.
+- **Historical distinction:** Jamia and Shaheen Bagh are reference-inspired settings drawing on 2019–2020 history, not documentary recreations or a claim of a current sit-in. Research context and limitations are in [DESIGN-REBUILD.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md).
+
 ## v0.6 textured humans and locomotion
 
 - **Source library:** [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox), MIT licence. Selected Male Adult 02 and Female Adult 04 clothed avatars, diffuse/normal/opacity textures, and compatible `m_idle_breathe_01`, `m_walk_neutral_01`, `m_run_neutral_01` animation FBXs. Original selected files are in `art/rocketbox-source/`; copyright and permission notice are retained at `docs/assets/ROCKETBOX-LICENSE.txt`.

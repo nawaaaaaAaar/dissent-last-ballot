@@ -1,5 +1,17 @@
 # QA and limitations
 
+## v0.8 three-district campaign
+
+`npm run test:campaign` exercises actual keyboard, mouse and touch input with deterministic simulation stepping. The campaign checks cover Jantar Mantar completion, both campus companions arriving together, all three community stations and the sustain objective, completed-campaign persistence, district replay, mobile walk/outer-stick run, Dodge, pause/resume, camera drag, map/journal navigation and portrait/landscape fit. The final suite also checks that menu Resume retains the unfinished player's position.
+
+`qa/v08/results.json` and `qa/v08/` captures record this campaign scope. The emergency network recovery is additionally tested in an isolated `ActionGame.damage` unit check; that is not presented as an end-to-end phone combat test. Action and slower-story regressions also passed after the district rebuild, including capture/retry, stamina, held rescue and both legacy handoffs. Their logs are `qa/v08-action-test.log` and `qa/v08-story-test.log`; older regression capture paths were refreshed and should not be mistaken for historical art.
+
+Actual-render review found white floors despite loaded texture assets: two differently versioned imports created separate material-library instances. Sharing the same module URL restored textured district surfaces. Review also found a carried running pose at a new mission's entrance; explicit animation reset corrected it. Subsequent captures show the corrected engine rendering, not generated promotional imagery.
+
+The test harness waits for models and supports deterministic stepping because software-rendered browser tests can be slow. Running three GPU-heavy suites together exhausted two tool wait windows; durable child-process logs subsequently recorded successful completion. Final campaign checks are run serially. Neither automated simulation time nor these tool timings establish real-device frame rates, load-time targets or human completion times.
+
+Phone coverage is Chromium emulation, not a physical iPhone/Android or Safari test. Crowd behaviour, facial acting, foot-contact IK, authored jumping/dodging, exact geography and production-quality destruction remain unfinished. No novice playtest has established ordinary-player enjoyment. Browser-local completed-campaign storage can be cleared or denied; denied storage does not block play, and current action missions do not resume after reload.
+
 ## v0.7 Break Through
 
 The final public frontend `27c687c` / `world.js?v=0.7.1` was completed in cloud Chromium with actual keyboard and mouse input: an optional rescue, recorder pickup, held breakthrough, Kabir and the assembly produced `won` with score 1796 and four remaining health pips. The organiser reached the courtyard rather than remaining at the rescue marker. Public phone emulation separately passed touch movement, Dodge, held rescue and pause/resume, with portrait/landscape captures. `qa/v07/public-results.json` and `public-*` images retain these observations; simulation time is not a novice completion-time benchmark.

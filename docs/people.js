@@ -4,6 +4,23 @@ import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
 
 let male,female;
+const wardrobe=new Map(),knitColors=[[113,137,124],[132,113,99],[100,118,141]];
+function knitTexture(source,variant){
+  const key=source.uuid+':'+variant;if(wardrobe.has(key))return wardrobe.get(key);
+  try{
+    const c=document.createElement('canvas');c.width=source.image.width;c.height=source.image.height;
+    const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(source.image,0,0);
+    const pixels=ctx.getImageData(0,0,c.width,c.height),rgb=knitColors[variant];
+    for(let i=0;i<pixels.data.length;i+=4){
+      const r=pixels.data[i],g=pixels.data[i+1],b=pixels.data[i+2],hi=Math.max(r,g,b),lo=Math.min(r,g,b);
+      if(r>105&&g>100&&b>85&&(hi-lo)/Math.max(1,hi)<.25){
+        const light=(r+g+b)/3/180;
+        for(let j=0;j<3;j++)pixels.data[i+j]=Math.min(255,rgb[j]*light);
+      }
+    }
+    ctx.putImageData(pixels,0,0);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.flipY=source.flipY;t.wrapS=source.wrapS;t.wrapT=source.wrapT;t.anisotropy=source.anisotropy;wardrobe.set(key,t);return t;
+  }catch{return source;}
+}
 export async function loadPeople(asset){
   const loader=new GLTFLoader();
   const results=await Promise.all([loader.loadAsync(asset('male-animated.glb')),loader.loadAsync(asset('female-animated.glb')),loadHuman(asset('courier-clothed.glb'))]);
@@ -17,6 +34,7 @@ export function human(color,police=false,options={}){
   model.traverse(o=>{
     if(!o.isMesh)return;o.castShadow=o.receiveShadow=true;
     const fix=m=>{m=m.clone();m.color.set('#ffffff');m.roughness=.83;m.metalness=0;
+      if(m.name==='m003_body'&&m.map&&color.toLowerCase()!=='#a86137')m.map=knitTexture(m.map,parseInt(color.slice(-3),16)%3);
       if(m.name.includes('opacity')){m.transparent=false;m.alphaTest=.4;m.depthWrite=true;m.side=THREE.DoubleSide;}
       return m;};
     o.material=Array.isArray(o.material)?o.material.map(fix):fix(o.material);
@@ -40,4 +58,10 @@ export function poseHuman(p,t,running=0,gesture=0){
   p.actions.Walk?.setEffectiveTimeScale(Math.max(.25,speed/1.012));
   p.actions.Run?.setEffectiveTimeScale(Math.max(.4,speed/2.88));
   p.mixer.update(dt);
+}
+export function resetHuman(p){
+  if(!p?.rocket)return;
+  p.lastTime=null;p.worldSpeed=0;p.blend={Idle:1,Walk:0,Run:0};
+  for(const [name,a]of Object.entries(p.actions)){a.reset().play();a.enabled=name==='Idle';a.setEffectiveWeight(name==='Idle'?1:0);a.setEffectiveTimeScale(1);}
+  p.mixer.update(0);
 }

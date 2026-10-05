@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.8: A City of Accounts
+
+- Defined a mobile-first third-person resistance adventure with three distinct mission structures, rather than expanding the runner or adding more dialogue errands. Research and implementation decisions are in [DESIGN-REBUILD.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md).
+- Added a City map, Jantar Mantar breakthrough, Jamia-inspired two-person campus escort, and Shaheen Bagh-inspired community-support mission. Locations are separate authored approximations, not a seamless real-world map or one verified historical event.
+- Added obstacle-aware companion paths and group-arrival requirements. Campus completion requires both companions at the gate and destination; the community mission requires three stations and an uncontested sustain period.
+- Added completed-mission persistence, best-score/help records, replay, next district and one health recovery from a network strengthened in another completed district. In-progress action checkpoints remain in-session only.
+- Simplified phone play: outer joystick travel runs; camera drag, Jump, Dodge and a contextual Action remain under two thumbs. Secondary notes live behind the map; objective direction/distance and mission review reduce ambiguity.
+- Added knit palette variants using the existing licensed textures, revised crowd clustering, reset animation poses, shared material-instance correction, garden access, landmark/gate collision and an occlusion-aware camera. No new realistic faces, bespoke garments or authored jump/dodge clips are claimed.
+- Retained the slower branching story and archived runner. Physical-device performance, Safari support, novice enjoyment and the requested photorealistic production standard remain unverified or unfinished.
+
 ## v0.7: Break Through
 
 v0.7.1 adds visible movement toward shelter after optional rescues, with reset on a new run. A tested arrival-threshold correction prevents the evacuee from stopping before the courtyard turn.

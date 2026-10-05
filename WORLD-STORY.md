@@ -1,5 +1,19 @@
 # DISSENT: The Account
 
+## Current campaign: A City of Accounts
+
+The v0.8 default is a three-district resistance adventure. Aman is useful to a network, not an invulnerable lone saviour. Its connection is fictional narrative progression across separate places and historical inspirations, not a claim that the incidents occurred on one day.
+
+- **Break through / Jantar Mantar:** Protect the recorder, open the fictional line, reunite with Kabir and reach the assembly. Optional help changes health, score and the network.
+- **Leave together / Jamia-inspired campus:** Regroup Mira and Kabir, navigate the campus, open the exit with both present, then arrive together. Going alone is not success.
+- **Keep the gathering / Shaheen Bagh-inspired street:** Choose the order of kitchen, aid and reading-circle support. Participants move toward the gathering; keep stations uncontested long enough to sustain it, then complete the assembly handoff.
+
+An earlier completed district's help provides one emergency health recovery in another mission. That is a concrete game consequence of solidarity, not a claim that survival or political accountability is guaranteed. The final handoff records what the group kept together; it does not announce that the state has fallen or that disputed allegations are judicially proven.
+
+The City map supports district selection and replay. Optional people/accounts notes and mission brief review remain available without compulsory dialogue interruptions. The older two-destination story below is separately selectable, not a branch of every campaign mission. See [the thematic research and design](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md).
+
+## Earlier branching chapter
+
 In v0.7 this branching narrative is selected with **Explore the slower story chapter**. The default **PLAY · Break through** mode is a separate action route: recover the recorder under immediate police pressure, help optional people, hold the barricade action, bring Kabir with you and reach the assembly. It has score/rank replay rather than the two handoff branches described below.
 
 Chapter one is an explorable fictional resistance story in a compressed Jantar Mantar setting. Aman arrives looking for Kabir and discovers that finding a friend means becoming useful to a gathering under state pressure. The journalist's account becomes a responsibility, not a collectible trophy.

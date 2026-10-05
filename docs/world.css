@@ -23,3 +23,32 @@
 @media(max-height:500px){.map-wrap{top:0}.objective small{font-size:9px}.rally-modal .dialog-panel{margin-bottom:0}.rally-track{margin:12px 0}.rally-modal p{font-size:13px}}
 body.action-play .status{display:none}.action-buttons button{padding:6px;font-size:11px;line-height:1.25;overflow-wrap:normal}
 @media(max-width:700px){.action-buttons button{font-size:10px}}
+.city-panel{max-width:760px}.district-cards{display:grid;gap:12px}.district-card{text-align:left;padding:18px;display:grid;gap:8px;min-height:124px}.district-card>span{font-size:11px;letter-spacing:.1em;color:var(--accent)}.district-card strong{font:600 24px var(--display)}.district-card p{margin:0;font-size:16px;line-height:1.45;color:var(--muted)}.district-card small{font-size:12px;color:#a9c0a5}.city-disclosure{font-size:12px!important;line-height:1.5!important;margin:16px 0!important}
+.waypoint-line{display:flex;align-items:center;gap:10px}.waypoint-line #waypoint-arrow{font-size:24px;display:block;color:var(--accent);width:22px;text-align:center}.waypoint-line small{font-size:12px;max-width:270px}
+body.action-play #inventory,body.action-play #action-hud>div:last-child{display:none}body.action-play .camera-hint{opacity:.7}
+#action-hud{gap:22px}#action-warning{top:210px;font-size:12px}
+@media(pointer:coarse),(max-width:700px){
+  body.action-play #sprint{display:none}
+  body.action-play #joystick{width:120px;height:120px;border:2px solid rgba(213,167,120,.55)}
+  body.action-play .action-buttons button{width:66px!important;height:66px;font-size:12px}
+  body.action-play .interact{left:auto;right:16px;bottom:108px;transform:none;width:140px;min-width:0;min-height:60px;font-size:14px;padding:10px}
+  body.action-play #action-hud{left:16px;right:auto;bottom:164px;padding:10px 14px;gap:20px}
+  body.action-play #toast{bottom:234px;width:calc(100% - 32px);font-size:14px}
+  body.action-play .map-wrap{display:none}
+  body.action-play .objective strong{font-size:16px;max-width:310px;line-height:1.35}
+  body.action-play .objective span{font-size:11px}
+  body.action-play .objective small{font-size:12px}
+  body.action-play .camera-hint{bottom:140px;font-size:10px}
+  .top-actions button{min-width:44px;min-height:44px;font-size:11px}
+  .district-card strong{font-size:22px}.district-card p{font-size:16px}.city-panel{padding:20px}
+}
+@media(max-height:500px){
+  body.action-play #joystick{width:96px;height:96px}
+  body.action-play .action-buttons button{height:58px;width:62px!important}
+  body.action-play #action-hud{left:16px;bottom:124px;padding:8px 10px;gap:14px}
+  body.action-play .interact{bottom:91px;right:16px;width:140px;min-height:52px}
+  body.action-play #toast{bottom:30px;max-width:400px;font-size:13px}
+  body.action-play .camera-hint{bottom:103px;font-size:9px}
+  body.action-play .objective strong{font-size:14px;max-width:430px}
+  #action-warning{top:166px}
+}

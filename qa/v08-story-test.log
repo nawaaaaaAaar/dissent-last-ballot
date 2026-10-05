@@ -1,0 +1,13 @@
+
+> dissent-last-ballot@0.8.0 test
+> node world-qa.mjs
+
+Completed encounter: organiser
+Completed encounter: aid
+Completed encounter: witness
+Completed encounter: barrier
+Completed encounter: companion
+Completed encounter: assembly
+Completed encounter: organiser
+Completed encounter: aid
+{"pass":true,"checks":["jump and pause/resume preserve position","optional fragment, journal assist adjustment and local checkpoint after reload","optional protest event","capture and story checkpoint recovery","supplies, recorder recovery, rhythm misses/hits, companion help and public-story ending","restart clears story; orbit camera changes heading","protected-record branch, assist rhythm skip and companion-absent ending","journal open/close","real touch joystick, camera drag, jump, run, sound after swipe, pause/resume; portrait and landscape fit"],"errors":[]}

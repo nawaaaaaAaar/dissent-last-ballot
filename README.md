@@ -1,10 +1,31 @@
 # DISSENT: The Last Ballot
 
-A third-person, explorable resistance-story chapter in a source-referenced Jantar Mantar setting. The runner has been replaced as the main game; its earlier version remains available as an archive.
+A mobile-first, third-person resistance adventure across three freely explorable, reference-inspired Delhi districts. The runner is an archive, not the main game. **v0.8: A City of Accounts** is an implemented campaign prototype, not a finished photorealistic release.
 
-## Play
+## What game is this?
 
-Open [DISSENT on GitHub Pages](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a WebGL 2 browser. No account or installation is required. The current version is **v0.7: Break Through**, a development build, not a finished photorealistic release.
+Explore, orient yourself, help people, and act under pressure. Each district changes the central challenge rather than reskinning the same chase:
+
+- **Jantar Mantar / Break through:** Recover the recorder, open a fictional barricade, reunite with Kabir and reach the assembly. Optional rescues trade time and risk for health and a stronger network.
+- **Jamia-inspired campus / Leave together:** Regroup Mira and Kabir, navigate around campus buildings, bring both to the gate, open it and arrive together. Companions use obstacle-aware paths; reaching the destination alone does not complete the mission.
+- **Shaheen Bagh-inspired street / Keep the gathering:** Support the kitchen, aid point and reading circle in any order. Sustain all three for twenty uncontested game seconds, then reach the assembly. Supported participants move toward the gathering.
+
+The City map lets you choose or replay a district. Completing missions advances the campaign; helping people in another completed district grants one emergency health recovery in a later mission. Best scores and help records persist in this browser when storage is available. Active action-mission checkpoints remain in-session only.
+
+These are separate authored spaces, not a continuous or survey-accurate Delhi map. Jamia and Shaheen Bagh draw on the 2019–2020 protest history; they are not claimed to be currently active gatherings, or part of the same historical day as the Jantar Mantar reporting. Characters, encounters and outcomes are fictional. The narrative opposes state repression without turning contested allegations into proven facts or offering real-world sabotage instructions. Read [the research, thematic distinctions and design decisions](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/DESIGN-REBUILD.md).
+
+## Current controls and verification
+
+- **Phone:** Left thumb moves; pushing the joystick toward its outer edge runs automatically. Right thumb drags the world to turn the camera. Jump, Dodge and the nearby contextual Action button cover the remaining frequent inputs. Hold Action for rescues and gate interactions. City map and pause keep secondary information out of the live controls.
+- **Desktop:** WASD/arrows move, Shift runs, Space jumps, Q dodges, E interacts or holds the nearby action. Drag to turn the camera. The on-screen Run toggle is available on desktop.
+- **Progress and guidance:** A directional objective and distance identify the current task. The City map contains mission selection and optional people/accounts notes. Pause can review the mission brief; returning to the menu and choosing Resume retains the current unfinished run.
+- **Tests:** `npm run test:campaign` covers the three-mission campaign, companions, persistence/replay/resume and portrait/landscape touch controls. `npm run test:action` and `npm test` retain action and slower-story regressions. Install with `npm ci` and `npx playwright install chromium`, then `npm start`.
+
+The three districts share licensed human meshes, scanned materials and runtime assets. Knit-colour variants, revised crowd clusters, camera collision and animation resets improve presentation; repeated faces, simplified police, basic buildings and missing authored jump/dodge clips remain obvious production gaps. Browser-emulated mobile inputs do not establish physical-phone performance or Safari compatibility. No ordinary-player enjoyment study has yet been conducted; see [QA](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) and [visual review](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/VISUAL-REVIEW.md).
+
+## Earlier single-district modes
+
+Open [DISSENT on GitHub Pages](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a WebGL 2 browser. No account or installation is required. The following describes the retained v0.7 action route and v0.6 slower story, not the complete v0.8 campaign.
 
 **PLAY · Break through** starts the new action chapter. Police pressure is active immediately. Recover the recorder, hold Action/E at the line, get Kabir moving and reach the assembly. Dodge red warning zones with Q or the touch button; sprint uses stamina, and jump clears fallen barriers. Optional hold-to-help rescues restore health and add score. The ending awards a run rank using time, health and people helped. No story-dialogue confirmation is required in this mode.
 

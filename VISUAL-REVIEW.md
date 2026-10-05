@@ -1,5 +1,15 @@
 # DISSENT visual review
 
+## v0.8 district and readability review
+
+`qa/v08/jamia-arrival.png`, `shaheen-arrival.png`, `mobile-campus.png` and `mobile-market-landscape.png` are actual engine captures. The campus has an original arched entrance, two building blocks, a contested exit and routes around obstacles. The community street uses opposing shopfronts, communal mats, stations, canopy and overhead lines. These are reference-inspired, not scans or exact architectural reconstructions.
+
+The first district review exposed untextured white floors caused by duplicate material-library module instances. The imports were unified and the captures regenerated. A running pose carried into the next mission was also corrected with animation reset. Crowd groups were moved toward foreground activity and gathering stations; three cached knit-colour variants reduce identical-shirt repetition without claiming new people or clothing meshes.
+
+Live mobile UI now removes a separate Run button, score/time clutter and repeated inventory readouts. The outer joystick runs, short contextual captions fit action controls, and secondary accounts sit behind the map. Camera collision draws the view forward when buildings, buses or landmark blocks would obstruct it. This is a readability and layout pass, not a photorealism certificate.
+
+Repeated faces, generic wardrobe, simplified police, sparse crowd animation, flat building silhouettes and missing authored jump/dodge clips remain below the requested real-world-looking standard. No new numerical quality score or production-readiness claim is assigned. Physical-phone performance and novice enjoyment still require real testing.
+
 ## v0.6 character and motion pass
 
 Textured MIT-licensed Rocketbox adults replace the student and non-police participants. Compatible idle/walk/run FBXs were retargeted onto each avatar's rest skeleton, root XY movement removed, and 1K WebP textures embedded in the GLBs. The source files, converter, editable Blender scenes and copyright notice are retained. [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox).

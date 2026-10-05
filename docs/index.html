@@ -2,51 +2,57 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171d1c"><title>DISSENT | The Account</title>
-<meta name="description" content="An explorable fictional resistance story around a source-referenced Jantar Mantar setting. Real-time 3D, desktop and touch controls.">
+<meta name="theme-color" content="#171d1c"><title>DISSENT | A City That Still Speaks</title>
+<meta name="description" content="A mobile-first third-person resistance adventure across Jantar Mantar, a Jamia-inspired campus and a Shaheen Bagh-inspired gathering. Three fictional missions in real-time 3D.">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./world.css?v=0.7.1">
+<link rel="stylesheet" href="./world.css?v=0.8.0">
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
 </head>
 <body>
 <div id="viewport" aria-label="Explorable 3D protest world"></div><div id="vignette"></div>
 <header class="topbar">
-  <a class="brand" href="./concept.html" aria-label="Dissent design dossier"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<small>JANTAR MANTAR / WORLD 0.7</small></span></a>
-  <div class="top-actions"><button id="journal" title="Journal / J">Journal</button><button id="sound">Sound off</button><button id="pause" hidden>Pause</button></div>
+  <a class="brand" href="./concept.html" aria-label="Dissent design dossier"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span>DISSENT<small id="district-label">JANTAR MANTAR</small></span></a>
+  <div class="top-actions"><button id="journal" title="City map / journal" disabled>City map</button><button id="sound">Sound off</button><button id="pause" hidden>Pause</button></div>
 </header>
 <section id="menu">
   <div class="menu-copy">
     <p class="eyebrow">A fictional resistance story / New Delhi</p>
     <h1>The street<br>is still ours.</h1>
-    <p class="lede">The police line is closing.<br>Recover the recorder. Get Kabir out. Reach the assembly.</p>
+    <p class="lede">Three districts. One resistance network.<br>Break the line. Keep people together. Hold the space.</p>
     <button id="start" class="primary" disabled>Preparing the world…</button>
+    <button id="city-map-start" class="secondary" disabled>Choose a district</button>
     <button id="story-start" class="secondary" disabled>Explore the slower story chapter</button>
     <button id="continue" class="secondary" hidden>Continue from your story checkpoint</button>
     <p id="loading" role="status">Loading the 3D engine…</p>
     <div class="settings"><label>Graphics <select id="quality"><option value="auto">Auto</option><option value="low">Mobile / low</option><option value="high">High / ambient occlusion</option></select></label><label><input type="checkbox" id="reduced"> Reduced motion</label><label><input type="checkbox" id="storymode" checked> Story assist</label></div>
-    <details><summary>How to play</summary><p>Desktop: WASD/arrows move, Shift runs, Space jumps, Q dodges, E acts. Hold E near people to help or at the barricade to break through. Drag to turn the camera. P/Escape pauses; J opens the journal.</p><p>Phone: left joystick moves; drag the world to look. Run uses stamina. Tap Dodge to evade, and hold nearby Action buttons to help or break through. Recover the recorder, get Kabir moving and reach the assembly. Story assist slows police. The separate story mode offers dialogue choices and a rhythm skip.</p></details>
+    <details><summary>How to play</summary><p>Desktop: WASD/arrows move, Shift runs, Space jumps, Q dodges, E acts. Hold E near people to help or at the barricade to break through. Drag to turn the camera. P/Escape pauses; J opens the City map.</p><p>Phone: left joystick moves; push toward its outer edge to run. Right thumb drags the world to look. Tap Dodge or Jump, and hold the nearby Action to help or open a gate. Follow the current objective: protect the recorder, escort both companions, or support and sustain the gathering. City map selects districts and opens optional accounts. Story assist slows police; the separate slower story offers dialogue choices and a rhythm skip.</p></details>
     <p class="disclosure">Rendered live in 3D. A source-referenced, compressed setting, not a surveyed map or reconstruction of actual incidents. Characters and story are fictional. Still a development build, not a finished photorealistic release.</p>
     <a class="quiet" href="./concept.html">Research, design &amp; asset provenance</a>
   </div>
-  <div class="menu-caption"><span>CHAPTER ONE / THE ACCOUNT</span><strong>Jantar Mantar Road</strong><span>A gathering that refuses to disappear.</span></div>
+  <div class="menu-caption"><span>CAMPAIGN / THREE DISTRICTS</span><strong>A city that still speaks.</strong><span>People, not scenery.</span></div>
 </section>
 <section id="hud" hidden aria-label="Story progress">
-  <div class="objective"><span id="location">THE GATHERING</span><strong id="objective">Meet Mira. Find out where Kabir went.</strong><small id="objective-distance"></small><small id="inventory"></small></div>
+  <div class="objective"><span id="location">THE GATHERING</span><strong id="objective">Meet Mira. Find out where Kabir went.</strong><div class="waypoint-line"><span id="waypoint-arrow" aria-hidden="true">↑</span><small id="objective-distance"></small></div><small id="inventory"></small></div>
   <div class="status"><div><span>STORY ACTS</span><strong id="story-count">0 / 5</strong></div><div><span>SOLIDARITY</span><strong id="solidarity">0</strong></div><div><span id="pressure">THE GATHERING</span><strong>OUR VOICES REMAIN</strong></div></div>
   <div class="map-wrap"><canvas id="map" width="144" height="144" aria-label="Approximate game map with player and story markers"></canvas><small>GAME MAP / APPROX.</small></div>
 </section>
 <div id="toast" role="status" aria-live="polite"></div>
+<section id="city-screen" class="modal" hidden><div class="dialog-panel city-panel"><p class="eyebrow">A city that still speaks / fictional campaign</p><h2>Where will you stand?</h2><p id="campaign-progress">0 / 3 districts completed</p><div class="district-cards">
+<button id="play-jantar" class="district-card"><span>CENTRAL DELHI</span><strong>Jantar Mantar</strong><p>Break the line: recorder, barricade and reunion under pursuit.</p><small id="district-status-jantar"></small></button>
+<button id="play-jamia" class="district-card"><span>SOUTH DELHI</span><strong>Jamia area</strong><p>Keep them together: regroup two companions and lead them around the campus blocks.</p><small id="district-status-jamia"></small></button>
+<button id="play-shaheen" class="district-card"><span>SOUTH-EAST DELHI</span><strong>Shaheen Bagh-inspired</strong><p>Hold the space: support three community stations and sustain the gathering.</p><small id="district-status-shaheen"></small></button>
+</div><p class="city-disclosure">Authored, reference-inspired districts, not exact maps or one real protest timeline. Choosing a district restarts that mission; completed district outcomes remain saved when browser storage is available.</p><button id="city-journal" class="secondary">People &amp; accounts</button><button id="city-close" class="secondary">Back</button></div></section>
 <div id="action-hud" hidden><div><span>HEALTH</span><strong id="health"></strong></div><div><span>STAMINA</span><div class="stamina-track"><i id="stamina"></i></div></div><div><span>SCORE / TIME</span><strong><b id="action-score">0</b> · <b id="action-time">0:00</b></strong><small id="action-rescues">0 / 3 helped</small></div></div>
 <div id="action-warning" hidden>POLICE CHARGE · MOVE OUT OF THE RED ZONE</div>
 <button id="interact" class="interact" hidden>Talk · E</button>
 <section id="dialog" class="modal" hidden><div class="dialog-panel"><p class="eyebrow" id="dialog-kicker"></p><h2 id="dialog-title"></h2><p id="dialog-copy"></p><button id="dialog-confirm" class="primary">Continue</button><button id="dialog-alt" class="secondary" hidden></button><button id="dialog-back" class="text-button">Keep exploring</button></div></section>
 <section id="rally-screen" class="modal rally-modal" hidden><div class="dialog-panel"><p class="eyebrow">A fictional crowd set piece</p><h2>Hold the rhythm.</h2><p>Press E or tap when the marker enters the gold window. Three shared beats bring the gathering forward. No penalty for missing.</p><div class="rally-track"><span class="rally-window"></span><span id="rally-cursor"></span></div><p id="rally-feedback">Wait for the gold window.</p><strong id="rally-count">0 / 3</strong><button id="rally-input" class="primary">Together · E</button><button id="rally-skip" class="text-button">Story assist: continue without timing</button></div></section>
 <section id="journal-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">People, not trophies</p><h2>Your journal.</h2><p id="journal-copy"></p><label class="assist-setting"><input type="checkbox" id="assist-game"> Story assist: slower pursuit and a rhythm skip</label><button id="journal-close" class="primary">Return to the gathering · J</button></div></section>
-<section id="pause-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">Your place is held</p><h2>Paused.</h2><p>Story checkpoints save in this browser when storage is available. No game progress is sent to a server. Restarting clears this chapter’s save.</p><button id="resume" class="primary">Resume exploring</button><button id="restart" class="secondary">Restart the chapter</button><button id="title" class="text-button">Return to title</button></div></section>
-<section id="ending" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">The account / Chapter one</p><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="retry" class="primary">Continue from last story point</button><button id="again" class="secondary">Start a new chapter run</button><a class="quiet" href="./concept.html">Read the context and limits</a></div></section>
+<section id="pause-screen" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">Your place is held</p><h2>Paused.</h2><h3 id="mission-brief-title">The Account</h3><p id="mission-brief-copy">Move freely, help people and protect the account.</p><p>Completed campaign districts save in this browser when storage is available. Action mission retries retain their stage within this tab; they do not restore that run after reload. No progress is sent to a server.</p><button id="resume" class="primary">Resume</button><button id="restart" class="secondary">Restart this mission</button><button id="title" class="text-button">Return to title</button></div></section>
+<section id="ending" class="modal" hidden><div class="dialog-panel"><p class="eyebrow">People and accounts / campaign</p><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="retry" class="primary">Retry checkpoint</button><button id="next-district" class="primary" hidden>Continue to the next district</button><button id="again" class="secondary">Replay this district</button><a class="quiet" href="./concept.html">Read the context and limits</a></div></section>
 <div id="controls" hidden><div id="joystick" aria-label="Touch movement joystick"><div id="stick"></div></div><div class="action-buttons"><button id="evade" hidden>DODGE · Q</button><button id="sprint">RUN</button><button id="jump">JUMP</button></div><span class="camera-hint">Drag the world to look</span></div>
 <div id="performance">3D LOADING</div>
-<script type="module" src="./world.js?v=0.7.1"></script>
+<script type="module" src="./world.js?v=0.8.0"></script>
 </body>
 </html>

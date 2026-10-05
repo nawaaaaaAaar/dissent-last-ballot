@@ -1,0 +1,15 @@
+{
+  "version": "0.8",
+  "pass": true,
+  "checks": [
+    "Jantar breakthrough and persistent campaign outcome",
+    "campus escort: two companions navigate around buildings and finish together",
+    "support three stations, sustain collective space and complete the three-district campaign",
+    "reload restores completed districts; replay resets mission; title Resume retains current in-session position",
+    "mobile map selection, joystick walk/run, dodge, pause and district switching; portrait/landscape fit",
+    "campaign help grants next-mission support; isolated damage-rule test consumes it once, not indefinitely"
+  ],
+  "errors": [],
+  "physicalPhoneTested": false,
+  "humanEnjoymentTested": false
+}

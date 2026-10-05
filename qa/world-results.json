@@ -54,10 +54,10 @@
       "Run"
     ],
     "treeAsset": true,
-    "fps": 0,
+    "fps": 1,
     "rendering": {
-      "draws": 380,
-      "triangles": 957966
+      "draws": 382,
+      "triangles": 957798
     },
     "events": [
       {
@@ -159,17 +159,36 @@
         "z": -39
       }
     ],
+    "district": "jantar",
+    "campaign": {},
+    "party": [
+      {
+        "id": "organiser",
+        "x": -3,
+        "z": 24
+      },
+      {
+        "id": "companion",
+        "x": -6,
+        "z": -36
+      }
+    ],
     "action": {
       "active": false,
+      "mission": "break",
       "health": 5,
       "stamina": 100,
       "dodge": 0,
       "cooldown": 0,
       "time": 0,
+      "settle": 0,
+      "contested": false,
       "charge": 0,
       "rescued": [],
+      "evacuees": [],
       "barrier": 0,
-      "score": 0
+      "score": 0,
+      "support": 0
     }
   },
   "mobile": {
@@ -215,8 +234,8 @@
     "treeAsset": true,
     "fps": 0,
     "rendering": {
-      "draws": 397,
-      "triangles": 1049442
+      "draws": 399,
+      "triangles": 1049274
     },
     "events": [
       {
@@ -318,17 +337,36 @@
         "z": -39
       }
     ],
+    "district": "jantar",
+    "campaign": {},
+    "party": [
+      {
+        "id": "organiser",
+        "x": -3,
+        "z": 24
+      },
+      {
+        "id": "companion",
+        "x": -6,
+        "z": -36
+      }
+    ],
     "action": {
       "active": false,
+      "mission": "break",
       "health": 5,
       "stamina": 100,
       "dodge": 0,
       "cooldown": 0,
       "time": 0,
+      "settle": 0,
+      "contested": false,
       "charge": 0,
       "rescued": [],
+      "evacuees": [],
       "barrier": 0,
-      "score": 0
+      "score": 0,
+      "support": 0
     }
   },
   "physicalDeviceTested": false,
