@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.10';
-import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?v=0.15.10';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.10';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.11';
+import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?v=0.15.11';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.11';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js?v=0.15.10';
-import {cityArt} from './city-art.js?v=0.15.10';
+import {WorldAudio} from './world-audio.js?v=0.15.11';
+import {cityArt} from './city-art.js?v=0.15.11';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.10';
+const asset=name=>'./assets/'+name+'?v=0.15.11';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
@@ -35,6 +35,7 @@ function finish(){
     `${chapter} ${game.network.credits} support credits are available. Choose another operation or explore.`:
     game.message+' Recovered recording and rescue/boarding checkpoints are retained within this tab, not after reload.';
   $('results').innerHTML=`<span>SCORE<br><b>${Math.round(game.score)}</b></span><span>JOB TIME<br><b>${Math.floor(game.elapsed/60)}:${String(Math.floor(game.elapsed%60)).padStart(2,'0')}</b></span><span>NETWORK<br><b>${game.network.total} jobs</b></span>`;
+  $('ending').querySelector('.panel').scrollTop=0;
 }
 function clearInput(){keys.clear();sticks.move={x:0,z:0};game.input.attack=game.input.interact=false;actionHeld=false;mouseStrike=stickStrike=buttonStrike=aimBrake=brakeHeld=false;}
 function start(){clearInput();mouseAim=false;game.start();game.accept('witness');game.say('Kabir is ahead. Move, use short strikes, dodge the red sector. Gold marks the next goal.',4);routeClock=0;step(0);poses.forEach(resetHuman);if(!audio.enabled)toggleAudio();syncPanels();render();}
@@ -327,12 +328,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.10');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.15.11');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.10',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.11',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

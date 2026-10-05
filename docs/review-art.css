@@ -6,3 +6,12 @@ button{border-radius:9px;transition:background .15s,border-color .15s}
 .vitals,.heat,.minimap{border-radius:9px;backdrop-filter:blur(6px)}
 #toast{border-radius:0 9px 9px 0;background:#122b29ed}
 @media(max-width:700px){#menu{background-position:65% center}.objective{padding:8px 10px}.objective strong{font-size:12px}.heat{top:170px}.vitals{bottom:152px}#toast{bottom:252px}}
+@media(max-height:500px){
+  #ending .panel{padding:14px;max-height:calc(100dvh - 86px)}
+  #ending .eyebrow{font-size:10px;margin:0 0 6px}
+  #ending h2{font-size:24px;line-height:1.1;margin:0 0 8px}
+  #ending .panel p:not(.eyebrow){font-size:13px;line-height:1.4;margin:0 0 8px}
+  #ending #results{font-size:12px;line-height:1.3;padding:4px 0 8px}
+  #ending button{margin-top:6px;min-height:40px;padding:8px 12px}
+  #ending .quiet{font-size:12px;margin-top:8px}
+}

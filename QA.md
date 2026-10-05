@@ -20,6 +20,16 @@ The supplied deterministic browser client separately exercised movement and stri
 
 Final replay and deployment observations are appended below after verification. Older sections are retained as history, not current-version claims.
 
+### Final full-cycle replay
+
+The v0.15.10 commit-pinned public build completed all four operations in ordinary browser time through actual controls: rescue GOLD / 1,541 / health 6 / van 100; gathering SILVER / 1,411 / health 3; courier GOLD / 1,433 / health 6 / van 100; charter SILVER / 1,411 / health 6 / van 88. The charter advanced cycle two, retained four best scores and an earned tempo upgrade, and left nine credits. No browser game state or simulation clock was edited.
+
+Travel was waypoint-assisted actual input, not an unaided human play study. The gathering's aid restoration, two-reader escort, courier/charter copying, rescue return and charter drive used actual touch pointers in landscape phone emulation. The charter took a single warned ram hit, escaped and completed; passive overlapping did not drain its vehicle.
+
+The final tree rendering is spatially chunked. The one-FPS cloud observation was subsequently traced to a background tab: foregrounding restored approximately 60 FPS in the checked scene. Do not attribute that observation entirely to geometry, or treat either result as a physical-device benchmark. Local software-rendering timings remain separate.
+
+The result panel retained its previous scroll position during later victories and clipped the heading at 844×390. The follow-up presentation patch resets its scroll and uses a compact short-viewport layout; game rules are unchanged. Final presentation/layout rechecks are recorded after deployment below.
+
 ## v0.14 City of Accounts
 
 This is a connected-city and gameplay-loop revision, not a final graphics approval. The raw OpenStreetMap extract and derivative map are retained, with 1,269 road ways and 786 building footprints. Those are data features, not 1,269 distinct named streets or 786 authored interiors. Geography is uniformly compressed, roads widened, building heights approximated and traffic rules simplified.

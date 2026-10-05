@@ -69,3 +69,28 @@ This is still below a finished indie action game's quality bar. Faces and outfit
 Street interpretation and driving remain sensitive areas despite the corrections. Physical phones, Safari and independent first-time-player enjoyment are unverified. Software-rendered local Chromium was much slower than the cloud browser, so its timings are not used as a phone-performance claim.
 
 The next highest-impact work is **authored encounter spaces and reactive NPC behaviour, supported by proper contact-timed combat and traversal animation**. That would add meaningful choices and convincing human action, rather than another layer of mission markers or reward counters.
+
+## Final end-to-end replay
+
+The reworked v0.15.10 rules and art were played through all three operations and the charter in normal browser time on a publicly served, commit-pinned GitHub build. Travel used manually selected observed/map-derived road waypoints through actual mouse or CDP touch input. Fighting included ordinary keyboard input, shield positioning, a late dodge, mistakes and recovery. No `advanceTime`, objective flags, health, positions or credits were injected into the browser game.
+
+| Operation | Observed result | What the replay established |
+|---|---|---|
+| Witness rescue | GOLD; score 1,541; health 6; van 100 | Fight, rescue, recording, companion boarding, broken sight, patrol stand-down and return completed. The touch-controlled return did not restart cooled pursuit. |
+| Gathering | SILVER; score 1,411; health 3 | Holding strikes alone took damage. Repositioning finished the first guard; a late dodge opened the aid-stage shield. A held touch restored aid, and slower touch movement led both readers to the assembly. |
+| Courier | GOLD; score 1,433; health 6; van 100 | One injury interrupted copying; the retained progress completed through held touch. A connected city drive delivered the dispatch at the fictional India Gate relay after escape. |
+| Charter | SILVER; score 1,411; health 6; van 88 | A warned ram landed once, rather than draining the vehicle through contact. A different western return route completed the charter, retained the earned tempo upgrade and advanced the network to cycle two. |
+
+These are agent-assisted playthroughs, not independent human enjoyment research. The reported mission seconds are simulation counters, not real-time speedrun benchmarks; exposure between tool calls and assisted steering affect them.
+
+### Comparison with the baseline
+
+The strongest material improvement is that the game now supports a readable sequence of decisions: a shield opening or dodge creates an escape opportunity; damage delays copying but does not erase it; holding aid while surrounded fails; a lost pursuit ends; both people arriving matters. Failure was used to revise the system rather than counted as successful feature coverage. The final runs were not all perfect, and the gathering's Silver result showed a recoverable challenge instead of a guaranteed held-button win.
+
+The city is easier to read and more coherently surfaced than the blank baseline. It has actual textured fronts, separated paths/lawns/roads, street services and connected landmark approaches. It still looks synthetic and under-authored against a finished indie game. Several roads and small footprint pieces remain awkward; atlas textures cannot substitute for detailed frontage modelling.
+
+Vegetation initially produced a worrying one-FPS observation, but follow-up identified background cloud-tab throttling: foregrounding the same final game restored roughly 60 FPS in the checked scene. Spatial chunking remains because it avoids drawing the entire grove for every view. This is not a controlled graphics benchmark, and neither the earlier background reading nor the foreground result proves performance on physical phones.
+
+The courier result exposed a retained-scroll-position bug that clipped the next heading in a short landscape viewport. The presentation patch resets scroll for every outcome and adds a compact landscape result layout. It changes presentation, not the four replayed operations' game rules.
+
+My assessment is **materially better, but not finished-game approval**. The next review should concentrate on authored combat/traversal performance and reactive encounter/city behaviour, followed by observed first-time-player sessions. More credits, markers or districts would not resolve the remaining gap.
