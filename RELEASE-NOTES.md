@@ -8,6 +8,7 @@
 - Preserved mobile dual-stick combat, vehicle boarding/exiting, directional driving, braking, line-of-sight search, damage and checkpoints.
 - Normal-time play caught unrescued Kabir being moved when exiting the van; fixed both exit and retry. Retry now restores a nearby pursuit instead of emptying the chase.
 - Touch review caught a stationary held-Strike rally completion; changed it to three separate eight-second gathering points that require repositioning.
+- Patch v0.14.4 fixes a cleared return roadblock recreating itself on reboarding, and preserves its activation state through retry. This was found during the public charter test, not only isolated rules.
 - Repeats change guard approaches; one return variant adds a roadblock. Later cycles slightly increase guard speed, capped at tier three.
 - Gameplay is the priority. Character/facade/combat-animation realism, physical phones, Safari and independent enjoyment remain unfinished. Earlier v0.13 results below are historical, not relabelled as new signoff.
 

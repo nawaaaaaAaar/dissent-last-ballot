@@ -1,0 +1,100 @@
+{
+  "release": "0.14.4",
+  "unit_checks": 13,
+  "normal_time_preview": {
+    "version": "0.14.1",
+    "actual_input": true,
+    "advance_time": false,
+    "rescue_completed": true,
+    "medal": "SILVER",
+    "health": 6,
+    "van_condition": 12,
+    "score": 1441,
+    "limitations": "Tool-call exposure and imperfect steering affected condition; not a controlled human benchmark."
+  },
+  "touch_preview": {
+    "version": "0.14.2",
+    "actual_touch": true,
+    "deterministic_time": true,
+    "courier_completed_after_checkpoint_retry": true,
+    "courier_medal": "GOLD",
+    "courier_score": 1253,
+    "stationary_rally_review": "Completed, judged insufficient gameplay, replaced by three moving zones in 0.14.3.",
+    "earned_progress_transferred_via_save_ui": true
+  },
+  "public_three_zone_rally": {
+    "frontend": "6724b6a",
+    "version": "0.14.3",
+    "actual_touch": true,
+    "deterministic_time": true,
+    "three_distinct_zones_required": true,
+    "simultaneous_movement_and_strike": true,
+    "completed": true,
+    "health": 6,
+    "van_condition": 100,
+    "medal": "GOLD",
+    "score": 2137,
+    "elapsed_time_not_speedrun": "104 includes tool-emulation idle time."
+  },
+  "public_charter_review": {
+    "frontend": "6724b6a",
+    "version": "0.14.3",
+    "sansad_to_india_gate": "Actual-touch drive, no collisions, van 100",
+    "dispatch_recovered": true,
+    "slow_controller_failed_from_pursuit": true,
+    "checkpoint_restored_packet_vehicle_pursuit": true,
+    "faster_controller_reached_roadblock_without_damage": true,
+    "cleared_roadblock": true,
+    "reboarding_regression_found": true,
+    "fix_release": "0.14.4"
+  },
+  "local_browser": {
+    "version": "0.14.3",
+    "guide_pause_resume": true,
+    "difficulty_changes": true,
+    "save_export": true,
+    "invalid_restore_rejected": true,
+    "earned_code_restore": true,
+    "page_errors": []
+  },
+  "final_local_patch": {
+    "version": "0.14.4",
+    "actual_mouse_keyboard": true,
+    "deterministic_time": true,
+    "legitimate_earned_save_restored_through_ui": true,
+    "charter_completed": true,
+    "cleared_roadblock_remained_clear_after_reboard": true,
+    "health": 6,
+    "van_condition": 100,
+    "medal": "GOLD",
+    "score": 1440,
+    "network_cycle": 2,
+    "credits": 10,
+    "retained_upgrades": ["tempo", "reinforce"],
+    "next_cycle_operation_accepted": true,
+    "landscape_actual_simultaneous_touch": {
+      "viewport": "844x390",
+      "movement_units": 1.8666665981977815,
+      "strikes": 2,
+      "horizontal_overflow": 0
+    },
+    "portrait_horizontal_overflow": 0,
+    "page_errors": [],
+    "supplied_client": "qa/v14-client-patch"
+  },
+  "delivery_status": {
+    "confirmed_public_version": "0.14.3",
+    "confirmed_public_frontend": "6724b6a",
+    "final_patch_source": "de791b2",
+    "final_patch_version": "0.14.4",
+    "private_preview_patch_confirmed": true,
+    "github_pages_patch_workflow": "queued at documentation time",
+    "final_patch_public_confirmation": false
+  },
+  "not_verified": [
+    "Physical iPhone or Android performance",
+    "Safari",
+    "Independent first-time-player enjoyment or retention",
+    "Production-ready realistic graphics"
+  ]
+}

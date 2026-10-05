@@ -1,5 +1,29 @@
 # QA and limitations
 
+## v0.14 City of Accounts
+
+This is a connected-city and gameplay-loop revision, not a final graphics approval. The raw OpenStreetMap extract and derivative map are retained, with 1,269 road ways and 786 building footprints. Those are data features, not 1,269 distinct named streets or 786 authored interiors. Geography is uniformly compressed, roads widened, building heights approximated and traffic rules simplified.
+
+Thirteen current isolated checks pass in `qa/v14/unit-results.json`: map relationships and routes, unrescued-witness position on exit/retry, mission and charter prerequisites, single awards and replay bests, delivery requirements, upgrades, save validation, network cycles, rally conditions, collisions, restored pursuit, changing rally targets and cleared-roadblock persistence. Unit checks stage rule state; they are not browser playthroughs.
+
+Normal browser-time preview play used actual keyboard/mouse controls without `advanceTime`. The first version exposed an unrescued witness teleport on van exit; that was fixed. The v0.14.1 rescue subsequently completed with Kabir and the recording delivered, health 6, van 12%, SILVER and score 1441. Time exposed between tool calls and imperfect steering affected van condition, so this is not a controlled human driving benchmark. The first hot arrival did not win.
+
+Phone-emulated preview testing used actual CDP touch pointers with deterministic simulation stepping. A courier reached India Gate and won GOLD after a vehicle-failure/checkpoint retry. A first rally won from a stationary strike position; review rejected that design and replaced it with three separate gathering, aid and reading-circle zones. Dynamic waypoint controllers also cut corners or oscillated; failed controller attempts are not counted as passed runs.
+
+Public frontend `6724b6a` was confirmed as v0.14.3. Actual touch completed the revised three-point rally: the first point stopped advancing after eight seconds, its target moved, and simultaneous movement/Strike pointers reached the other two zones. The result was GOLD, health 6, van 100%, score 2137, with earned upgrades retained. The same session drove from Sansad Marg to India Gate with no collisions, recovered the charter and exercised a return-roadblock confrontation. A slow delivery controller lost the van to pursuit; retry restored the earned packet, vehicle and nearby patrol, and a faster route reached the roadblock without damage.
+
+That confrontation caught a persistence regression: boarding could recreate a cleared roadblock. v0.14.4 makes activation once per operation and retains it through checkpoints. Its separate thirteenth unit check covers clear, reboard, failure, retry and another reboard.
+
+Local persistent Chromium checked help/pause freeze, resume, mission selection, difficulty changes, save export, malformed restore rejection and legitimate earned-code restore without page errors. The supplied game client separately exercised movement and held strikes; `qa/v14-client-final/` belongs to v0.14.3 and `qa/v14-client-patch/` confirms v0.14.4 with actual movement/Strike state and an inspected capture.
+
+The final local v0.14.4 charter was completed through actual mouse/keyboard controls with deterministic stepping, using legitimate earlier-earned progress restored through the UI. It travelled from CP to India Gate, recovered the dispatch, drove to the return roadblock, exited and struck it open, reboarded without recreating it, and delivered to Jantar Mantar after losing pursuit. The result was GOLD, health 6, van 100%, score 1440, network cycle 2, ten credits and both earned upgrades retained. This is a local final-patch run, not a public final-patch completion. A new cycle operation was then accepted; actual CDP touch at 844×390 produced 1.87 units of movement and two strikes with simultaneous pointers. Both 844×390 and 390×844 had zero horizontal overflow and no page errors.
+
+A cloud emulation issue initially dropped touches below the native visible viewport despite correct reported device metrics. Synchronising the CDP visible size restored joystick input. The resulting idle time is included in the public rally timer and is not a player speedrun measurement. Tests do not set browser game positions, health, completion flags or credits; legitimate progress codes earned in earlier actual-input runs are explicitly transferred through the UI.
+
+`qa/v14/results.json` records version-specific final checks and captures. Deterministic stepping is not FPS measurement. Physical iPhone/Android hardware, Safari, ordinary first-time-player enjoyment, traffic/crowd simulation and realistic character/environment art remain unverified.
+
+Delivery status: the connected-city update is confirmed public as v0.14.3. Source patch v0.14.4 is pushed, and the private preview loads it, but GitHub's Pages workflow remained queued when these notes were written. Do not treat the source push as a confirmed public v0.14.4 deployment.
+
 ## v0.13 Play review
 
 Normal-time review of v0.12.2 used actual browser keyboard input without `advanceTime`: walking, held Space, Dodge, movement/pausing and a separate barrier/rescue/recording/boarding/two-turn/brake attempt. Holding Space for 2.2 seconds produced one hit, while officers could overlap at zero distance. The fast turn/brake attempt ended at x40.34/z-38.33, beyond the intended eastern junction. `PLAYER-REVIEW.md` separates deliberate action from time spent exposed between tool calls.
