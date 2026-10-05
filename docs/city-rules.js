@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.6';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.7';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -249,7 +249,7 @@ export class City{
       if(e.lunge>0){e.lunge-=dt;this.move(e,Math.sin(e.attackYaw)*8*dt,Math.cos(e.attackYaw)*8*dt);if(d<2.1&&!v.occupied)this.hurt();continue;}
       if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.cooldown=1.7;e.lunge=e.role==='rush'?.34:0;if(d<(e.role==='guard'?3.3:2.7)&&!v.occupied&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.95)this.hurt();}continue;}
       const reach=e.role==='rush'?4.2:e.role==='guard'?3.3:2.7,committed=this.enemies.filter(q=>q.hp>0&&(q.windup>0||q.lunge>0)).length;
-      if(!v.occupied&&d<reach&&e.cooldown<=0&&sight&&committed<(this.network.total?2:1)){e.windup=e.windupTotal=(this.mission?.style==='hard'?.65:.95)+(e.role==='guard'?.12:0);e.attackYaw=e.yaw=Math.atan2(p.x-e.x,p.z-e.z);continue;}
+      if(!v.occupied&&d<reach&&e.cooldown<=0&&sight&&committed<(this.mission?.style==='hard'||this.network.cycle>1?2:1)){e.windup=e.windupTotal=(this.mission?.style==='hard'?.65:.95)+(e.role==='guard'?.12:0);e.attackYaw=e.yaw=Math.atan2(p.x-e.x,p.z-e.z);continue;}
       const target=sight&&e.role==='flank'&&d>2.5?{x:p.x+Math.cos(p.yaw)*2.8,z:p.z-Math.sin(p.yaw)*2.8}:sight?p:this.hidden<6?e.last:e.home;
       if(d<1.7&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else this.chase(e,target,dt,(e.role==='guard'?2.1:e.role==='flank'?3.5:2.8)+(this.mission?.style==='hard'?.5:0)+Math.max(0,(this.mission?.tier||1)-1)*.2);
     }
@@ -279,7 +279,7 @@ export class City{
         if(this.wave===0||i.interact&&p.hurt<=0&&p.attack<=0){this.hold+=dt*(this.wave===1?8/2.8:1);this.score+=dt*10;}
       }
       const wave=Math.min(2,Math.floor(this.hold/8));
-      if(wave>this.wave){this.wave=wave;this.hold=wave*8;this.spawn(m.zones[wave],3+wave);
+      if(wave>this.wave){this.wave=wave;this.hold=wave*8;this.spawn(m.zones[wave],m.style==='hard'||m.tier>1?3+wave:3);
         if(wave===2){this.readers=[-1,1].map(s=>({...snap({x:m.zones[2].x+s,z:m.zones[2].z}),yaw:0}));this.say('Anita: the reading group is separated. Lead both readers to the assembly on foot.',5);}
         else this.say('Gathering secured. Clear the aid point, then hold Action to restore support.',4);
         this.saveCheckpoint();}
