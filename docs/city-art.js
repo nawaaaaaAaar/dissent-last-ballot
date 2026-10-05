@@ -16,9 +16,9 @@ export async function cityArt(scene,WORLD,PLACES){
   }
   const g=new THREE.Group(),pos=[],uv=[];
   WORLD.buildings.forEach((b,k)=>{
-    const tile=k%4,tx=tile%2*.5,ty=tile<2?.5:0;
-    for(let j=0;j<b.poly.length;j++){
-      const a=b.poly[j],c=b.poly[(j+1)%b.poly.length],len=Math.hypot(c.x-a.x,c.z-a.z);
+    const tile=parseInt(b.id,10)%4,tx=tile%2*.5,ty=tile<2?.5:0;
+    for(const contour of[b.poly,...b.holes])for(let j=0;j<contour.length;j++){
+      const a=contour[j],c=contour[(j+1)%contour.length],len=Math.hypot(c.x-a.x,c.z-a.z);if(len<.02)continue;
       const bays=Math.max(1,Math.ceil(len/3));
       for(let n=0;n<bays;n++)for(let floor=0;floor<Math.max(1,Math.ceil(b.height/3));floor++){
         const t=n/bays,u=(n+1)/bays,y=floor*3,h=Math.min(b.height,y+3);
@@ -26,7 +26,7 @@ export async function cityArt(scene,WORLD,PLACES){
         for(const i of [0,1,2,0,2,3]){pos.push(...corners[i]);uv.push(tx+(i===1||i===2?.499:.001),ty+(i>=2?.499:.001));}
       }
     }
-    const shape=new THREE.Shape(b.poly.map(p=>new THREE.Vector2(p.x,-p.z)));
+    const shape=new THREE.Shape(b.poly.map(p=>new THREE.Vector2(p.x,-p.z)));shape.holes=b.holes.map(h=>new THREE.Path(h.map(p=>new THREE.Vector2(p.x,-p.z))));
     const cap=new THREE.Mesh(new THREE.ShapeGeometry(shape),roof);cap.rotation.x=-Math.PI/2;cap.position.y=b.height;g.add(cap);
     const x=b.poly.reduce((s,p)=>s+p.x,0)/b.poly.length,z=b.poly.reduce((s,p)=>s+p.z,0)/b.poly.length;
     if(k%3===0){box(g,M.dark,x,b.height+.35,z,1.2,.7,1.2);cylinder(g,M.sand,x+1,b.height+.1,z, .5,.2);}

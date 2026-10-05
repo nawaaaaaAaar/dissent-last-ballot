@@ -23,7 +23,8 @@ export function inside(p,poly){
 export function installMap(data){
   WORLD.roads=data.roads;
   WORLD.parks=(data.parks||[]).map(b=>({...b,poly:b.points.map(([x,z])=>({x,z}))}));
-  WORLD.buildings=data.buildings.map(b=>({...b,poly:b.points.map(([x,z])=>({x,z})),x:b.points.reduce((s,p)=>s+p[0],0)/b.points.length,z:b.points.reduce((s,p)=>s+p[1],0)/b.points.length}));
+  WORLD.sourceFootprints=data.buildings.length;
+  WORLD.buildings=(data.renderBuildings||data.buildings).map(b=>({...b,poly:b.points.map(([x,z])=>({x,z})),holes:(b.holes||[]).map(r=>r.map(([x,z])=>({x,z}))),x:b.points.reduce((s,p)=>s+p[0],0)/b.points.length,z:b.points.reduce((s,p)=>s+p[1],0)/b.points.length}));
   const ids=new Map(),nodes=[],segments=[];
   const node=(x,z)=>{const key=x.toFixed(2)+','+z.toFixed(2);if(!ids.has(key)){ids.set(key,nodes.length);nodes.push({x,z,links:[]});}return ids.get(key);};
   for(const r of data.roads)for(let i=1;i<r.points.length;i++){
@@ -33,7 +34,7 @@ export function installMap(data){
     const walkOnly=['footway','path','steps'].includes(r.kind);
     if(!walkOnly){nodes[a].drive=true;nodes[b].drive=true;}
     nodes[a].links.push({id:b,length,walkOnly});nodes[b].links.push({id:a,length,walkOnly});
-    segments.push({a:nodes[a],b:nodes[b],name:r.name,walkOnly,width:walkOnly?2:r.kind==='service'?4:r.kind==='pedestrian'?5:7});
+    segments.push({a:nodes[a],b:nodes[b],name:r.name,walkOnly,width:walkOnly?1.2:r.kind==='service'?3:r.kind==='pedestrian'?2.5:4.5});
   }
   WORLD.nodes=nodes;WORLD.segments=segments;
   // Join divided lanes and tiny OSM gaps for arcade navigation, not real traffic routing.

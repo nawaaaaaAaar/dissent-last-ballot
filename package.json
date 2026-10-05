@@ -1,10 +1,11 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "private": true,
   "type": "module",
   "description": "Top-down 3D resistance action mission with driving and mobile dual-stick controls",
   "scripts": {
+    "build:map": "python tools/build-delhi-map.py && node tools/trim-street-footprints.mjs",
     "start": "python -m http.server 5173 --directory docs",
     "test": "node city-unit.mjs",
     "test:city": "node city-unit.mjs",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
-    "playwright": "1.59.0"
+    "playwright": "1.59.0",
+    "polygon-clipping": "^0.15.7"
   }
 }

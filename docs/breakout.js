@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.1';
-import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.1';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.1';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.2';
+import {installMap,PLACES,SCALE,roadRoute} from './city-data.js?v=0.15.2';
+import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.2';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js?v=0.15.1';
-import {cityArt} from './city-art.js?v=0.15.1';
+import {WorldAudio} from './world-audio.js?v=0.15.2';
+import {cityArt} from './city-art.js?v=0.15.2';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.1';
+const asset=name=>'./assets/'+name+'?v=0.15.2';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
@@ -30,8 +30,9 @@ function syncPanels(){
 function finish(){
   $('ending-kicker').textContent=game.mode==='won'?'THE NETWORK HOLDS':'THE RUN WAS INTERRUPTED';
   $('ending-title').textContent=game.mode==='won'?`${game.result.medal} · ${game.result.title}`:'Try another route.';
+  const chapter=game.mission?.id==='charter'?'The fictional charter demands constitutional accountability, ending contested SIR, and transparent eligible-voter inclusion. Replacement alone is not repair. This is not news of an actual policy change.':game.mission?.type==='rescue'?'Kabir: “Now the account travels further than the cordon.” You brought both your friend and his account to the network.':game.mission?.type==='rally'?'Anita: “The gathering can speak again.” Both readers reached the assembly together.':'Sana: “Keep it moving.” The copied account reached the next relay.';
   $('ending-copy').textContent=game.mode==='won'?
-    `Operation complete. ${game.network.credits} support credits are available. Choose another job, improve your medal, or explore the city. The fictional network demands Gyanesh Kumar’s departure through constitutional processes, ending contested SIR, and transparent inclusion support for every eligible voter. This is not news of actual resignation, repeal or voter restoration.`:
+    `${chapter} ${game.network.credits} support credits are available. Choose another operation or explore.`:
     game.message+' Recovered recording and rescue/boarding checkpoints are retained within this tab, not after reload.';
   $('results').innerHTML=`<span>SCORE<br><b>${Math.round(game.score)}</b></span><span>JOB TIME<br><b>${Math.floor(game.elapsed/60)}:${String(Math.floor(game.elapsed%60)).padStart(2,'0')}</b></span><span>NETWORK<br><b>${game.network.total} jobs</b></span>`;
 }
@@ -45,8 +46,9 @@ function toggleAudio(){
   if(engineGain&&!on)engineGain.gain.value=0;
 }
 function button(id,callback){$(id).addEventListener('click',callback);}
-button('start',start);button('tutorial',help);button('pause-help',help);button('help-close',()=>setMode(helpReturn));
-button('pause',pause);button('resume',pause);button('restart',()=>{game.abandon();board();});button('again',()=>{game.continue();board();});button('sound',toggleAudio);
+button('start',start);button('tutorial',help);button('pause-help',help);button('help-close',()=>setMode(helpReturn)); 
+button('pause',pause);button('resume',pause);button('restart',()=>{game.abandon();board();});button('again',()=>{if(game.mode==='caught')game.abandon();else game.continue();board();});button('sound',toggleAudio);
+button('view',()=>{wideCamera=!wideCamera;$('view').textContent=wideCamera?'Close view':'Overview';resize();render();});
 function board(){
   clearInput();helpReturn=game.mode;setMode('board');
   $('network-status').textContent=`Cycle ${game.network.cycle} · ${game.network.total} operations · ${game.network.credits} support credits`;
@@ -82,7 +84,7 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape'||e.code==='KeyP')pause();
   if(e.code==='KeyM')board();
 });
-document.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyZ'){wideCamera=!wideCamera;resize();}});
+document.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyZ')$('view').click();});
 window.addEventListener('blur',()=>{keys.clear();if(game.mode==='playing')pause();});
 function aimNearest(){
   if(mouseAim||stickStrike)return;
@@ -217,7 +219,7 @@ function drawCityMap(){const c=$('city-map').getContext('2d'),n=420;paintMap(c,n
 function hud(){
   $('objective').textContent=game.objective();const t=game.target(),p=game.player;
   $('distance').textContent=Math.round(Math.hypot(t.x-p.x,t.z-p.z)/SCALE)+' real-map m · '+(game.mission?game.mission.title:'Delhi free roam');
-  const next=guideRoute.find(q=>Math.hypot(q.x-p.x,q.z-p.z)>4)||t;
+  const next=guideRoute.find(q=>Math.hypot(q.x-p.x,q.z-p.z)>1)||t;
   $('direction').style.transform=`rotate(${Math.atan2(next.x-p.x,-(next.z-p.z))}rad)`;
   $('health').textContent='HEALTH '+Array.from({length:6},(_,i)=>i<p.health?'●':'○').join('');
   $('stamina').style.width=p.stamina+'%';$('vehicle-status').textContent=game.van.occupied?`VAN ${Math.round(game.van.health)}% · ${Math.round(game.van.speed*3)} GAME km/h`:'ON FOOT · '+(game.friend.rescued?'KABIR WITH YOU':game.mission?.type==='rescue'?'FIND KABIR':game.mission?.type==='rally'?'STAND TOGETHER':game.record?'DISPATCH SECURED':'EXPLORE');
@@ -273,6 +275,7 @@ function step(dt){
     for(let j=0;j<particleMeshes.length;j++){const q=game.particles[j],m=particleMeshes[j];m.visible=!!q;if(q){m.position.set(q.x,Math.max(.06,q.y),q.z);m.material.color.set(q.color==='teal'?'#91cab3':q.color==='red'?'#dd7655':'#e2b578');}}
   }
   routeClock-=dt;if(routeClock<=0){guideRoute=roadRoute(game.player,game.target(),{vehicle:game.van.occupied});routeClock=1.5;}
+  while(guideRoute.length>1&&Math.hypot(guideRoute[0].x-game.player.x,guideRoute[0].z-game.player.z)<1)guideRoute.shift();
   routeMarks.forEach((m,i)=>{const nearby=guideRoute.filter(q=>Math.hypot(q.x-game.player.x,q.z-game.player.z)<24&&Math.hypot(q.x-game.player.x,q.z-game.player.z)>2),q=nearby[i],next=nearby[i+1]||game.target();m.visible=game.mode==='playing'&&!!q;if(q){m.position.set(q.x,.1,q.z);m.rotation.z=-Math.atan2(next.x-q.x,next.z-q.z);}});
   if(engineGain){engineGain.gain.setTargetAtTime(audio.enabled&&game.van.occupied&&game.mode==='playing'?.014:0,audio.ctx.currentTime,.1);engineTone.frequency.setTargetAtTime(45+game.van.speed*4,audio.ctx.currentTime,.1);}
 }
@@ -294,12 +297,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.1');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    const response=await fetch('./delhi-map.json?v=0.15.2');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
     installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.1',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.2',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);

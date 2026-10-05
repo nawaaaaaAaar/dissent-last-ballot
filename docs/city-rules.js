@@ -1,7 +1,8 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.1';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.2';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
+const solid=(p,b)=>inside(p,b.poly)&&!(b.holes||[]).some(h=>inside(p,h));
 export const CONTRACTS=[
   {id:'witness',type:'rescue',title:'Bring the witness home',from:'jantar',to:'cp',reward:2,story:'Kabir carries testimony from the gathering. Get him out, keep the account safe, and build a route back to the network.'},
   {id:'signal',type:'courier',title:'Restore the signal',from:'tolstoy',to:'gate',reward:2,story:'Sana’s dispatch must reach a volunteer relay. Route choice and losing pursuit matter more than knocking everyone down.'},
@@ -30,7 +31,7 @@ export class City{
     this.reset();this.mode='playing';
     const source=this.place('jantar'),p=snap({x:source.x-9,z:source.z-12});
     let v=snap({x:source.x-14,z:source.z-16},true);
-    const clear=q=>!WORLD.buildings.some(b=>inside(q,b.poly)||b.poly.some((a,i)=>segmentDistance(q,a,b.poly[(i+1)%b.poly.length])<2.5));
+    const clear=q=>!WORLD.buildings.some(b=>solid(q,b)||b.poly.some((a,i)=>segmentDistance(q,a,b.poly[(i+1)%b.poly.length])<2.5));
     if(!clear(v)){const candidate=WORLD.nodes.filter(n=>n.drive&&dist(n,p)<35).sort((a,b)=>dist(a,p)-dist(b,p)).find(clear);if(candidate)v={x:candidate.x,z:candidate.z};}
     Object.assign(this.player,p);Object.assign(this.van,v,{yaw:0});
     this.say('Aman: Kabir is inside the cordon. We get him out together. Move, strike in short combos, dodge the red tell.',6);
@@ -40,7 +41,7 @@ export class City{
     const spec=CONTRACTS.find(c=>c.id===id);if(!spec||id==='charter'&&this.network.completed.length<3)return false;
     if(this.mission)return false;
     this.serial++;this.mission={...spec,style,source:this.place(spec.from),destination:this.place(spec.to),variant:this.serial%3,tier:Math.min(3,this.network.cycle),started:this.time};
-    this.elapsed=0;this.score=0;this.hits=0;this.crashes=0;this.hold=0;this.wave=0;this.copy=0;this.readers=[];this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.supports.forEach(s=>s.used=false);
+    this.elapsed=0;this.result=null;this.score=0;this.hits=0;this.crashes=0;this.hold=0;this.wave=0;this.copy=0;this.readers=[];this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.supports.forEach(s=>s.used=false);
     this.friend.x=this.mission.source.x;this.friend.z=this.mission.source.z;
     WORLD.record={...this.mission.source};WORLD.safe={...this.mission.destination};
     const source=this.mission.source;
@@ -65,7 +66,7 @@ export class City{
     const p={x,z};
     // Road widths are expanded for mobile play. OSM footprints still block off-road movement.
     if(!WORLD.segments.some(s=>(r<=1||!s.walkOnly)&&segmentDistance(p,s.a,s.b)<s.width/2-r*.3)){
-      for(const b of WORLD.buildings)if(Math.abs(b.x-x)<30&&Math.abs(b.z-z)<30&&(inside(p,b.poly)||b.poly.some((a,i)=>segmentDistance(p,a,b.poly[(i+1)%b.poly.length])<r)))return false;
+      for(const b of WORLD.buildings)if(Math.abs(b.x-x)<30&&Math.abs(b.z-z)<30&&(solid(p,b)||[b.poly,...b.holes].some(h=>h.some((a,i)=>segmentDistance(p,a,h[(i+1)%h.length])<r))))return false;
     }
     if(!ignoreGate&&this.gate.hp>0&&Math.abs(x-this.gate.x)<4+r&&Math.abs(z-this.gate.z)<.45+r)return false;
     if(!ignoreGate&&this.roadblock&&Math.abs(x-this.block.x)<4+r&&Math.abs(z-this.block.z)<.5+r)return false;
@@ -76,7 +77,7 @@ export class City{
     for(const house of WORLD.buildings){
       if(Math.min(dist(a,house),dist(b,house))>60)continue;
       const n=Math.ceil(dist(a,b)/2);
-      for(let i=1;i<n;i++)if(inside({x:a.x+(b.x-a.x)*i/n,z:a.z+(b.z-a.z)*i/n},house.poly))return false;
+      for(let i=1;i<n;i++)if(solid({x:a.x+(b.x-a.x)*i/n,z:a.z+(b.z-a.z)*i/n},house))return false;
     }
     if(!opaqueOnly){const n=Math.ceil(dist(a,b));for(let i=1;i<n;i++)if(!this.valid(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n,.1))return false;}
     return true;
@@ -180,7 +181,7 @@ export class City{
     this.mode='won';this.say('The network grows. Choose another operation or explore the city.');
   }
   continue(){if(this.mode==='won'){this.mission=null;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.car.active=false;this.enemies.forEach(e=>e.hp=0);this.heat=0;this.gate.hp=0;this.player.health=6;this.van.health=100;this.supplies.forEach(s=>s.taken=false);this.mode='playing';}}
-  abandon(){this.mission=null;this.enemies.forEach(e=>e.hp=0);this.car.active=false;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.heat=0;this.gate.hp=0;this.roadblock=false;this.mode='playing';}
+  abandon(){const failed=this.mode==='caught'||this.player.health<=0||this.van.health<=0;this.mission=null;this.readers=[];this.result=null;this.enemies.forEach(e=>e.hp=0);this.car.active=false;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.heat=0;this.gate.hp=0;this.roadblock=false;if(failed){this.player.health=6;this.player.stamina=100;this.van.health=100;this.van.speed=0;}this.mode='playing';}
   retry(){
     const m=this.mission,c=this.checkpoint;if(!m){this.start();return;}
     const spec=m.id,style=m.style;this.abandon();this.serial--;this.accept(spec,style);this.mission.variant=m.variant;

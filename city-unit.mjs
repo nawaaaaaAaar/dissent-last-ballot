@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.1';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.2';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
 function check(name,fn){fn();checks.push(name);}
 check('OSM map and georeferenced landmark relationships',()=>{
-  assert.equal(WORLD.roads.length,1852);assert.equal(WORLD.buildings.length,785);assert.equal(WORLD.parks.length,124);
+  assert.equal(WORLD.roads.length,1852);assert.equal(WORLD.sourceFootprints,785);assert(WORLD.buildings.length>300);assert.equal(WORLD.parks.length,124);
   assert(PLACES[1].z<PLACES[0].z&&PLACES[0].z<PLACES[2].z);assert(PLACES[2].x>PLACES[0].x);
   for(const p of PLACES){const route=roadRoute(snap(PLACES[1]),snap(p));assert(route.length>1);assert.equal(route.at(-1).x,snap(p).x);}
 });
@@ -92,6 +92,16 @@ check('frontal shield blocks early strikes, finisher opens it',()=>{
 check('volunteer service is consumed once per operation',()=>{
   const g=new City();g.start();g.accept('signal');g.enemies.forEach(e=>e.hp=0);const s=g.supports[0];Object.assign(g.player,{x:s.x,z:s.z,health:2,stamina:0});g.van.x+=100;g.van.health=40;
   g.interact();assert(s.used);assert.equal(g.player.health,4);assert.equal(g.van.health,75);assert.equal(g.score,40);g.interact();assert.equal(g.score,40);
+});
+check('abandoning failure starts a playable new operation, not zero-condition limbo',()=>{
+  const g=new City();g.start();g.accept('signal');g.mode='caught';g.player.health=0;g.van.health=0;g.abandon();assert.equal(g.player.health,6);assert.equal(g.van.health,100);assert(g.accept('hold'));assert.equal(g.result,null);
+});
+check('underground station is excluded while original surface footprints remain',()=>{
+  const d=JSON.parse(fs.readFileSync('docs/delhi-map.json'));assert(!d.buildings.some(b=>b.id==='1158884368'));assert.equal(d.buildings.length,785);assert(d.renderBuildings.length>300);
+});
+check('trimmed street display has a clear vehicle spawn',()=>{
+  const g=new City();g.start();assert(g.valid(g.van.x,g.van.z,1.2));
+  for(const b of WORLD.buildings)assert(!b.poly.some((p,i)=>Math.hypot(p.x-g.van.x,p.z-g.van.z)<1));
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));
