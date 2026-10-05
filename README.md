@@ -4,7 +4,11 @@ A third-person, explorable resistance-story chapter in a source-referenced Janta
 
 ## Play
 
-Open [DISSENT on GitHub Pages](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a WebGL 2 browser. No account or installation is required. The current version is **v0.6: The Account**, a development build, not a finished photorealistic release.
+Open [DISSENT on GitHub Pages](https://nawaaaaaaaar.github.io/dissent-last-ballot/) in a WebGL 2 browser. No account or installation is required. The current version is **v0.7: Break Through**, a development build, not a finished photorealistic release.
+
+**PLAY · Break through** starts the new action chapter. Police pressure is active immediately. Recover the recorder, hold Action/E at the line, get Kabir moving and reach the assembly. Dodge red warning zones with Q or the touch button; sprint uses stamina, and jump clears fallen barriers. Optional hold-to-help rescues restore health and add score. The ending awards a run rank using time, health and people helped. No story-dialogue confirmation is required in this mode.
+
+The button **Explore the slower story chapter** retains v0.6's branching narrative. Its controls and checkpoint description below refer to that mode. Action mode retries retain mission items in the current session, but do not save the run across reloads. Sound is activated by the Play gesture and can be muted.
 
 - **Desktop:** WASD/arrows walk, Shift runs, Space jumps, E interacts, P/Escape pauses. Drag the scene to orbit the camera; movement follows its direction.
 - **Phone:** Move with the left joystick. Drag the world to turn the camera. Use Run, Jump and nearby interaction buttons.
@@ -33,7 +37,7 @@ It is still not the requested real-world-looking production game. Faces have no 
 
 ## Build and verification
 
-Run `npm ci` and `npx playwright install chromium`, then `npm start`. In another terminal, `npm test` runs world-story and touch-input checks. `DISSENT_URL` may target another deployment. Software-rendered tests are intentionally deterministic and do not certify physical-device frame rates.
+Run `npm ci` and `npx playwright install chromium`, then `npm start`. In another terminal, `npm run test:action` runs the action chapter and mobile checks; `npm test` covers the slower world-story mode. `DISSENT_URL` may target another deployment. Software-rendered tests are intentionally deterministic and do not certify physical-device frame rates.
 
 The vendored browser runtime needs no build step. `tools/convert-rocketbox.py` reproduces the textured human and animation conversion; original selected FBX/texture sources and editable Blender files are included. `tools/build-art.py` preserves the earlier clothing/tree pipeline. Credits and licences are in [asset provenance](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/ASSETS.md).
 

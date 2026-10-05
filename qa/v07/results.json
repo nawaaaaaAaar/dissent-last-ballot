@@ -1,0 +1,14 @@
+{
+  "version": "0.7",
+  "pass": true,
+  "checks": [
+    "immediate playable action, dodge and cooldown",
+    "hold-to-help rescue, recorder pickup, live barricade progress, companion and winning handoff without dialogue",
+    "damage, capture and checkpoint retry",
+    "sprint consumes stamina; resting restores it",
+    "real touch movement, dodge, held rescue action, pause; portrait and landscape layout"
+  ],
+  "errors": [],
+  "physicalPhoneTested": false,
+  "humanEnjoymentTested": false
+}

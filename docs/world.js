@@ -1,14 +1,15 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {human,loadPeople,poseHuman} from './people.js?v=0.6.1';
-import {STORY,ITEMS} from './story.js?v=0.6.1';
-import {WorldAudio} from './world-audio.js?v=0.6.1';
-import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.6.1';
+import {human,loadPeople,poseHuman} from './people.js?v=0.7.0';
+import {STORY,ITEMS} from './story.js?v=0.7.0';
+import {WorldAudio} from './world-audio.js?v=0.7.0';
+import {materials as M,box,cylinder,label,sign,mergeStatic,barricade,bus,observatory,ramaYantra,bench,lamp,tent} from './world-props.js?v=0.7.0';
 import {EffectComposer,RenderPass,SSAOPass,OutputPass} from './effects.js';
+import {ActionGame} from './action-game.js?v=0.7.0';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.6.1';
+const asset=n=>(window.origin==='null'?'https://raw.githubusercontent.com/nawaaaaaAaar/dissent-last-ballot/main/docs/assets/':'./assets/')+n+'?v=0.7.0';
 const s={mode:'loading',x:0,z:31,y:0,vy:0,yaw:0,pitch:.35,time:0,move:0,sprint:false,
   tasks:{organiser:false,aid:false,witness:false,barrier:false,assembly:false},solidarity:0,pressure:0,
   quality:coarse?'low':'high',sound:false,near:null,dialog:null,checkpoint:null,capture:0,reduced:false};
@@ -40,7 +41,7 @@ function continueGame(){
   hud();nearest();saveProgress();toast('Your last story checkpoint is restored. Progress stays on this browser.');
 }
 const keys=new Set(),joy={x:0,y:0},actors=[],police=[],trees=[],flags=[],colliders=[],events=[];
-let renderer,scene,camera,player,composer,ssao,sun,treeSource,barriers=[],clock,manual=false,last=0,anim=0,fps=0,frames=0,frameStart=performance.now(),toastTime=0,cameraDrag=null,ambient;
+let renderer,scene,camera,player,composer,ssao,sun,treeSource,barriers=[],clock,manual=false,last=0,anim=0,fps=0,frames=0,frameStart=performance.now(),toastTime=0,cameraDrag=null,ambient,action;
 const rng=seed=>()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;},rand=rng(5108);
 const objectives=[
   ['organiser','Meet the organiser at the gathering'],
@@ -59,7 +60,10 @@ function mode(m){
   $('retry').hidden=m!=='caught';
   $('journal').hidden=!['playing','journal'].includes(m);
   $('rally-screen').hidden=m!=='rally';$('journal-screen').hidden=m!=='journal';
+  $('action-hud').hidden=!action?.active||['menu','loading','error','won','caught'].includes(m);
+  $('evade').hidden=!action?.active;
   document.body.classList.toggle('playing',m!=='menu'&&m!=='loading');
+  document.body.classList.toggle('action-play',!!action?.active);
 }
 async function tex(name,repeat=1,srgb=false){
   const t=await new THREE.TextureLoader().loadAsync(asset(name));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeat,repeat);
@@ -139,6 +143,10 @@ function buildWorld(){
   const b=bus();b.position.set(7.7,0,-25);scene.add(b);colliders.push({x:7.7,z:-25,w:3.2,d:9.2,name:'transport bus'});
   for(let x=-7.9;x<9;x+=3.15){const g=barricade();g.position.set(x,0,-33);scene.add(g);barriers.push(g);}
   for(let x of [-7,6]){const g=barricade();g.position.set(x,0,36);scene.add(g);}
+  for(const [x,z] of [[-1,-8],[-8,-19]]){
+    const g=barricade();g.position.set(x,.12,z);g.rotation.x=Math.PI/2;scene.add(g);
+    colliders.push({x,z,w:3.15,d:.8,name:'fallen barricade'});
+  }
   const supplies=new THREE.Group();
   for(let i=0;i<7;i++){
     const x=-24.1+i*.35;
@@ -233,6 +241,11 @@ function addTrees(){
 }
 function nearest(){
   let best=null,d=2.7;for(const e of events){
+    if(s.tasks[e.id])continue;
+    if(action?.active){
+      if(['witness','record'].includes(e.id))continue;
+      if(action.rescued.includes(e.id))continue;
+    }
     if(e.item&&s.items.includes(e.id))continue;
     if(e.id==='companion'&&(!s.tasks.barrier||s.companion))continue;
     if(e.id==='record'&&(!s.tasks.barrier||s.choice!=='archive'))continue;
@@ -242,9 +255,13 @@ function nearest(){
   }
   s.near=best;
   $('interact').hidden=s.mode!=='playing'||!best;
-  if(best)$('interact').textContent=best.prompt+'  ·  E';
+  if(best)$('interact').textContent=action?.active?
+    (best.id==='barrier'?`HOLD TO BREAK THROUGH ${Math.round(action.barrier*100)}%`:
+    ['aid','organiser','protest'].includes(best.id)?'HOLD TO HELP · +200':
+    best.id==='companion'?'GET KABIR MOVING · E':best.id==='assembly'?'FINISH THE RUN · E':best.prompt+' · E'):best.prompt+'  ·  E';
 }
 function dialog(e){
+  if(action?.active){action.interact(s,e);return;}
   if(e.item){
     s.items.push(e.id);e.prop.visible=e.marker.visible=false;
     if(e.type==='water'){s.inventory.water++;toast(`Water secured: ${s.inventory.water} / 3. Bring it to Dev at first aid.`);}
@@ -297,7 +314,8 @@ function journal(){
     (s.notes.map(n=>n.title+'\n'+n.copy).join('\n\n')||'Explore the benches and courtyard for optional story fragments.');
   mode('journal');
 }
-function begin(){
+function begin(playAction=false){
+  action?.reset(playAction);
   try{localStorage.removeItem(SAVE_KEY);}catch{}
   keys.clear();joy.x=joy.y=0;$('sprint').classList.remove('active');
   Object.assign(s,{x:0,z:31,y:0,vy:0,capture:0,pressure:0,solidarity:0,yaw:0,dialog:null,checkpoint:null});
@@ -307,13 +325,19 @@ function begin(){
   for(const k in s.tasks)s.tasks[k]=false;
   barriers.forEach(g=>g.rotation.x=0);police.forEach((a,i)=>{a.p.group.position.set(4+i*1.3,0,-37-i);});
   mode('playing');toast(coarse?'Move with the left joystick. Mira waits by the gold ring ahead.':'WASD to move; drag to look. Meet Mira at the gold ring ahead.',6);hud();
+  if(playAction){
+    s.pressure=1;s.checkpoint={x:0,z:31};
+    police.forEach((a,i)=>a.p.group.position.set(5+i,0,35-i));
+    toast(coarse?'RUN is ready. Move with the joystick. Dodge red zones; recover the recorder.':'WASD · SHIFT run · SPACE jump · Q dodge. Recover the recorder. Hold E to help.',5);
+    $('sprint').classList.add('active');
+  }
 }
 function valid(x,z){
   const area=(x>=-10.4&&x<=10.4&&z>=-49&&z<=38)||(x>=-28&&x<=-10.4&&z>=-12&&z<=22);
   if(!area)return false;
   if(!s.tasks.barrier&&z<-32&&z>-34)return false;
   if(!s.tasks.barrier&&s.z>-32&&z<=-34)return false;
-  for(const c of colliders)if(Math.abs(x-c.x)<c.w/2+.32&&Math.abs(z-c.z)<c.d/2+.32)return false;
+  for(const c of colliders)if(Math.abs(x-c.x)<c.w/2+.32&&Math.abs(z-c.z)<c.d/2+.32&&!(c.name==='fallen barricade'&&s.y>.65))return false;
   return true;
 }
 function step(dt){
@@ -328,8 +352,8 @@ function step(dt){
   let ix=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
   let iz=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
   const mag=Math.hypot(ix,iz);if(mag>1){ix/=mag;iz/=mag;}
-  s.sprint=keys.has('ShiftLeft')||keys.has('ShiftRight')||$('sprint').classList.contains('active');
-  const speed=s.sprint?4.6:1.8;
+  s.sprint=(keys.has('ShiftLeft')||keys.has('ShiftRight')||$('sprint').classList.contains('active'))&&(!action?.active||action.sprintAllowed);
+  const speed=action?.active&&action.dodge>0?7.5:s.sprint?4.6:action?.active?2.6:1.8;
   const dx=(ix*Math.cos(s.yaw)-iz*Math.sin(s.yaw))*speed*dt;
   const dz=(-ix*Math.sin(s.yaw)-iz*Math.cos(s.yaw))*speed*dt;
   const previousX=s.x,previousZ=s.z;
@@ -343,7 +367,7 @@ function step(dt){
   anim+=dt*(s.move?(s.sprint?10.5:7.5):.75);poseHuman(player,anim,s.move?(s.sprint?1:.65):0);
   for(const a of actors){
     const dist=Math.hypot(a.p.group.position.x-s.x,a.p.group.position.z-s.z);
-    a.p.group.visible=s.quality==='high'||dist<28;
+    a.p.group.visible=s.quality==='high'||dist<28||(a.police&&s.pressure>0);
     if(!a.p.group.visible)continue;
     if(a===events.find(e=>e.id==='companion')?.a&&s.companion){
       const p=a.p.group.position,d=Math.hypot(s.x-p.x,s.z-p.z);a.p.worldSpeed=d>1.6?4.1:0;
@@ -351,10 +375,10 @@ function step(dt){
       poseHuman(a.p,s.time*7.5+a.phase,d>1.6?.65:0);
     }else if(a.police&&s.pressure){
       const p=a.p.group.position,d=Math.max(.1,Math.hypot(s.x-p.x,s.z-p.z));
-      const speed=s.assist?1.3:1.7;
+      const speed=action?.active?(s.assist?2.0:2.7):(s.assist?1.3:1.7);
       if(d>1.2){const x=p.x+(s.x-p.x)/d*speed*dt,z=p.z+(s.z-p.z)/d*speed*dt;if(valid(x,z)){p.x=x;p.z=z;}}
       a.p.group.rotation.y=Math.atan2(s.x-p.x,s.z-p.z)+Math.PI;poseHuman(a.p,s.time*8+a.phase,.7);
-      if(d<1.25)s.capture+=dt;
+      if(d<1.25&&!action?.active)s.capture+=dt;
     }else if(a.walking){
       const p=a.p.group.position,oldX=p.x,oldZ=p.z;p.x=a.x+Math.sin(s.time*.18+a.phase)*2.5;p.z=a.z+Math.cos(s.time*.18+a.phase)*1.8;
       a.p.worldSpeed=Math.hypot(p.x-oldX,p.z-oldZ)/Math.max(.0001,dt);a.p.poseTimeDivisor=4.5;
@@ -367,8 +391,10 @@ function step(dt){
   if(s.capture>(s.assist?3.4:1.8)){mode('caught');$('ending-title').textContent='The account is interrupted.';$('ending-copy').textContent='The fictional crackdown caught up with you. Return to your last completed story point; supplies, recovered items and story choices remain remembered for this play session.';}
   barriers.forEach((g,i)=>{if(s.tasks.barrier)g.rotation.x=Math.min(Math.PI/2,g.rotation.x+dt*(1+i*.12));});
   if(!s.reduced)flags.forEach((f,i)=>{const p=f.geometry.attributes.position;for(let j=0;j<p.count;j++)p.setZ(j,Math.sin(s.time*2+p.getX(j)*4+i)*.055*(p.getX(j)+.6));p.needsUpdate=true;});
-  events.forEach(e=>{e.marker.visible=!(e.item?s.items.includes(e.id):s.tasks[e.id])&&Math.hypot(s.x-e.x,s.z-e.z)<25;if(e.id==='companion')e.marker.visible=s.tasks.barrier&&!s.companion;if(e.id==='record')e.marker.visible=s.tasks.barrier&&s.choice==='archive'&&!s.tasks.assembly;});
-  nearest();hud();map();
+  events.forEach(e=>{e.marker.visible=!(e.item?s.items.includes(e.id):s.tasks[e.id])&&Math.hypot(s.x-e.x,s.z-e.z)<25;if(e.id==='companion')e.marker.visible=s.tasks.barrier&&!s.companion;if(e.id==='record')e.marker.visible=s.tasks.barrier&&s.choice==='archive'&&!s.tasks.assembly;if(action?.active&&(e.id==='witness'||e.id==='record'||action.rescued.includes(e.id)))e.marker.visible=false;});
+  nearest();
+  if(action?.active){action.update(dt,s,s.near,police,s.move>0);actionHud();}
+  hud();map();
   events.forEach(e=>e.marker.scale.setScalar(e.id===s.target?1.5:1));
 }
 function hud(){
@@ -378,6 +404,7 @@ function hud(){
   if(s.tasks.witness){id='barrier';text='Stand with Mira at the barricade';}
   if(s.tasks.barrier){id=s.choice==='archive'?'record':'assembly';text=s.choice==='archive'?'Reach Leela at the protected record desk':'Bring Sana’s statement to Iqbal at the assembly';}
   if(s.tasks.assembly)text='Chapter complete';
+  if(action?.active){id=action.target(s);text=action.objective(s);}
   s.target=id;const target=events.find(e=>e.id===id);$('objective').textContent=text;
   $('objective-distance').textContent=target&&!s.tasks.assembly?`${Math.round(Math.hypot(s.x-target.x,s.z-target.z))} m • ${s.tasks.barrier&&!s.companion?'Kabir can still be helped near the line':'Gold markers guide the main story'}`:'';
   $('inventory').textContent=`WATER ${s.inventory.water}/3 • RECORDER ${s.inventory.recorder?'SECURED':'MISSING'}`;
@@ -386,13 +413,33 @@ function hud(){
   $('pressure').textContent=s.pressure?'CRACKDOWN ACTIVE':'THE GATHERING';
   $('location').textContent=s.x<-10?'COMMUNITY COURTYARD':s.z<-32?'ASSEMBLY APPROACH':s.z<-10?'JANTAR MANTAR ROAD':'THE GATHERING';
 }
+function actionHud(){
+  $('health').textContent='●'.repeat(Math.max(0,action.health))+'○'.repeat(5-Math.max(0,action.health));
+  $('stamina').style.width=action.stamina+'%';
+  $('action-score').textContent=action.score;
+  $('action-time').textContent=Math.floor(action.time/60)+':'+String(Math.floor(action.time%60)).padStart(2,'0');
+  $('action-rescues').textContent=action.rescued.length+' / 3 helped';
+  $('evade').textContent=action.cooldown>0?'DODGE '+action.cooldown.toFixed(1):'DODGE · Q';
+  document.body.classList.toggle('hurt',action.hurt>1.4);
+  $('action-warning').hidden=action.charge<=0;
+}
+function actionWin(){
+  s.tasks.assembly=true;mode('won');
+  const medal=action.health>=4&&action.rescued.length>=2?'SOLIDARITY':action.health>=3?'DEFIANCE':'SURVIVOR';
+  $('ending-title').textContent=medal+' · '+action.score;
+  $('ending-copy').textContent=`You brought Kabir and the recorder through the line. ${action.rescued.length} of 3 other people helped. Time ${Math.floor(action.time/60)}:${String(Math.floor(action.time%60)).padStart(2,'0')}. The assembly can speak; the state did not erase their account. Try another route or help everyone on the next run.`;
+}
+function actionFail(){
+  mode('caught');$('ending-title').textContent='Caught in the crackdown.';
+  $('ending-copy').textContent='The run is not over. Retry from the last checkpoint with recovered items intact. Keep moving when a red zone appears, manage your sprint, and use Dodge to get space.';
+}
 function map(){
   const c=$('map').getContext('2d'),w=144;c.clearRect(0,0,w,w);c.fillStyle='rgba(17,26,27,.87)';c.fillRect(0,0,w,w);
   const xy=(x,z)=>[(x+32)/80*w,(z+54)/98*w];
   c.fillStyle='#596463';const a=xy(-10,-49),b=xy(10,38);c.fillRect(a[0],a[1],b[0]-a[0],b[1]-a[1]);
   const d=xy(-28,-12),e=xy(-10,22);c.fillRect(d[0],d[1],e[0]-d[0],e[1]-d[1]);
   c.fillStyle='#51614d';const f=xy(12,-50);c.fillRect(f[0],f[1],144-f[0],144);
-  for(const ev of events){if(ev.item&&s.items.includes(ev.id))continue;const p=xy(ev.x,ev.z);c.fillStyle=ev.item&&ev.type==='note'?'#91b0a7':s.tasks[ev.id]?'#647567':'#d4b079';c.beginPath();c.arc(...p,ev.id===s.target?4.5:ev.item?2:3,0,6.28);c.fill();if(ev.id===s.target){c.strokeStyle='#f6e8c9';c.lineWidth=1;c.stroke();}}
+  for(const ev of events){if(ev.item&&s.items.includes(ev.id))continue;if(action?.active&&(['witness','record'].includes(ev.id)||action.rescued.includes(ev.id)))continue;const p=xy(ev.x,ev.z);c.fillStyle=ev.item&&ev.type==='note'?'#91b0a7':s.tasks[ev.id]?'#647567':'#d4b079';c.beginPath();c.arc(...p,ev.id===s.target?4.5:ev.item?2:3,0,6.28);c.fill();if(ev.id===s.target){c.strokeStyle='#f6e8c9';c.lineWidth=1;c.stroke();}}
   const p=xy(s.x,s.z);c.fillStyle='#faf0d6';c.beginPath();c.arc(...p,3.5,0,6.28);c.fill();
   c.strokeStyle='#faf0d6';c.beginPath();c.moveTo(...p);c.lineTo(p[0]-Math.sin(s.yaw)*8,p[1]-Math.cos(s.yaw)*8);c.stroke();
 }
@@ -423,15 +470,15 @@ function quality(){
 }
 function pause(){
   if(s.mode==='paused'){mode(s.beforePause||'playing');return;}
-  if(['playing','dialog','rally','journal'].includes(s.mode)){keys.clear();joy.x=joy.y=0;s.beforePause=s.mode;mode('paused');}
+  if(['playing','dialog','rally','journal'].includes(s.mode)){keys.clear();joy.x=joy.y=0;if(action)action.holding=false;s.beforePause=s.mode;mode('paused');}
 }
 function bindings(){
   let lastTouch=-1000;
   document.addEventListener('pointerdown',()=>lastTouch=-1000,true);
   document.addEventListener('click',e=>{if(performance.now()-lastTouch<700&&(e.pointerType==='touch'||e.detail>0)){e.preventDefault();e.stopImmediatePropagation();}},true);
   function button(id,fn){$(id).addEventListener('pointerup',e=>{if(e.pointerType==='touch'){lastTouch=performance.now();fn();}});$(id).onclick=e=>{if(e.detail===0||performance.now()-lastTouch>700)fn();};}
-  button('start',begin);button('pause',pause);button('resume',pause);button('restart',begin);button('again',begin);
-  button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;police.forEach((a,i)=>a.p.group.position.set(7+i*.5,0,-37-i));mode('playing');toast('Your completed acts of solidarity remain. Continue the chapter.');});
+  button('start',()=>{if(!s.sound){try{s.sound=audio.toggle();$('sound').textContent=s.sound?'Sound on':'Sound off';}catch{}}begin(true);});button('story-start',()=>begin(false));button('pause',pause);button('resume',pause);button('restart',()=>begin(action?.active));button('again',()=>begin(action?.active));
+  button('retry',()=>{const c=s.checkpoint;s.x=c?.x||0;s.z=c?.z||31;s.capture=0;if(action.active){action.health=5;action.hurt=2;action.stamina=100;action.charge=0;action.sweep=0;action.warning.visible=false;}police.forEach((a,i)=>a.p.group.position.set(s.x+4+i*.5,0,s.z+5));mode('playing');toast('Checkpoint restored. Keep going.');});
   button('title',()=>{mode('menu');keys.clear();joy.x=joy.y=0;});
   button('dialog-confirm',complete);button('dialog-back',()=>{s.dialog=null;mode('playing');});
   button('dialog-alt',()=>{s.choice='archive';complete();});
@@ -440,6 +487,9 @@ function bindings(){
   $('storymode').onchange=()=>s.assist=$('storymode').checked;
   $('assist-game').onchange=()=>{s.assist=$('assist-game').checked;$('storymode').checked=s.assist;};
   button('interact',()=>{if(s.near)dialog(s.near);});
+  button('evade',()=>{if(s.mode==='playing')action.evade();});
+  $('interact').addEventListener('pointerdown',()=>{if(action?.active&&s.near)action.interact(s,s.near);});
+  for(const type of ['pointerup','pointercancel'])$('interact').addEventListener(type,()=>{if(action)action.holding=false;});
   button('jump',()=>{if(s.mode==='playing'&&!s.y)s.vy=5.3;});
   button('sprint',()=>{$('sprint').classList.toggle('active');});
   button('sound',()=>{
@@ -451,10 +501,11 @@ function bindings(){
     if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowLeft','ArrowDown','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){keys.add(e.code);if(s.mode!=='menu')e.preventDefault();}
     if(e.code==='Space'&&s.mode==='playing'){if(!s.y)s.vy=5.3;e.preventDefault();}
     if(e.code==='KeyE'&&!e.repeat){if(s.mode==='playing'&&s.near)dialog(s.near);else if(s.mode==='dialog')complete();else if(s.mode==='rally')rallyHit();}
+    if(e.code==='KeyQ'&&!e.repeat&&s.mode==='playing')action.evade();
     if(e.code==='KeyJ'&&!e.repeat)journal();
     if(['Escape','KeyP'].includes(e.code)){pause();e.preventDefault();}
   });
-  document.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',()=>{keys.clear();joy.x=joy.y=0;});
+  document.addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyE'&&action)action.holding=false;});window.addEventListener('blur',()=>{keys.clear();joy.x=joy.y=0;if(action)action.holding=false;});
   let pointer;
   $('joystick').addEventListener('pointerdown',e=>{pointer=e.pointerId;e.preventDefault();$('joystick').setPointerCapture(pointer);moveStick(e);});
   function moveStick(e){
@@ -493,14 +544,23 @@ async function init(){
     }
     buildWorld();if(treeSource)addTrees();else toast('Tree asset unavailable; the chapter remains playable.');
     player=human('#a86137');player.group.position.set(0,0,31);scene.add(player.group);populate();
+    action=new ActionGame(scene,{toast,tone:(...args)=>audio.tone(...args),collect:e=>{
+      s.items.push(e.id);e.prop.visible=e.marker.visible=false;
+      if(e.type==='recorder'){s.inventory.recorder=true;toast('Recorder secured. Get through the barricade.',3);}
+      else if(e.type==='water'){s.inventory.water++;action.health=Math.min(5,action.health+1);toast('Water recovered. Health restored.',2);}
+      else{s.notes.push(e);toast(e.title+' added to the journal.',2);}
+      audio.tone(480,.12);
+    },win:actionWin,fail:actionFail});
     composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));ssao=new SSAOPass(scene,camera,innerWidth,innerHeight);
     ssao.kernelRadius=.5;ssao.minDistance=.002;ssao.maxDistance=.08;composer.addPass(ssao);composer.addPass(new OutputPass());
-    quality();mode('menu');$('start').disabled=false;$('start').textContent='Enter the gathering';$('loading').textContent='Ready • Desktop and touch controls';
+    quality();mode('menu');$('start').disabled=false;$('story-start').disabled=false;$('start').textContent='PLAY · Break through';$('loading').textContent='Ready • Desktop and touch controls';
     $('continue').hidden=!savedGame();
     window.render_game_to_text=()=>JSON.stringify({mode:s.mode,coordinates:'x east/right, z south/back; approximate game geography, not surveyed map',position:{x:+s.x.toFixed(2),z:+s.z.toFixed(2),y:+s.y.toFixed(2)},cameraYaw:+s.yaw.toFixed(2),tasks:s.tasks,inventory:s.inventory,items:s.items,choice:s.choice,companion:s.companion,notes:s.notes.length,rally:{hits:s.rallyHits,phase:+Math.abs(Math.sin(s.rallyTime*2)).toFixed(2)},solidarity:s.solidarity,pressure:s.pressure,near:s.near?.id||null,dialog:s.dialog,quality:s.quality,sound:s.sound,texturedHumans:true,animationClips:['Idle','Walk','Run'],treeAsset:!!treeSource,fps,rendering:{draws:renderer.info.render.calls,triangles:renderer.info.render.triangles},events:events.map(e=>({id:e.id,x:e.x,z:e.z,done:e.item?s.items.includes(e.id):!!s.tasks[e.id]})),police:police.map(a=>({x:+a.p.group.position.x.toFixed(2),z:+a.p.group.position.z.toFixed(2)}))});
-    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.6`;};
+    window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP • ${s.quality.toUpperCase()} • WORLD / 0.7`;};
+    const worldText=window.render_game_to_text;
+    window.render_game_to_text=()=>JSON.stringify({...JSON.parse(worldText()),action:{active:action.active,health:action.health,stamina:+action.stamina.toFixed(2),dodge:+action.dodge.toFixed(2),cooldown:+action.cooldown.toFixed(2),time:+action.time.toFixed(2),charge:+action.charge.toFixed(2),rescued:action.rescued,barrier:+action.barrier.toFixed(2),score:action.score}});
     window.resumeRealTime=()=>{manual=false;last=performance.now();};
-    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.6`;}}
+    function frame(now){requestAnimationFrame(frame);if(manual)return;const dt=Math.min(.05,(now-last)/1000||0);last=now;step(dt);render();frames++;if(now-frameStart>1000){fps=Math.round(frames*1000/(now-frameStart));frames=0;frameStart=now;$('performance').textContent=`${fps} fps • ${s.quality.toUpperCase()} • WORLD / 0.7`;}}
     requestAnimationFrame(frame);
   }catch(e){console.error(e);s.mode='error';$('loading').textContent=e.message;$('start').textContent='Reload to retry';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }

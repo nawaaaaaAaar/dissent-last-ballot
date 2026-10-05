@@ -55,7 +55,7 @@ async function supplies(p){
 try{
   const ctx=await browser.newContext({viewport:{width:1280,height:800}});
   const p=await ready(ctx);await shot(p,'world-final-title.png');
-  await p.locator('#start').click();await tick(p,0);await shot(p,'world-final-street.png');
+  await p.locator('#story-start').click();await tick(p,0);await shot(p,'world-final-street.png');
   await p.keyboard.press('Space');await tick(p,180);assert((await state(p)).position.y>0);await tick(p,700);
   await p.locator('#pause').click();const paused=(await state(p)).position;
   await p.keyboard.down('w');await tick(p,500);await p.keyboard.up('w');
@@ -105,7 +105,7 @@ try{
   checks.push('journal open/close');
   const desktop=await state(p);await ctx.close();
   const mobileCtx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
-  const m=await ready(mobileCtx);await shot(m,'world-mobile-title.png');await m.locator('#start').tap();await tick(m,0);
+  const m=await ready(mobileCtx);await shot(m,'world-mobile-title.png');await m.locator('#story-start').tap();await tick(m,0);
   const session=await mobileCtx.newCDPSession(m);
   const r=await m.locator('#joystick').boundingBox(),cx=r.x+r.width/2,cy=r.y+r.height/2;
   await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:cx,y:cy,id:1}]});

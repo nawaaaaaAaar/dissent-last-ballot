@@ -1,5 +1,7 @@
 # DISSENT: The Account
 
+In v0.7 this branching narrative is selected with **Explore the slower story chapter**. The default **PLAY · Break through** mode is a separate action route: recover the recorder under immediate police pressure, help optional people, hold the barricade action, bring Kabir with you and reach the assembly. It has score/rank replay rather than the two handoff branches described below.
+
 Chapter one is an explorable fictional resistance story in a compressed Jantar Mantar setting. Aman arrives looking for Kabir and discovers that finding a friend means becoming useful to a gathering under state pressure. The journalist's account becomes a responsibility, not a collectible trophy.
 
 ## Characters

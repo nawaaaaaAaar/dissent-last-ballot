@@ -1,5 +1,17 @@
 # QA and limitations
 
+## v0.7 Break Through
+
+The supplied game client also exercised movement and jumping in the default action mode (`qa/v07-client/`). Its initial five-second Play wait expired before the models finished loading; the adapted client now waits up to 90 seconds for the deterministic game hook, freezes rendering, then clicks Play. The rerun records `playing`, active pressure and airborne height. This adaptation is a test-loader accommodation, not a claim of fast cold loading.
+
+`npm run test:action` passed the default action chapter through live rescue, recorder recovery, held barricade progress, Kabir and the winning assembly handoff. Separate assertions cover dodge/cooldown, paused mission time, deliberate capture and checkpoint retry, stamina consumption/recovery, actual mobile touch movement and Dodge, and portrait/landscape fit. Results and actual engine captures are in `qa/v07/`; there were no page errors.
+
+The deliberate-failure test caught officers stopping at a distance greater than the damage threshold. Contact damage was changed to overlap their stopping range. The stamina test also corrected its own toggle assumption after restart. Visual review found the mobile Dodge caption overflowing its button; button padding and type size were revised.
+
+`npm test` also passed both endings and checkpoint continuation in the separately selectable story mode after the new controls and props were added. The action tests use actual keyboard/click/touch input with deterministic simulation stepping. Physical phones, human enjoyment, authored dodge/jump motion and a reactive crowd remain unverified or unfinished.
+
+Action-mode checkpoints preserve the mission during retry in the current tab, not across reloads. The source snapshot and older branch results do not establish a new graphics-quality claim.
+
 ## v0.6 The Account
 
 The public GitHub Pages frontend commit `4d34f67` (`world.js?v=0.6.1`) was checked in cloud Chromium through supplies, recorder recovery, the public handoff choice, rally pause/resume and three successful beats, companion help and the completed assembly ending. Public low-graphics mobile emulation used actual touch input for start and joystick travel, then portrait/landscape captures with no horizontal overflow. `qa/v06-public-results.json` and `qa/v06-public-*` retain these checks. Deterministic stepping was used; reported FPS is not a hardware benchmark.

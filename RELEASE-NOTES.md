@@ -1,5 +1,15 @@
 # DISSENT release notes
 
+## v0.7: Break Through
+
+- Made the default Play button start an action chapter rather than a chain of dialogue errands. The older branching story is available separately.
+- Added immediate police pursuit, five health pips, contact damage, telegraphed red pressure zones, a short dodge with cooldown, stamina-driven sprinting and jump-clearable fallen barriers.
+- Added optional live hold-to-help rescues, a live hold-to-break barricade interaction, recorder recovery, companion movement and a playable handoff without dialogue interruptions.
+- Added score, time and three ending ranks, with replay incentives for helping more people and finishing with health intact.
+- Passed action completion, capture/retry, stamina and mobile touch checks; retained both slower-story endings. Corrected a contact-range gap found by the failure test, and cramped mobile Dodge text found in visual review.
+- Retains v0.6 art. The dodge uses acceleration/invulnerability, not a new authored roll animation. Pressure zones and destruction are abstract game systems, not physical police/crowd simulations or real-world instructions.
+- Action checkpoints are in-session only. Physical-phone performance and human enjoyment are not verified.
+
 ## v0.6: The Account
 
 - Added named fictional characters and a personal story motive: Aman is looking for Kabir.

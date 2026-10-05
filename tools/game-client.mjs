@@ -289,6 +289,8 @@ async function main() {
 
   if (args.clickSelector) {
     try {
+      await page.waitForFunction(() => typeof window.advanceTime === "function", {timeout: 90000});
+      await page.evaluate(() => window.advanceTime(0));
       await page.click(args.clickSelector, { timeout: 5000 });
       await page.waitForTimeout(250);
     } catch (err) {

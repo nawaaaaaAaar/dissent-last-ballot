@@ -1,0 +1,83 @@
+import {chromium} from 'playwright';
+import {mkdir,writeFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+process.env.PW_TEST_SCREENSHOT_NO_FONTS_READY='1';
+const base=process.env.DISSENT_URL||'http://127.0.0.1:5173/';
+const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader']});
+const errors=[],checks=[];
+const state=p=>p.evaluate(()=>JSON.parse(render_game_to_text()));
+const tick=(p,ms)=>p.evaluate(ms=>advanceTime(ms),ms);
+async function setup(ctx){
+  const p=await ctx.newPage();p.setDefaultTimeout(30000);p.on('pageerror',e=>errors.push(e.message));
+  await p.goto(base+(base.includes('?')?'&':'?')+'quality=low&qa=action',{waitUntil:'domcontentloaded'});
+  await p.waitForFunction(()=>typeof advanceTime==='function',{timeout:90000});await tick(p,0);return p;
+}
+async function walk(p,x,z){
+  for(let i=0;i<30;i++){
+    const v=(await state(p)).position,dx=x-v.x,dz=z-v.z;
+    if(Math.hypot(dx,dz)<.4)return;
+    const k=Math.abs(dx)>.28?(dx>0?'d':'a'):(dz>0?'s':'w'),d=Math.abs(dx)>.28?Math.abs(dx):Math.abs(dz);
+    await p.keyboard.down(k);await tick(p,Math.min(10000,d/2.6*1000));await p.keyboard.up(k);
+    assert.equal((await state(p)).mode,'playing','player must survive route');
+  }throw Error('route failed');
+}
+try{
+  await mkdir('qa/v07',{recursive:true});
+  const ctx=await browser.newContext({viewport:{width:1280,height:800}}),p=await setup(ctx);
+  await p.locator('#start').click();await tick(p,0);
+  assert.equal((await state(p)).action.active,true);assert.equal((await state(p)).pressure,1);
+  await p.locator('#sprint').click();
+  await p.keyboard.press('q');await tick(p,100);assert((await state(p)).action.dodge>0);
+  await tick(p,600);const cooldown=(await state(p)).action.cooldown;
+  await p.keyboard.press('q');assert((await state(p)).action.cooldown<=cooldown+.01);
+  checks.push('immediate playable action, dodge and cooldown');
+  await p.locator('#pause').click();const t=(await state(p)).action.time;await tick(p,1000);
+  assert.equal((await state(p)).action.time,t);await p.locator('#resume').click();
+  await walk(p,-3,24);await p.keyboard.down('e');await tick(p,1100);await p.keyboard.up('e');
+  assert((await state(p)).action.rescued.includes('organiser'));
+  await walk(p,3,24);await walk(p,3,-14);await p.keyboard.press('e');
+  assert.equal((await state(p)).inventory.recorder,true);
+  await walk(p,-3,-14);await walk(p,-3,-29.6);
+  await p.keyboard.down('e');await tick(p,2000);await p.keyboard.up('e');
+  assert.equal((await state(p)).tasks.barrier,true);
+  await tick(p,700);
+  await p.screenshot({path:'qa/v07/breakthrough.png'});
+  await walk(p,-6,-29.6);await walk(p,-6,-36);await p.keyboard.press('e');
+  assert.equal((await state(p)).companion,true);
+  await walk(p,-2,-36);await walk(p,-2,-45);await p.keyboard.press('e');
+  assert.equal((await state(p)).mode,'won');
+  await p.screenshot({path:'qa/v07/ending.png'});
+  checks.push('hold-to-help rescue, recorder pickup, live barricade progress, companion and winning handoff without dialogue');
+  await p.locator('#again').click();await tick(p,40000);assert.equal((await state(p)).mode,'caught');
+  await p.locator('#retry').click();assert.equal((await state(p)).mode,'playing');assert.equal((await state(p)).action.health,5);
+  checks.push('damage, capture and checkpoint retry');
+  await p.keyboard.down('Shift');await p.keyboard.down('w');await tick(p,2000);await p.keyboard.up('w');await p.keyboard.up('Shift');
+  assert((await state(p)).action.stamina<100);const stamina=(await state(p)).action.stamina;
+  await p.locator('#sprint').click();await tick(p,500);assert((await state(p)).action.stamina>stamina);
+  checks.push('sprint consumes stamina; resting restores it');
+  const mobile=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}),m=await setup(mobile);
+  await m.locator('#start').tap();await tick(m,0);const cdp=await mobile.newCDPSession(m);
+  const r=await m.locator('#joystick').boundingBox();
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+r.height/2}]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x+r.width/2,y:r.y+r.height/2-38}]});
+  await tick(m,1000);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  assert((await state(m)).position.z<28);await m.locator('#evade').tap();assert((await state(m)).action.dodge>0);
+  await tick(m,600);
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+r.height/2}]});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x+r.width/2-38,y:r.y+r.height/2}]});
+  await tick(m,700);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  assert.equal((await state(m)).near,'organiser');
+  const actionBox=await m.locator('#interact').boundingBox();
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:actionBox.x+actionBox.width/2,y:actionBox.y+actionBox.height/2}]});
+  await tick(m,1100);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  assert((await state(m)).action.rescued.includes('organiser'));
+  await m.locator('#pause').tap();assert.equal((await state(m)).mode,'paused');await m.locator('#resume').tap();
+  await m.screenshot({path:'qa/v07/mobile.png'});
+  await m.setViewportSize({width:844,height:390});await m.waitForTimeout(400);await tick(m,0);
+  await m.screenshot({path:'qa/v07/landscape.png'});
+  assert(await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  checks.push('real touch movement, dodge, held rescue action, pause; portrait and landscape layout');
+  assert.deepEqual(errors,[]);
+  await writeFile('qa/v07/results.json',JSON.stringify({version:'0.7',pass:true,checks,errors,physicalPhoneTested:false,humanEnjoymentTested:false},null,2));
+  console.log(JSON.stringify({pass:true,checks,errors}));
+}finally{await browser.close();}

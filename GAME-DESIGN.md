@@ -1,5 +1,13 @@
 # DISSENT: making the resistance story playable
 
+## v0.7 correction: action before exposition
+
+The creator's response to v0.6 was “Make it game actually.” Its mechanics passed functional tests, but too much of the experience still consisted of walking to markers and confirming dialogue. The default mode is now a short action chapter: immediate pursuit → recorder recovery → held barricade interaction → Kabir → assembly, with optional hold-to-help rescues along the way.
+
+Stamina, a cooldown dodge, five health pips, telegraphed red zones and fallen obstacles create moment-to-moment decisions. Movement away from a warning, a correctly timed jump or a dodge can prevent a hit. The player can spend time helping others for health and score, or focus on the critical route. A run rank rewards remaining health, time and help rather than injuries or destruction points.
+
+The older story chapter remains separately selectable; its two narrative destinations are not two branches of the new action mode. This change is an implemented response to feedback, not evidence that the new loop has already passed novice playtests. The art is retained, not newly photorealistic.
+
 The design goal is an accessible third-person exploration game that a person can enjoy without arriving as an expert gamer or political researcher. The narrative should emerge from useful actions, uncertainty, relationships and consequences, not a sequence of compulsory lectures. This brief records the research, its application to v0.6, and what remains unproven.
 
 ## What makes this kind of game work

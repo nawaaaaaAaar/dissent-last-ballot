@@ -56,8 +56,8 @@
     "treeAsset": true,
     "fps": 0,
     "rendering": {
-      "draws": 368,
-      "triangles": 956298
+      "draws": 380,
+      "triangles": 957966
     },
     "events": [
       {
@@ -158,7 +158,19 @@
         "x": 6.6,
         "z": -39
       }
-    ]
+    ],
+    "action": {
+      "active": false,
+      "health": 5,
+      "stamina": 100,
+      "dodge": 0,
+      "cooldown": 0,
+      "time": 0,
+      "charge": 0,
+      "rescued": [],
+      "barrier": 0,
+      "score": 0
+    }
   },
   "mobile": {
     "mode": "playing",
@@ -203,8 +215,8 @@
     "treeAsset": true,
     "fps": 0,
     "rendering": {
-      "draws": 385,
-      "triangles": 1047774
+      "draws": 397,
+      "triangles": 1049442
     },
     "events": [
       {
@@ -305,7 +317,19 @@
         "x": 6.6,
         "z": -39
       }
-    ]
+    ],
+    "action": {
+      "active": false,
+      "health": 5,
+      "stamina": 100,
+      "dodge": 0,
+      "cooldown": 0,
+      "time": 0,
+      "charge": 0,
+      "rescued": [],
+      "barrier": 0,
+      "score": 0
+    }
   },
   "physicalDeviceTested": false,
   "humanEnjoymentTested": false
