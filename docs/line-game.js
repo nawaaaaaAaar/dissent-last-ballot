@@ -29,7 +29,7 @@ $('move-stick').addEventListener('pointermove',moveStick);
 for(const event of['pointerup','pointercancel','lostpointercapture'])$('move-stick').addEventListener(event,()=>{stickPointer=null;stick={x:0,z:0};$('move-stick').querySelector('i').style.transform='';});
 document.addEventListener('keydown',e=>{
  if(e.target.tagName==='SELECT')return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys.add(e.code);
- if(e.repeat)return;if(e.code==='Space')game.strike();if(e.code==='KeyQ')game.dodge();
+ if(e.repeat)return;if(e.code==='Enter'&&game.mode==='menu'&&!$('start').disabled)start();if(e.code==='Space')game.strike();if(e.code==='KeyQ')game.dodge();
  if(e.code==='KeyE'&&game.context()?.id!=='rescue')game.action();if(e.code==='KeyP'||e.code==='Escape')pause();
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));

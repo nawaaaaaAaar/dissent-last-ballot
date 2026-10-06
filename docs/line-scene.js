@@ -25,7 +25,7 @@ export async function buildLine(container,low){
  const rust=new THREE.MeshStandardMaterial({map:wall,color:'#aa5f45',roughness:.94});
  const fence=new THREE.MeshStandardMaterial({color:'#43544f',metalness:.55,roughness:.55});
  function ground(mat,x,z,w,d,y=.01,tile=4){const g=new THREE.PlaneGeometry(w,d),uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*w/tile,uv.getY(i)*d/tile);const p=new THREE.Mesh(g,mat);p.rotation.x=-Math.PI/2;p.position.set(x,y,z);p.receiveShadow=true;scene.add(p);}
- ground(asphalt,0,-25,13,104);ground(paving,-7.3,-25,3,104,.015,2);ground(paving,7.3,-25,3,104,.015,2);
+ ground(asphalt,0,-25,13,104,.01,2.8);ground(paving,-7.3,-25,3,104,.015,2);ground(paving,7.3,-25,3,104,.015,2);
  const stat=new THREE.Group();
  for(const side of[-1,1]){
   box(stat,stone,side*9,.4,-25,.55,.8,104);
@@ -45,6 +45,10 @@ export async function buildLine(container,low){
  const entry=new THREE.Group();entry.position.set(-9,0,-2);entry.rotation.y=Math.PI/2;
  box(entry,stone,0,2.4,0,5,.45,1);sign(entry,'JANTAR MANTAR',0,2.4,.52,4.6,.4,'#c9b48c','#3e4237','जंतर मंतर');scene.add(entry);
  tent(stat,-6.7,11);sign(stat,'हर योग्य मतदाता',-6.7,2.5,12.82,3.7,.4,'#e2d5b8','#364b40','EVERY ELIGIBLE VOTER');
+ box(stat,M.wood,-6,.82,8,2,.1,1);
+ for(const x of[-6.8,-5.2])for(const z of[7.6,8.4])box(stat,fence,x,.4,z,.04,.8,.04);
+ box(stat,M.white,-6,.9,8,.45,.12,.32);box(stat,M.red,-6,.969,8,.28,.018,.07);box(stat,M.red,-6,.97,8,.07,.018,.25);
+ for(let i=0;i<3;i++)cylinder(stat,M.chrome,-5.4+i*.12,.93,8.1,.045,.16);
  bench(stat,-7,3,Math.PI);bench(stat,7,15,Math.PI);
  for(const z of[16,13,-12,-27]){cylinder(stat,rust,-7,.22,z,.34,.44);cylinder(stat,M.leaf,-7,.6,z,.42,.25);}
  const truck=bus();truck.position.set(5.8,0,-7);truck.rotation.y=Math.PI;scene.add(truck);
@@ -74,8 +78,8 @@ export async function buildLine(container,low){
  clothGeo.computeVertexNormals();const fabric=new THREE.Mesh(clothGeo,cloth);fabric.position.y=1;cart.add(fabric);
  for(const x of[-1,1]){cylinder(cart,fence,x,.9,0,.035,1.8);box(cart,fence,x,.13,0,.1,.1,1.1);for(const z of[-.4,.4])cylinder(cart,M.dark,x,.13,z,.11,.08,Math.PI/2);}
  sign(cart,'आवाज़ बचाओ',0,1,.04,1.75,.35,'#6b8071','#f0e4c8','KEEP THE ACCOUNT');scene.add(cart);
- function vehicle(){
-  const g=new THREE.Group(),paint=new THREE.MeshStandardMaterial({color:'#ded9cd',metalness:.25,roughness:.47});
+ function vehicle(police=false){
+  const g=new THREE.Group(),paint=new THREE.MeshStandardMaterial({color:police?'#304b56':'#ded9cd',metalness:.25,roughness:.47});
   const shell=new THREE.Mesh(new RoundedBoxGeometry(2.2,1.3,4.7,3,.16),paint);shell.position.y=1;g.add(shell);
   box(g,paint,0,1.85,.2,2.15,.9,3.8);box(g,M.glass,0,1.9,.95,1.91,.67,.03);
   // Model forward is local +z; the game rotates it along travel direction.
@@ -83,17 +87,20 @@ export async function buildLine(container,low){
   for(const s of[-1,1]){
    for(const z of[-.6,.95])box(g,M.glass,s*1.086,1.9,z,.03,.62,1.2);
    box(g,cloth,s*1.12,1.1,0,.04,.18,4.3);
-   const v=sign(g,'VOLUNTEER',s*1.125,1.43,-.1,1.4,.27,'#ded9cd','#395b4e');v.rotation.y=s*Math.PI/2;
+   const v=sign(g,police?'PATROL':'VOLUNTEER',s*1.125,1.43,-.1,1.4,.27,police?'#304b56':'#ded9cd',police?'#e8dab8':'#395b4e');v.rotation.y=s*Math.PI/2;
    for(const z of[-1.45,1.45]){cylinder(g,M.dark,s*1.10,.43,z,.43,.22,Math.PI/2);cylinder(g,M.chrome,s*1.23,.43,z,.22,.035,Math.PI/2);}
    box(g,M.white,s*.72,1,2.38,.32,.2,.035);box(g,M.red,s*.72,1,-2.38,.25,.25,.035);
-  }return g;
+  }if(police){box(g,M.chrome,0,2.35,0,.9,.08,.22);box(g,M.red,-.25,2.44,0,.3,.12,.2);box(g,M.glass,.25,2.44,0,.3,.12,.2);}return g;
  }
  const van=vehicle();scene.add(van);
+ const patrol=vehicle(true);scene.add(patrol);patrol.visible=false;
  const hero=human('#75816b',false,{localWardrobe:false}),friend=human('#b8936d',false,{localWardrobe:true});
  const enemies=Array.from({length:6},(_,i)=>human('#9f8c70',true));scene.add(hero.group,friend.group,...enemies.map(p=>p.group));
  for(let i=0;i<6;i++){
   const p=enemies[i];p.shield=box(p.group,fence,0,.92,.38,.58,.92,.09);p.shield.visible=i===2;
   if(i===2){box(p.shield,M.dark,0,0,.05,.52,.12,.035);box(p.shield,M.chrome,0,.42,.05,.56,.035,.035);}
+  p.condition=new THREE.Group();p.condition.position.y=2.1;p.group.add(p.condition);
+  for(let k=0;k<(i===2?4:3);k++)box(p.condition,M.cream,(k-1.5)*.15,0,0,.12,.035,.02);
  }
  const supporters=[];
  for(let i=0;i<5;i++){const p=human(i%2?'#b17b54':'#879b80',false,{localWardrobe:true,female:i===1||i===4});p.group.position.set(-5.5+(i%2)*1.6,0,14-Math.floor(i/2)*1.4);p.group.rotation.y=i*.8;scene.add(p.group);supporters.push(p);
@@ -110,8 +117,12 @@ export async function buildLine(container,low){
  }
  function update(game,dt){
   const t=game.time;person(hero,game.p,t);person(friend,game.friend,t);hero.group.visible=!game.van.occupied;friend.group.visible=!game.friend.aboard;
-  const a=game.p.attack;if(a)poseMotion(hero,a.clip,a.time/a.duration);
-  else if(game.p.traversal)poseMotion(hero,'Vault',game.p.traversal.time/game.p.traversal.duration);
+  const a=game.p.attack;if(a){
+   const target=game.enemies.filter(e=>e.hp>0&&Math.hypot(e.x-game.p.x,e.z-game.p.z)<1.8).sort((a,b)=>Math.hypot(a.x-game.p.x,a.z-game.p.z)-Math.hypot(b.x-game.p.x,b.z-game.p.z))[0];
+   const at=target?new THREE.Vector3(target.x,1.25,target.z):new THREE.Vector3(game.p.x+Math.sin(a.yaw)*1.1,1.2,game.p.z+Math.cos(a.yaw)*1.1);
+   poseMotion(hero,a.clip,a.time/a.duration,{target:at});
+  }
+  else if(game.p.traversal)poseMotion(hero,'Vault',game.p.traversal.time/game.p.traversal.duration,{right:new THREE.Vector3(-5.3,.73,-18),left:new THREE.Vector3(-5.9,.73,-18)});
   else if(game.p.dodge>0)poseMotion(hero,'Dodge',1-game.p.dodge/.29);
   else if(game.p.hurt>0)poseMotion(hero,'Hurt',1-game.p.hurt/.8);
   if(game.friend.state==='brace')poseMotion(friend,'Brace',.5);
@@ -119,6 +130,7 @@ export async function buildLine(container,low){
   enemies.forEach((p,i)=>{
    const e=game.enemies[i];person(p,{...e,speed:e.state==='advance'?2.3:0},t);
    p.group.visible=e.active;
+   p.condition.visible=e.hp>0&&e.state!=='watch';p.condition.children.forEach((b,k)=>b.visible=k<e.hp);p.condition.rotation.y=-e.yaw;
    if(e.hp<=0){p.group.rotation.z=Math.min(1,e.downTime*2)*1.35;p.group.position.y=-.35*Math.min(1,e.downTime*2);}
    else if(e.wind>0)poseMotion(p,'EnemyStrike',.12+(1-e.wind/(e.role==='shield'?.85:.68))*.30);
    else if(e.attack>0)poseMotion(p,'EnemyStrike',.42+(1-e.attack/.4)*.58);
@@ -127,6 +139,9 @@ export async function buildLine(container,low){
   });
   supporters.forEach((p,i)=>{p.worldSpeed=0;p.poseTimeDivisor=1;poseHuman(p,t,0);if(game.phase!=='reach')poseMotion(p,'Brace',.5);});
   van.position.set(game.van.x,0,game.van.z);van.rotation.y=game.van.yaw;van.rotation.z=game.van.occupied?Math.sin(t*11)*.003:0;
+  patrol.visible=game.van.occupied&&game.mode!=='won';
+  const approach=game.sirenTime%7;
+  patrol.position.set(2,0,game.van.z+(approach<4.5?9:approach<5.3?9-(approach-4.5)*7:3.4+(approach-5.3)*3));patrol.rotation.y=Math.PI;
   rail.rotation.x=game.gateFall*1.45;cart.position.z=-3+game.cartShift;
   playerMark.visible=!game.van.occupied;playerMark.position.set(game.p.x,.025,game.p.z);
   const target=new THREE.Vector3(game.p.x*.68,1,game.p.z-1.4);focus.lerp(target,1-Math.exp(-dt*5));

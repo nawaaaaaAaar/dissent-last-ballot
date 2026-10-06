@@ -52,7 +52,7 @@ export class Line{
   return this.enemies.filter(e=>e.hp>0&&e.active&&len(e,this.p)<2.3&&this.visible(this.p,e)).sort((a,b)=>len(a,this.p)-len(b,this.p))[0];
  }
  strike(){
-  const p=this.p;if(this.mode!=='playing'||this.van.occupied||p.attack||p.dodge>0||p.traversal||p.stamina<10)return;
+  const p=this.p;if(this.mode!=='playing'||this.van.occupied||p.attack||p.dodge>0||p.traversal||p.stamina<28)return;
   p.combo=p.comboTime>0?(p.combo+1)%3:0;p.comboTime=1.1;
   const e=this.nearest();if(e)p.yaw=Math.atan2(e.x-p.x,e.z-p.z);
   else if(Math.abs(p.z+18)<2&&Math.abs(p.x)<4)p.yaw=p.z>-18?Math.PI:0;
@@ -62,7 +62,8 @@ export class Line{
  dodge(){
   const p=this.p;if(this.mode!=='playing'||this.van.occupied||p.dodgeCd>0||p.stamina<18||p.traversal)return;
   p.attack=null;p.dodge=.29;p.dodgeCd=.68;p.stamina-=18;
-  const d=Math.hypot(this.input.x,this.input.z);p.dodgeYaw=d>.1?Math.atan2(this.input.x,this.input.z):p.yaw;
+  const d=Math.hypot(this.input.x,this.input.z);p.dodgeYaw=d>.1?Math.atan2(this.input.x,this.input.z):p.yaw+Math.PI;
+  if(this.enemies.some(e=>e.hp>0&&e.wind>0&&e.wind<.3&&len(p,e)<2)){p.counter=.8;this.enemies.filter(e=>e.hp>0&&e.wind>0&&e.wind<.3&&len(p,e)<2).forEach(e=>{e.broken=2;});this.say('OPENING · strike now',1);}
   this.event('miss');
  }
  context(){
@@ -115,7 +116,7 @@ export class Line{
  retry(){
   if(this.checkpoint==='drive'){
    this.p.hp=6;this.van.hp=100;this.van.x=2.5;this.van.z=-31;this.van.speed=0;this.van.yaw=Math.PI;this.van.occupied=true;
-   this.p.x=2.5;this.p.z=-31;this.sirenTime=0;this.mode='playing';this.input={x:0,z:0,attack:false,action:false,run:false,brake:false};this.say('Sana: Left of the works. We’re still together.');return;
+   this.p.x=2.5;this.p.z=-31;this.phase='drive';this.sirenTime=0;this.rams=0;this.lastCrash=0;this.mode='playing';this.input={x:0,z:0,attack:false,action:false,run:false,brake:false};this.say('Sana: Left of the works. We’re still together.');return;
   }this.start();
  }
  update(dt){
@@ -189,8 +190,15 @@ export class Line{
  companionUpdate(dt){
   const f=this.friend,p=this.p;if(!f.rescued||f.aboard)return;
   if(f.traversal){const v=f.traversal;v.time+=dt;const t=Math.min(1,v.time/.8);f.z=v.from+(v.to-v.from)*(t*t*(3-2*t));f.height=Math.sin(t*Math.PI)*.6;f.state='vault';f.speed=0;if(t>=1){f.traversal=null;f.height=0;}return;}
+  if(this.gateHp>0&&f.z>-18&&p.z<-18){
+   const q={x:-5.6,z:-16.65},d=len(f,q);f.speed=3.45;f.state='follow';f.yaw=Math.atan2(q.x-f.x,q.z-f.z);
+   if(d<.75){f.x=-5.6;f.traversal={time:0,from:f.z,to:-19.5};return;}
+   this.move(f,(q.x-f.x)/d*f.speed*dt,(q.z-f.z)/d*f.speed*dt,.3,'vault');return;
+  }
   const threat=this.enemies.find(e=>e.hp>0&&(e.wind>0||e.attack>0)&&len(e,f)<2.5);
-  if(threat){f.state='brace';f.speed=0;return;}
+  f.braceCd=Math.max(0,(f.braceCd||0)-dt);f.braceTime=Math.max(0,(f.braceTime||0)-dt);
+  if(threat&&f.braceCd<=0){f.braceTime=.55;f.braceCd=2.5;}
+  if(f.braceTime>0){f.state='brace';f.speed=0;return;}
   const d=len(f,p);f.state=d>2?'follow':'ready';f.speed=d>2?3.45:0;
   if(d>2){f.yaw=Math.atan2(p.x-f.x,p.z-f.z);let dx=(p.x-f.x)/d*f.speed*dt,dz=(p.z-f.z)/d*f.speed*dt;
    if(this.blocked(f.x+dx,f.z+dz,.3)){
@@ -215,7 +223,7 @@ export class Line{
   p.x=v.x;p.z=v.z;p.yaw=v.yaw;this.distance+=len(v,{x:ox,z:oz});
   const beat=this.sirenTime%7;
   if(beat>4.5&&beat<5.3)this.ramWarning=true;else this.ramWarning=false;
-  const k=Math.floor(this.sirenTime/7);
+  const k=Math.floor((this.sirenTime+1.7)/7);
   if(k>this.rams){this.rams=k;if(Math.abs(v.x-2)<1.5){v.hp-=12;this.event('hurt',v.x,v.z);this.say('Patrol on the right. Keep left.',2);}}
   if(v.z<-68&&Math.abs(v.x)<7){this.mode='won';this.phase='safe';this.say('Sana: The account is safe. Now it belongs to everyone.');}
   if(v.hp<=0){this.mode='failed';this.say('The van cannot continue. Retry the escape checkpoint.');}
