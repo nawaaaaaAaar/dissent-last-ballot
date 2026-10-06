@@ -1,5 +1,5 @@
 {
-  "passed": 42,
+  "passed": 43,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -42,6 +42,7 @@
     "each gathering stage has authored guard homes near its functional space",
     "nearby aim assist targets the blocking cordon, not an occluded guard",
     "visible short reach does not damage a body beyond the jab envelope",
-    "barricade contact uses the nearest physical rail, not its centre radius"
+    "barricade contact uses the nearest physical rail, not its centre radius",
+    "walking and contact advance cannot cross a standing opponent centre"
   ]
 }

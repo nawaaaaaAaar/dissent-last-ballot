@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.17.1';
-import {layout,contains,crossing,local,STRIKES,ENEMY_REACH} from './encounters.js?v=0.17.1';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.17.2';
+import {layout,contains,crossing,local,STRIKES,ENEMY_REACH} from './encounters.js?v=0.17.2';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -105,7 +105,8 @@ export class City{
   route(a,b,vehicle=false){return roadRoute(a,b,{vehicle});}
   move(e,dx,dz,r=.38){
     const x=e.x,z=e.z;
-    if(this.valid(x+dx,z,r))e.x+=dx;if(this.valid(e.x,z+dz,r))e.z+=dz;
+    const bodyClear=(nx,nz)=>e!==this.player||this.van.occupied||e.dash>0||!this.enemies.some(q=>q.hp>0&&Math.hypot(q.x-nx,q.z-nz)<.72&&Math.hypot(q.x-nx,q.z-nz)<dist(e,q)-.001);
+    if(this.valid(x+dx,z,r)&&bodyClear(x+dx,z))e.x+=dx;if(this.valid(e.x,z+dz,r)&&bodyClear(e.x,z+dz))e.z+=dz;
     return Math.hypot(e.x-x,e.z-z);
   }
   chase(e,target,dt,speed,r=.4){

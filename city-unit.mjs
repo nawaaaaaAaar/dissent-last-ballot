@@ -190,5 +190,10 @@ check('barricade contact uses the nearest physical rail, not its centre radius',
   Object.assign(g.player,{x:g.gate.x+2,z:g.gate.z-1});g.input.aimX=0;g.input.aimZ=1;g.attack();g.contact();assert.equal(g.gate.hp,2);assert.equal(g.player.contactKind,'barrier');
   g.player.attackCd=0;g.player.z=g.gate.z-2;g.attack();g.contact();assert.equal(g.gate.hp,2);
 });
+check('walking and contact advance cannot cross a standing opponent centre',()=>{
+  const g=new City();g.start();g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);const p=g.player,e=g.enemies[0];Object.assign(e,{hp:3,x:p.x,z:p.z+1});
+  g.move(p,0,.5);assert(e.z-p.z>=.72);g.move(p,0,-.5);assert(e.z-p.z>1);
+  p.dash=.2;g.move(p,0,1);assert(e.z-p.z<.72);
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v17',{recursive:true});fs.writeFileSync('qa/v17/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));
