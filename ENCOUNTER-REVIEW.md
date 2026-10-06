@@ -52,3 +52,5 @@ The spaces are more purposeful, but they are not finished set pieces. Prop silho
 The next highest-impact weakness is the physical readability and presentation of these same encounters: closer camera framing without occlusion, matched reach/foot placement, hand-to-prop contact and recovery transitions, supported by specific sound cues. Do not respond by adding districts or more reward counters. Independent first-time player testing should then determine whether the choices remain enjoyable after repeated runs.
 
 Final verification and mobile/deployment scope are recorded in `QA.md`. Feature presence and isolated checks do not establish finished-game quality or player enjoyment.
+
+The final public source reports v0.16.5. Its follow-up touch replay verified screen movement, a bench vault and three assisted cordon contacts; portrait simultaneous movement/aim and both orientations were checked. A fresh public-root capture/retry passed after an earlier long-lived browser stalled. This final follow-up is narrower than the full v0.16.4 cycle, not another claimed full phone playthrough.

@@ -14,7 +14,15 @@ Forty isolated rule checks now cover the installed map and contact/prop/companio
 
 Original runtime joint keyframes are sampled from gameplay phase. They are not mocap or full-body IK, and hit geometry remains an arcade radius/cone rather than literal fist collision. Actual game captures retain simple props, adapted footprints and repeated avatars; menu/ending illustrations are not gameplay-art proof. Physical phones, Safari and independent player enjoyment remain unverified.
 
-Final public root, mobile input/layout and deployment rechecks are appended after verification.
+### Final input and public deployment checks
+
+GitHub Pages successfully deployed source commit `4f2f8f9c03cf50d62841741cac36824edc81553a`. A fresh public root reported v0.16.5, and ordinary-time attacks caused capture; Retry checkpoint restored health 6 and four encounter props. The final patch changes nearby input assistance and in-game help, not the campaign objectives tested in the full v0.16.4 cycle.
+
+Final v0.16.5 phone emulation at 844×390 exercised actual touch movement, screen Action, held Strike and vault Action. Assisted strikes opened the cordon with three contact hits despite the hidden guard; a touch-triggered vault crossed the selected bench and returned height to zero. At 390×844, simultaneous movement/aim pointers moved the player and produced two more contact events. Both orientations had zero horizontal overflow. Captures were inspected. These are input/layout tests, not a full phone campaign or physical-device performance certification.
+
+One long-lived cloud browser became unresponsive during the first final idle/capture check, including screenshot failure. Its cause was not established; that attempt is not marked passed. A fresh browser repeated capture/retry on the public root successfully. Physical phones and Safari remain untested.
+
+A separate renderer binding check on the final public source found 11 Jab tracks and different upper-arm quaternions at windup, contact and return phases. This checks actual keyframe binding, not convincing choreography or hand/foot IK. The supplied deterministic client also checked final v0.16.5 source in `qa/v16-client-final165/`; its screenshot was inspected. The debug overlay retains a historical `CITY / 0.14` label; runtime `render_game_to_text().version` is the version authority.
 
 ## Strict review rework: current scope
 

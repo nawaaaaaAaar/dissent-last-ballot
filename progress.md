@@ -1,5 +1,9 @@
 Original prompt: Build DISSENT: The Last Ballot as a playable 3D student-resistance runner and make it playable on mobile phones. Push work to GitHub and the public link.
 
+## Authored encounters request
+
+Replayed public v0.15.13 before edits. Reworked witness cordon/community forecourt with collision/sight props, vaults, movable screens, phase-timed skeletal strikes, guard homes, regrouping and threatened companions. First iterations failed motion binding/axes, context selection, later-stage placement and parked-van clearance; revised after play. Fresh v0.16.4 completed rescue/gathering/courier/charter in ordinary time, cycle two, no runtime state injection. Final v0.16.5 adds visible-target/barrier assistance and corrected in-game guidance. Forty isolated rules pass; final touch/deployment checks in QA.md. No districts or reward counters added. See ENCOUNTER-REVIEW.md for actual observations and remaining quality gap.
+
 ## Strict review request
 
 Gameplay and graphics are both priorities. Start with fresh normal-time public play, rank all requested weaknesses against a finished indie/action game, rework the highest-impact failures, replay end to end and revise again if the result is not materially better. Do not equate feature completion with fun or defer the art pass.
