@@ -14,9 +14,9 @@ export async function buildLine(container,low){
  const sun=new THREE.DirectionalLight('#fff0d6',3.5);sun.position.set(-15,28,-14);sun.castShadow=true;sun.shadow.mapSize.set(low?1024:2048,low?1024:2048);Object.assign(sun.shadow.camera,{left:-18,right:18,top:18,bottom:-18,near:1,far:80});sun.shadow.bias=-.0002;sun.shadow.normalBias=.02;scene.add(sun,sun.target);
  const asset=n=>'./assets/'+n;
  const texture=async(n,color=false)=>{const t=await new THREE.TextureLoader().loadAsync(asset(n));t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.colorSpace=color?THREE.SRGBColorSpace:THREE.NoColorSpace;return t;};
- const [road,norm,rough,wall,concrete,peopleResult,tree,sky]=await Promise.all([
+ const [road,norm,rough,wall,concrete,peopleResult,tree,sky,grass]=await Promise.all([
   texture('asphalt-diff.webp',true),texture('asphalt-normal.webp'),texture('asphalt-rough.webp'),texture('limewash.webp',true),texture('concrete-diff.webp',true),
-  loadPeople(asset),new GLTFLoader().loadAsync(asset('tree-review.glb')),new RGBELoader().loadAsync(asset('delhi-sky.hdr')),
+  loadPeople(asset),new GLTFLoader().loadAsync(asset('tree-review.glb')),new RGBELoader().loadAsync(asset('delhi-sky.hdr')),texture('grass-diff.webp',true),
  ]);
  const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(sky).texture;scene.environmentIntensity=.45;sky.dispose();pmrem.dispose();
  const asphalt=new THREE.MeshStandardMaterial({map:road,normalMap:norm,roughnessMap:rough,normalScale:new THREE.Vector2(.16,.16),roughness:.9,color:'#aaa9a2'});
@@ -36,7 +36,8 @@ export async function buildLine(container,low){
  }
  for(let z=-75;z<23;z+=5)box(stat,M.cream,0,.018,z,.12,.015,2.1);
  const monument=observatory();monument.scale.setScalar(.55);monument.position.set(-22,0,-8);scene.add(monument);
- ground(new THREE.MeshStandardMaterial({color:'#7b8463',roughness:1}),-20,-25,23,104,0);
+ const garden=new THREE.MeshStandardMaterial({map:grass,color:'#a9b6a0',roughness:1});
+ ground(garden,-25,-25,33,104,0,3);ground(garden,25,-25,33,104,0,3);
  for(const side of[-1,1])for(let n=0;n<8;n++){
   const g=tree.scene.clone(true);g.position.set(side*11.6,0,20-n*12);g.rotation.y=n*2.399;g.scale.setScalar(1.25+(n%3)*.13);
   g.traverse(o=>{if(o.isMesh){o.castShadow=!low;o.receiveShadow=true;}});scene.add(g);
@@ -80,13 +81,21 @@ export async function buildLine(container,low){
  sign(cart,'आवाज़ बचाओ',0,1,.04,1.75,.35,'#6b8071','#f0e4c8','KEEP THE ACCOUNT');scene.add(cart);
  function vehicle(police=false){
   const g=new THREE.Group(),paint=new THREE.MeshStandardMaterial({color:police?'#304b56':'#ded9cd',metalness:.25,roughness:.47});
-  const shell=new THREE.Mesh(new RoundedBoxGeometry(2.2,1.3,4.7,3,.16),paint);shell.position.y=1;g.add(shell);
-  box(g,paint,0,1.85,.2,2.15,.9,3.8);box(g,M.glass,0,1.9,.95,1.91,.67,.03);
+  const shell=new THREE.Mesh(new RoundedBoxGeometry(2.2,1.3,4.7,3,.16),paint);shell.position.y=1;shell.castShadow=shell.receiveShadow=true;g.add(shell);
+  const cabin=new THREE.Mesh(new RoundedBoxGeometry(2.15,.9,3.8,3,.11),paint);cabin.position.set(0,1.85,.2);cabin.castShadow=cabin.receiveShadow=true;g.add(cabin);
   // Model forward is local +z; the game rotates it along travel direction.
   box(g,M.glass,0,1.9,2.13,1.93,.61,.04);box(g,M.chrome,0,.73,2.37,2.22,.15,.15);
+  for(const x of[-.51,.51])box(g,M.glass,x,1.94,-1.735,.91,.58,.035);
+  box(g,M.metal,0,1.57,-2.36,.024,1.25,.02);box(g,M.chrome,0,.7,-2.4,2.1,.15,.09);
+  for(const x of[-.45,.45]){box(g,M.chrome,x,1.23,-2.37,.18,.03,.03);box(g,paint,x,1.85,-1.765,.06,.7,.035);}
+  sign(g,'DL / COMMUNITY',0,.92,-2.415,.78,.18,'#e9e0c9','#324d40').rotation.y=Math.PI;
+  for(const x of[-.55,.55]){const w=box(g,M.metal,x,1.77,2.16,.025,.41,.018);w.rotation.z=x>0?.25:-.25;}
+  for(const x of[-.7,-.35,0,.35,.7])box(g,paint,x,2.312,.2,.025,.025,2.8);
   for(const s of[-1,1]){
    for(const z of[-.6,.95])box(g,M.glass,s*1.086,1.9,z,.03,.62,1.2);
    box(g,cloth,s*1.12,1.1,0,.04,.18,4.3);
+   box(g,M.metal,s*1.10,1.42,1.58,.02,1.2,.018);box(g,M.chrome,s*1.12,1.44,1.18,.025,.035,.22);
+   box(g,M.dark,s*1.25,1.92,1.6,.2,.24,.17);box(g,M.chrome,s*1.25,1.94,1.70,.14,.16,.02);
    const v=sign(g,police?'PATROL':'VOLUNTEER',s*1.125,1.43,-.1,1.4,.27,police?'#304b56':'#ded9cd',police?'#e8dab8':'#395b4e');v.rotation.y=s*Math.PI/2;
    for(const z of[-1.45,1.45]){cylinder(g,M.dark,s*1.10,.43,z,.43,.22,Math.PI/2);cylinder(g,M.chrome,s*1.23,.43,z,.22,.035,Math.PI/2);}
    box(g,M.white,s*.72,1,2.38,.32,.2,.035);box(g,M.red,s*.72,1,-2.38,.25,.25,.035);

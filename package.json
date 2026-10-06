@@ -1,13 +1,13 @@
 {
   "name": "dissent-last-ballot",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "private": true,
   "type": "module",
-  "description": "Top-down 3D resistance action mission with driving and mobile dual-stick controls",
+  "description": "An authored 3D Delhi-inspired rescue-and-escape encounter for mobile and desktop",
   "scripts": {
     "build:map": "python tools/build-delhi-map.py && node tools/trim-street-footprints.mjs",
     "start": "python -m http.server 5173 --directory docs",
-    "test": "node city-unit.mjs",
+    "test": "node line-unit.mjs",
     "test:city": "node city-unit.mjs",
     "test:breakout": "node breakout-unit.mjs",
     "test:browser": "node breakout-qa.mjs",
