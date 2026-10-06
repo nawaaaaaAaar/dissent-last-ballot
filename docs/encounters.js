@@ -28,6 +28,11 @@ export function layout(m){
       prop('assembly-screen','screen',x-8,z+4,3.7,.7),
     ],
     guards:[{x:x+2,z:z-4,role:'guard'},{x:x-6,z:z,role:'rush'},{x:x+6,z:z+3,role:'flank'}],
+    stages:[
+      [{x:x+2,z:z-4,role:'guard'},{x:x-6,z:z,role:'rush'},{x:x+6,z:z+3,role:'flank'}],
+      [{x:x+8,z:z-3.5,role:'guard'},{x:x+3,z:z-6,role:'rush'},{x:x+11,z:z+3,role:'flank'}],
+      [{x:x-4,z:z+2,role:'guard'},{x:x-9,z:z+8,role:'rush'},{x:x+1,z:z+7,role:'flank'}],
+    ],
     zones:[{x,z},{x:x+8,z:z-1},{x:x-4,z:z+6}],
   };
   return {name:'The dispatch desk',hint:'The desk breaks direct approaches. Copy during a recovery opening or use its screen.',

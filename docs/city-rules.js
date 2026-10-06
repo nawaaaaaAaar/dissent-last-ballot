@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.2';
-import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.2';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.3';
+import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.3';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -58,7 +58,7 @@ export class City{
   spawn(p,count){
     this.enemies.forEach((e,i)=>{
       const angle=(i+.5)*Math.PI*2/count+this.serial*.7,q=snap({x:p.x+Math.sin(angle)*10,z:p.z+Math.cos(angle)*10});
-      const authored=this.wave===0?this.encounter.guards?.[i]:null;
+      const authored=this.encounter.stages?.[this.wave]?.[i]||(this.wave===0?this.encounter.guards?.[i]:null);
       const role=authored?.role||['guard','rush','flank','brawler','rush'][i],hp=role==='guard'?4:3;
       let home=authored?{x:authored.x,z:authored.z}:q;
       if(!this.valid(home.x,home.z,.4)){
