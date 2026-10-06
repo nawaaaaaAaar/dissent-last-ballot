@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
-import {installMotion,clearMotion,poseMotion} from './contact-motion.js?v=0.16.5';
+import {installMotion,clearMotion,poseMotion,blendReturn} from './contact-motion.js?v=0.17.0';
 export {poseMotion};
 
 let male,female,maleDelhi,femaleDelhi,officer;
@@ -64,9 +64,11 @@ export function poseHuman(p,t,running=0,gesture=0){
   p.actions.Walk?.setEffectiveTimeScale(Math.max(.25,speed/1.012));
   p.actions.Run?.setEffectiveTimeScale(Math.max(.4,speed/2.88));
   p.mixer.update(dt);
+  blendReturn(p,dt);
 }
 export function resetHuman(p){
   if(!p?.rocket)return;
+  clearMotion(p);p.returnPose=null;p.motionLast=false;
   p.lastTime=null;p.lastPosition=null;p.worldSpeed=0;p.blend={Idle:1,Walk:0,Run:0};
   for(const [name,a]of Object.entries(p.actions)){a.reset().play();a.enabled=name==='Idle';a.setEffectiveWeight(name==='Idle'?1:0);a.setEffectiveTimeScale(1);}
   p.mixer.update(0);

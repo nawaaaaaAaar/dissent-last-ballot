@@ -151,7 +151,8 @@ check('authored props block movement and tall screens block sight',()=>{
 });
 check('vault moves through only the selected low furniture with a valid landing',()=>{
   const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);const b=g.props.find(o=>o.id==='cordon-right');Object.assign(g.player,{x:b.x,z:b.z-1.15});
-  assert(g.vault(b));g.update(.05);assert(g.player.height>0);assert.equal(g.player.traversal.kind,'Vault');
+  assert(g.vault(b));g.update(.05);assert.equal(g.player.height,0);assert.equal(g.player.traversal.kind,'Vault');
+  for(let i=0;i<4;i++)g.update(.05);assert(g.player.height>0);
   for(let i=0;i<15;i++)g.update(.05);assert.equal(g.player.traversal,null);assert.equal(g.player.height,0);assert(g.player.z>b.z);assert(g.valid(g.player.x,g.player.z));
 });
 check('screen changes its physical and sight position, checkpoint retains it',()=>{
@@ -177,8 +178,17 @@ check('each gathering stage has authored guard homes near its functional space',
 });
 check('nearby aim assist targets the blocking cordon, not an occluded guard',()=>{
   const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,{x:g.gate.x,z:g.gate.z-1});
-  Object.assign(g.enemies[0],{hp:4,x:g.gate.x-.5,z:g.gate.z+1,role:'guard'});assert.equal(g.assistedTarget(),g.gate);
+  Object.assign(g.enemies[0],{hp:4,x:g.gate.x-.5,z:g.gate.z+1,role:'guard'});assert.deepEqual(g.assistedTarget(),g.gateContact());
   g.gate.hp=0;assert.equal(g.assistedTarget(),g.enemies[0]);
 });
+check('visible short reach does not damage a body beyond the jab envelope',()=>{
+  const g=new City();g.start();g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);
+  const e=g.enemies[0];Object.assign(e,{hp:3,x:g.player.x,z:g.player.z+1.8,role:'rush',cooldown:10});g.input.aimZ=1;g.attack();g.contact();assert.equal(e.hp,3);assert.equal(g.player.contactKind,'miss');
+});
+check('barricade contact uses the nearest physical rail, not its centre radius',()=>{
+  const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);g.props=[];
+  Object.assign(g.player,{x:g.gate.x+2,z:g.gate.z-1});g.input.aimX=0;g.input.aimZ=1;g.attack();g.contact();assert.equal(g.gate.hp,2);assert.equal(g.player.contactKind,'barrier');
+  g.player.attackCd=0;g.player.z=g.gate.z-2;g.attack();g.contact();assert.equal(g.gate.hp,2);
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
-fs.mkdirSync('qa/v16',{recursive:true});fs.writeFileSync('qa/v16/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));
+fs.mkdirSync('qa/v17',{recursive:true});fs.writeFileSync('qa/v17/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

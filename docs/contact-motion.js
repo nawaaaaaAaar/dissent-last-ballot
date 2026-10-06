@@ -2,7 +2,8 @@ import * as THREE from 'three';
 
 // Original joint-space keyframes, sampled by the SAME normalized phase as
 // gameplay contact. No baked root motion: traversal root is collision checked.
-export {STRIKES} from './encounters.js?v=0.16.5';
+import {STRIKES} from './encounters.js?v=0.17.0';
+export {STRIKES};
 const joint={
   R:'Bip01 R UpperArm',L:'Bip01 L UpperArm',RE:'Bip01 R Forearm',LE:'Bip01 L Forearm',
   S:'Bip01 Spine2',P:'Bip01 Pelvis',RT:'Bip01 R Thigh',LT:'Bip01 L Thigh',
@@ -20,6 +21,28 @@ const frames={
   Hurt:[[0,{}],[.2,{S:[-.32,0,.2],H:[-.16,0,0],R:[-.4,0,.6],L:[-.4,0,-.6]}],[.5,{S:[-.2,0,.1],RT:[.2,0,0]}],[1,{}]],
   Help:[[0,{}],[.25,{S:[.25,0,0],R:[-1.2,0,.1],L:[-.8,0,-.2]}],[.75,{S:[.25,0,0],R:[-1.2,0,.1],L:[-.8,0,-.2]}],[1,{}]],
 };
+for(const move of STRIKES)frames[move.clip][2][0]=move.contact/move.duration;
+const ease=x=>{x=THREE.MathUtils.clamp(x,0,1);return x*x*(3-2*x);};
+function bone(p,name){return p.model.getObjectByName(name.replaceAll(' ','_'))||p.model.getObjectByName(name);}
+function aimBone(b,to){
+  const origin=b.getWorldPosition(new THREE.Vector3()),child=b.children.find(c=>c.isBone);if(!child)return;
+  const from=child.getWorldPosition(new THREE.Vector3()).sub(origin).normalize(),desired=to.clone().sub(origin).normalize();
+  const q=new THREE.Quaternion().setFromUnitVectors(from,desired).multiply(b.getWorldQuaternion(new THREE.Quaternion()));
+  b.quaternion.copy(b.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));b.updateMatrixWorld(true);
+}
+// Two-bone support/contact solve. The pole preserves an outward elbow rather
+// than letting a look-at solution reverse the elbow through the chest.
+export function handContact(p,side,target,weight){
+  const a=bone(p,`Bip01 ${side} UpperArm`),b=bone(p,`Bip01 ${side} Forearm`),h=bone(p,`Bip01 ${side} Hand`);if(!a||!b||!h||weight<=0)return;
+  p.group.updateMatrixWorld(true);
+  const s=a.getWorldPosition(new THREE.Vector3()),el=b.getWorldPosition(new THREE.Vector3()),end=h.getWorldPosition(new THREE.Vector3());
+  const goal=end.clone().lerp(target,weight),dir=goal.clone().sub(s),l1=s.distanceTo(el),l2=el.distanceTo(end),d=THREE.MathUtils.clamp(dir.length(),Math.abs(l1-l2)+.005,l1+l2-.005);dir.normalize();
+  const pole=new THREE.Vector3(side==='R'?.7:-.7,-.25,0).applyQuaternion(p.group.getWorldQuaternion(new THREE.Quaternion()));
+  pole.addScaledVector(dir,-pole.dot(dir)).normalize();
+  const along=(l1*l1-l2*l2+d*d)/(2*d),offset=Math.sqrt(Math.max(0,l1*l1-along*along));
+  const desiredElbow=s.clone().addScaledVector(dir,along).addScaledVector(pole,offset);
+  aimBone(a,desiredElbow);aimBone(b,s.clone().addScaledVector(dir,d));
+}
 export function installMotion(person){
   person.motionActions={};
   person.actions.Idle.time=0;person.mixer.update(0);person.group.updateMatrixWorld(true);
@@ -45,10 +68,24 @@ export function installMotion(person){
 }
 export function clearMotion(person){
   if(!person.motionActions)return;
+  if(person.motionLast){
+    person.returnPose=new Map();person.model.traverse(b=>{if(b.isBone)person.returnPose.set(b,b.quaternion.clone());});person.returnTime=0;person.motionLast=false;
+  }
   for(const a of Object.values(person.motionActions)){a.enabled=false;a.setEffectiveWeight(0);}
 }
-export function poseMotion(person,name,phase){
+export function blendReturn(person,dt){
+  if(!person.returnPose)return;person.returnTime+=dt;const f=ease(person.returnTime/.14);
+  for(const [b,q]of person.returnPose)b.quaternion.copy(q.clone().slerp(b.quaternion,f));
+  if(f>=1)person.returnPose=null;
+}
+export function poseMotion(person,name,phase,contact=null){
   const a=person.motionActions?.[name];if(!a)return;
-  for(const b of Object.values(person.actions))b.setEffectiveWeight(0);
-  a.enabled=true;a.paused=true;a.play();a.time=THREE.MathUtils.clamp(phase,0,.9999);a.setEffectiveWeight(1);person.mixer.update(0);
+  const weight=name==='Brace'?1:ease(phase/.12)*ease((1-phase)/.18);
+  for(const [key,b]of Object.entries(person.actions))b.setEffectiveWeight((person.blend[key]||0)*(1-weight));
+  a.enabled=true;a.paused=true;a.play();a.time=THREE.MathUtils.clamp(phase,0,.9999);a.setEffectiveWeight(weight);person.mixer.update(0);person.returnPose=null;person.motionLast=true;
+  if(contact){
+    if(name==='Vault'){const w=ease((phase-.10)/.10)*ease((.43-phase)/.13);handContact(person,'R',contact.right,w);handContact(person,'L',contact.left,w);}
+    else{const peak=STRIKES.find(s=>s.clip===name),center=peak?peak.contact/peak.duration:.55,w=ease((phase-center+.18)/.18)*ease((center+.25-phase)/.25);
+      if(name==='Cross')handContact(person,'L',contact.target,w);else if(name==='Push'){handContact(person,'L',contact.target.clone().add(new THREE.Vector3(-.13,0,0)),w);handContact(person,'R',contact.target.clone().add(new THREE.Vector3(.13,0,0)),w);}else handContact(person,'R',contact.target,w);}
+  }
 }

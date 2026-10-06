@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {box,cylinder,sign,materials as M} from './world-props.js';
 
 export function encounterArt(scene){
@@ -7,6 +8,7 @@ export function encounterArt(scene){
   const wood=new THREE.MeshStandardMaterial({color:'#8c6240',roughness:.92});
   const metal=new THREE.MeshStandardMaterial({color:'#65706a',roughness:.62,metalness:.25});
   const models=new Map();let key='';
+  function rounded(g,m,x,y,z,w,h,d){const p=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,2,.025),m);p.position.set(x,y,z);g.add(p);return p;}
   function clear(){
     group.traverse(o=>{if(o.material?.map){o.material.map.dispose();o.material.dispose();}});
     group.clear();models.clear();
@@ -14,22 +16,32 @@ export function encounterArt(scene){
   function create(o){
     const g=new THREE.Group();group.add(g);
     if(o.kind==='screen'){
-      box(g,cloth,0,1,0,o.w,1.3,.035);
+      const fabric=new THREE.PlaneGeometry(o.w,1.3,12,8),v=fabric.attributes.position;
+      for(let i=0;i<v.count;i++)v.setZ(i,.05*Math.sin(v.getX(i)*8)*Math.sin((v.getY(i)+.65)/1.3*Math.PI));
+      fabric.computeVertexNormals();const banner=new THREE.Mesh(fabric,cloth);banner.position.y=1;g.add(banner);
+      cylinder(g,metal,0,1.68,0,.028,o.w,Math.PI/2);
       for(const x of [-o.w/2,o.w/2]){
         cylinder(g,metal,x,.85,0,.035,1.7);
         box(g,metal,x,.12,0,.2,.2,.8);
         for(const z of[-.26,.26])cylinder(g,M.dark,x,.12,z,.10,.08,Math.PI/2);
       }
-      sign(g,'MOVE · BREAK SIGHT',0,1.05,.025,o.w*.84,.38,'#35665b','#f4dfb8');
+      sign(g,'KEEP THE SPACE OPEN',0,1.05,.065,o.w*.84,.32,'#35665b','#f4dfb8');
+      for(const x of[-o.w*.45,o.w*.45])box(g,M.cream,x,1.52,.04,.035,.24,.02);
     }else{
-      const top=box(g,wood,0,.74,0,o.w,.12,o.d);
-      for(const x of[-o.w*.4,o.w*.4])for(const z of[-o.d*.35,o.d*.35])box(g,metal,x,.37,z,.07,.7,.07);
+      const h=o.height,top=rounded(g,wood,0,h-.06,0,o.w,.12,o.d);
+      for(const x of[-o.w*.4,o.w*.4])for(const z of[-o.d*.35,o.d*.35])box(g,metal,x,h/2,z,.06,h-.08,.06);
+      box(g,metal,0,.17,0,o.w*.8,.045,.045);
       if(o.kind==='bench'){
-        for(const x of[-.5,0,.5])box(g,wood,x,.81,0,.02,.025,o.d*.95);
-        sign(g,'VAULT',0,.81,0,1,.26,'#b6936c','#2a423b').rotation.x=-Math.PI/2;
+        top.visible=false;
+        for(let i=0;i<4;i++)rounded(g,wood,0,h-.045,-o.d/2+(i+.5)*o.d/4,o.w,.09,o.d/4-.025);
+        for(const x of[-o.w*.38,o.w*.38])box(g,metal,x,h-.06,0,.045,.06,o.d*.9);
       }else{
-        box(g,M.cream,.3,.84,0,.45,.035,.32);box(g,M.white,-.4,.85,.1,.34,.08,.25);
-        cylinder(g,cloth,.8,.87,-.05,.10,.17);
+        rounded(g,M.cream,.3,h+.018,0,.45,.035,.32);rounded(g,M.white,-.4,h+.04,.1,.34,.08,.25);
+        cylinder(g,cloth,.8,h+.09,-.05,.10,.17);
+        box(g,cloth,-o.w*.25,h+.012,0,o.w*.35,.015,o.d*.9);
+        box(g,M.white,-o.w*.25,h-.16,o.d/2+.015,o.w*.35,.35,.025);
+        box(g,M.red,-o.w*.25,h-.16,o.d/2+.031,.10,.24,.012);box(g,M.red,-o.w*.25,h-.16,o.d/2+.032,.24,.10,.012);
+        rounded(g,M.dark,-.65,.15,-.35,.5,.3,.35);
       }
       top.castShadow=true;
     }

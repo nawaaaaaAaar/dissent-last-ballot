@@ -1,11 +1,12 @@
 // Deliberately authored fictional street encounters on the existing Delhi map.
 // These placements are gameplay, not a record of real protest infrastructure.
-const prop=(id,kind,x,z,w,d,yaw=0)=>({id,kind,x,z,w,d,yaw,height:kind==='screen'?1.65:.76,shift:0});
+const prop=(id,kind,x,z,w,d,yaw=0)=>({id,kind,x,z,w,d,yaw,height:kind==='screen'?1.65:kind==='bench'?.56:.76,shift:0});
 export const STRIKES=[
-  {clip:'Jab',duration:.42,contact:.17,cost:8},
-  {clip:'Cross',duration:.46,contact:.20,cost:8},
-  {clip:'Push',duration:.64,contact:.28,cost:10},
+  {clip:'Jab',duration:.46,contact:.18,cost:8,reach:1.35},
+  {clip:'Cross',duration:.50,contact:.21,cost:8,reach:1.40},
+  {clip:'Push',duration:.68,contact:.29,cost:10,reach:1.55},
 ];
+export const ENEMY_REACH={guard:1.65,rush:1.55,flank:1.5,brawler:1.5};
 export function layout(m){
   if(!m)return {name:'',props:[]};
   const {x,z}=m.source;

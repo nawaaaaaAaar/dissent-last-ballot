@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.5';
-import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.5';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.17.0';
+import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.17.0';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -132,24 +132,25 @@ export class City{
     if(p.stamina<cost+18){if(this.message!=='Dodge energy reserved. Release Strike and reposition to recover.')this.say('Dodge energy reserved. Release Strike and reposition to recover.',1.6);return false;}
     p.combo=combo;p.comboClock=1.2;p.stamina-=cost;
     const tempo=this.network.upgrades.includes('tempo')?.9:1;
-    p.swing={clip:move.clip,time:0,duration:move.duration*tempo,contact:move.contact*tempo,hit:false,combo};
+    p.swing={clip:move.clip,time:0,duration:move.duration*tempo,contact:move.contact*tempo,reach:move.reach,advance:0,hit:false,combo};
     p.attack=p.swing.duration;p.attackCd=p.swing.duration+.06;p.yaw=p.attackYaw=Math.atan2(this.input.aimX,this.input.aimZ);this.hits++;
     return true;
   }
   contact(){
     const p=this.player,swing=p.swing;if(!swing||swing.hit)return;
     swing.hit=true;
-    let hit=false;
-    for(const e of this.enemies)if(e.hp>0&&dist(p,e)<2.55&&this.line(p,e,false)&&Math.abs(turn(p.attackYaw,Math.atan2(e.x-p.x,e.z-p.z)))<1.05){
+    let hit=false;p.contactKind='miss';
+    for(const e of this.enemies)if(e.hp>0&&dist(p,e)<swing.reach&&this.line(p,e,false)&&Math.abs(turn(p.attackYaw,Math.atan2(e.x-p.x,e.z-p.z)))<.85){
       const frontal=Math.abs(turn(e.yaw,Math.atan2(p.x-e.x,p.z-e.z)))<1;
       if(e.role==='guard'&&frontal&&p.combo<3&&e.guardBreak<=0){
-        hit=true;this.burst(e.x,e.z,'gold',5);this.say('Shield facing you: flank it or finish a three-strike combo.',1.5);continue;
+        hit=true;p.contactKind='shield';this.burst(e.x,e.z,'gold',5);this.say('Shield facing you: flank it or finish a three-strike combo.',1.5);continue;
       }
       e.hp=Math.max(0,e.hp-(swing.combo===3?2:1));e.stun=swing.combo===3?1.1:.4;e.windup=0;e.lunge=0;e.strikeDuration=0;e.cooldown=.9;e.guardBreak=swing.combo===3?1.5:e.guardBreak;e.state='stagger';
-      this.move(e,Math.sin(p.attackYaw)*(swing.combo===3?1.3:.4),Math.cos(p.attackYaw)*(swing.combo===3?1.3:.4));hit=true;this.hitStop=.045;this.burst(e.x,e.z,'teal',swing.combo===3?12:7);this.heat=Math.max(1,this.heat+.15);
+      this.move(e,Math.sin(p.attackYaw)*(swing.combo===3?1.3:.4),Math.cos(p.attackYaw)*(swing.combo===3?1.3:.4));hit=true;p.contactKind='body';this.hitStop=.045;this.burst(e.x,e.z,'teal',swing.combo===3?12:7);this.heat=Math.max(1,this.heat+.15);
       if(e.hp<=0){this.score+=60;for(const ally of this.enemies)if(ally!==e&&ally.hp>0&&dist(ally,e)<9){ally.regroup=1.4;ally.cooldown=Math.max(ally.cooldown,1.4);}}
     }
-    if(this.gate.hp>0&&dist(p,this.gate)<3.5&&Math.abs(turn(p.attackYaw,Math.atan2(this.gate.x-p.x,this.gate.z-p.z)))<1.1){this.gate.hp--;hit=true;this.burst(p.x,p.z);if(!this.gate.hp){this.score+=100;for(const e of this.enemies)if(e.hp>0&&dist(e,this.gate)<5){e.stun=1.2;e.guardBreak=1.3;}this.say('Front line opened. The guard is off balance: get Kabir clear.');}}
+    const edge=this.gateContact();
+    if(this.gate.hp>0&&dist(p,edge)<swing.reach&&Math.abs(turn(p.attackYaw,Math.atan2(edge.x-p.x,edge.z-p.z)))<.85){this.gate.hp--;hit=true;p.contactKind='barrier';this.burst(edge.x,edge.z);if(!this.gate.hp){this.score+=100;for(const e of this.enemies)if(e.hp>0&&dist(e,this.gate)<5){e.stun=1.2;e.guardBreak=1.3;}this.say('Front line opened. The guard is off balance: get Kabir clear.');}}
     if(this.roadblock&&dist(p,this.block)<5){this.roadblock=false;hit=true;this.burst(p.x,p.z);this.say('Roadblock opened.');}
     if(!hit&&this.messageTime<=0)this.say('Close the gap. Dodge as the red tell fills.',1);
     p.contactSerial=(p.contactSerial||0)+1;p.contactHit=hit;
@@ -163,9 +164,10 @@ export class City{
   }
   assistedTarget(){
     const p=this.player,enemy=this.enemies.filter(e=>e.hp>0&&dist(e,p)<3.2&&this.line(p,e,false)).sort((a,b)=>dist(a,p)-dist(b,p))[0];
-    const gate=this.gate.hp>0&&dist(p,this.gate)<3.5?this.gate:null;
+    const gate=this.gate.hp>0&&dist(p,this.gateContact())<2?this.gateContact():null;
     return gate&&(!enemy||dist(p,gate)<dist(p,enemy))?gate:enemy;
   }
+  gateContact(){return{x:clamp(this.player.x,this.gate.x-this.gate.w/2,this.gate.x+this.gate.w/2),z:this.gate.z};}
   nearby(){
     if(this.van.occupied)return{id:'exit',label:'EXIT VAN'};
     if(this.player.traversal)return null;
@@ -218,7 +220,7 @@ export class City{
     const steps=Math.ceil(dist(p,to)/.2);
     if(!this.valid(to.x,to.z,.4,false,o.id)||dist(p,to)>4||Array.from({length:steps},(_,i)=>({x:p.x+(to.x-p.x)*(i+1)/steps,z:p.z+(to.z-p.z)*(i+1)/steps})).some(q=>!this.valid(q.x,q.z,.4,false,o.id))){this.say('No clear landing here. Approach the long side of the furniture.');return false;}
     p.yaw=Math.atan2(to.x-p.x,to.z-p.z);p.stamina-=12;p.swing=null;p.attack=0;
-    p.traversal={kind:'Vault',time:0,duration:.62,from:{x:p.x,z:p.z},to,prop:o.id};return true;
+    p.traversal={kind:'Vault',time:0,duration:.84,from:{x:p.x,z:p.z},to,prop:o.id};return true;
   }
   saveCheckpoint(){this.checkpoint={x:this.player.x,z:this.player.z,van:{...this.van},record:this.record,rescued:this.friend.rescued,gate:this.gate.hp,hold:this.hold,wave:this.wave,readers:this.readers.map(r=>({...r})),roadblock:this.roadblock,blockActivated:this.blockActivated,props:this.props.map(o=>({...o}))};}
   hurt(){const p=this.player;if(p.hurt>0||p.dash>0||this.mode!=='playing')return;p.health--;p.hurt=1.2;p.swing=null;p.attack=0;this.burst(p.x,p.z,'red',5);if(p.health<=0){this.mode='caught';this.say('Caught. Retry the checkpoint or try a different mission.');}else this.say('Red warning: dodge, interrupt, or use another route.',2);}
@@ -279,7 +281,13 @@ export class City{
     const p=this.player,v=this.van,i=this.input,mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));
     for(const k of['hurt','dash','dashCd','attack','attackCd','comboClock'])p[k]=Math.max(0,p[k]-dt);v.hurt=Math.max(0,v.hurt-dt);this.hitStop=Math.max(0,this.hitStop-dt);
     if(this.noise){this.noise.remaining-=dt;if(this.noise.remaining<=0)this.noise=null;}
-    if(p.swing){p.swing.time+=dt;if(!p.swing.hit&&p.swing.time>=p.swing.contact)this.contact();if(p.swing.time>=p.swing.duration)p.swing=null;}
+    if(p.swing){
+      p.swing.time+=dt;
+      const advance=.16*Math.min(1,p.swing.time/p.swing.contact),delta=advance-p.swing.advance;
+      if(delta>0)this.move(p,Math.sin(p.attackYaw)*delta,Math.cos(p.attackYaw)*delta);
+      p.swing.advance=advance;
+      if(!p.swing.hit&&p.swing.time>=p.swing.contact)this.contact();if(p.swing.time>=p.swing.duration)p.swing=null;
+    }
     if(v.occupied){
       let corner=0;if(mag>.12){const desired=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,desired));v.yaw+=turn(v.yaw,desired)*Math.min(1,dt*12);}
       const desired=i.brake?0:mag*14*(corner>.35?Math.max(.22,Math.cos(corner)):1);
@@ -288,9 +296,9 @@ export class City{
       if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.35,2,5));v.speed=0;v.hurt=Math.max(v.hurt,2);this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to stop, then steer away from the wall.',1.6);}
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;if(this.friend.aboard){this.friend.x=v.x;this.friend.z=v.z;}
     }else if(p.traversal){
-      const t=p.traversal;t.time=Math.min(t.duration,t.time+dt);const f=t.time/t.duration,s=f*f*(3-2*f);
+      const t=p.traversal;t.time=Math.min(t.duration,t.time+dt);const f=t.time/t.duration,u=t.kind==='Vault'?clamp((f-.16)/.64,0,1):f,s=u*u*(3-2*u);
       p.x=t.from.x+(t.to.x-t.from.x)*s;p.z=t.from.z+(t.to.z-t.from.z)*s;p.speed=0;p.vx=p.vz=0;
-      p.height=t.kind==='Vault'?Math.sin(Math.PI*f)*.8:0;
+      p.height=t.kind==='Vault'?Math.sin(Math.PI*clamp((f-.16)/.64,0,1))*.68:0;
       if(t.push){const o=this.props.find(o=>o.id===t.prop);o.x=t.push.from.x+(t.push.to.x-t.push.from.x)*s;o.z=t.push.from.z+(t.push.to.z-t.push.from.z)*s;}
       if(f>=1){if(t.push)this.props.find(o=>o.id===t.prop).shift=t.shift;p.traversal=null;p.height=0;}
     }else{
@@ -319,21 +327,21 @@ export class City{
       if(sight){visible=true;e.last={x:p.x,z:p.z};this.lastSeen={...e.last};}
       if(e.strikeDuration>0){
         e.state='strike';e.strikeTime+=dt;
-        if(e.role==='rush'&&e.strikeTime<.3)this.move(e,Math.sin(e.attackYaw)*6*dt,Math.cos(e.attackYaw)*6*dt);
-        if(!e.strikeHit&&e.strikeTime>=e.strikeDuration*.55){e.strikeHit=true;if(dist(e,p)<(e.role==='guard'?2.8:2.4)&&!v.occupied&&this.line(e,p,false)&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.8)this.hurt();}
+        if(e.role==='rush'&&e.strikeTime<.3){const step=Math.min(7*dt,Math.max(0,dist(e,p)-1.05));this.move(e,Math.sin(e.attackYaw)*step,Math.cos(e.attackYaw)*step);}
+        if(!e.strikeHit&&e.strikeTime>=e.strikeDuration*.55){e.strikeHit=true;if(dist(e,p)<(e.role==='guard'?1.65:1.55)&&!v.occupied&&this.line(e,p,false)&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.8)this.hurt();}
         if(e.strikeTime>=e.strikeDuration){e.strikeDuration=0;e.recovery=e.role==='rush'?1.2:.85;e.cooldown=1.3;e.state='recover';}
         continue;
       }
       if(e.recovery>0){e.state='recover';continue;}
       if(e.regroup>0){e.state='regroup';this.chase(e,e.home,dt,2.2);continue;}
       if(e.windup>0){e.state='telegraph';e.windup=Math.max(0,e.windup-dt);if(e.windup<=0){e.strikeDuration=.48;e.strikeTime=0;e.strikeHit=false;}continue;}
-      const reach=e.role==='rush'?4.2:e.role==='guard'?3:2.7,committed=this.enemies.filter(q=>q.hp>0&&(q.windup>0||q.strikeDuration>0)).length;
+      const reach=e.role==='rush'?3:e.role==='guard'?1.65:1.5,committed=this.enemies.filter(q=>q.hp>0&&(q.windup>0||q.strikeDuration>0)).length;
       if(!v.occupied&&d<reach&&e.cooldown<=0&&sight&&committed<(this.mission?.style==='hard'||this.network.cycle>1?2:1)){e.windup=e.windupTotal=(this.mission?.style==='hard'?.5:.75)+(e.role==='guard'?.12:0);e.attackYaw=e.yaw=Math.atan2(p.x-e.x,p.z-e.z);e.state='telegraph';continue;}
       const investigating=!sight&&this.noise&&dist(e,this.noise)<18;
       const holding=e.role==='guard'&&e.guardBreak<=0&&!investigating&&(d>4.5||dist(p,e.home)>7);
       const target=investigating?this.noise:holding?e.home:sight&&e.role==='flank'&&d>2.5?{x:p.x+Math.cos(p.yaw)*3,z:p.z-Math.sin(p.yaw)*3}:sight?p:this.hidden<4?e.last:e.home;
       e.state=investigating?'investigate':holding?'hold':sight&&e.role==='flank'?'flank':sight?'approach':'search';
-      if(d<1.7&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else if(dist(e,target)>.5)this.chase(e,target,dt,(e.role==='guard'?2:e.role==='flank'?3.5:2.8)+(this.mission?.style==='hard'?.5:0)+Math.max(0,(this.mission?.tier||1)-1)*.2);
+      if(d<1.1&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else if(dist(e,target)>.5)this.chase(e,target,dt,(e.role==='guard'?2:e.role==='flank'?3.5:2.8)+(this.mission?.style==='hard'?.5:0)+Math.max(0,(this.mission?.tier||1)-1)*.2);
     }
     for(let a=0;a<5;a++)for(let b=a+1;b<5;b++){const e=this.enemies[a],f=this.enemies[b],d=dist(e,f);if(e.hp>0&&f.hp>0&&d<.9){const dx=(e.x-f.x)/(d||1),dz=(e.z-f.z)/(d||1);this.move(e,dx*dt,dz*dt);this.move(f,-dx*dt,-dz*dt);}}
     if(this.car.active){
@@ -362,7 +370,7 @@ export class City{
       }
       const wave=Math.min(2,Math.floor(this.hold/8));
       if(wave>this.wave){this.wave=wave;this.hold=wave*8;this.spawn(m.zones[wave],m.style==='hard'||m.tier>1?3+wave:3);
-        if(wave===2){this.readers=[-1,1].map(s=>({...snap({x:m.zones[2].x+s,z:m.zones[2].z}),yaw:0}));this.say('Anita: the reading group is separated. Lead both readers to the assembly on foot.',5);}
+        if(wave===2){this.readers=[-1,1].map(s=>({...snap({x:m.zones[2].x+s,z:m.zones[2].z}),yaw:0}));this.say('Anita: Together. Stay close. We leave nobody behind. Lead both readers to the assembly.',5);}
         else this.say('Gathering secured. Clear the aid point, then hold Action to restore support.',4);
         this.saveCheckpoint();}
     }
