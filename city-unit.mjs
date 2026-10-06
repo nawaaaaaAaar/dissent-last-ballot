@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.16.2';
 import {City} from './docs/city-rules.js';
+const mapImport=fs.readFileSync('docs/city-rules.js','utf8').match(/from '(\.\/city-data\.js[^']*)'/)[1];
+const {installMap,PLACES,roadRoute,snap,WORLD}=await import('./docs/'+mapImport.slice(2));
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
 function check(name,fn){fn();checks.push(name);}
@@ -165,6 +166,14 @@ check('companion braces near a committed attack then resumes following',()=>{
   const g=new City();g.start();g.accept('witness');g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);g.friend.rescued=true;
   Object.assign(g.friend,{x:g.player.x+3,z:g.player.z});const e=g.enemies[0];Object.assign(e,{hp:3,x:g.friend.x+1,z:g.friend.z,windup:.6,cooldown:10});g.companion(g.friend,g.player,.05,6.5);assert.equal(g.friend.state,'shelter');
   e.hp=0;for(let i=0;i<25;i++)g.companion(g.friend,g.player,.05,6.5);assert(['follow','wait'].includes(g.friend.state));
+});
+check('new encounter does not place its table through the parked van',()=>{
+  const g=new City();g.start();const p=g.place('gate');Object.assign(g.van,{x:p.x+2,z:p.z+2,occupied:true});Object.assign(g.player,g.van);
+  g.network.completed=['witness','hold','signal'];assert(g.accept('charter'));const o=g.props.find(o=>o.id==='dispatch-table');
+  assert(Math.hypot(o.x-g.van.x,o.z-g.van.z)>=2);assert(g.valid(g.van.x,g.van.z,1.1));
+});
+check('each gathering stage has authored guard homes near its functional space',()=>{
+  const g=new City();g.start();g.accept('hold');for(const wave of[1,2]){g.wave=wave;g.spawn(g.mission.zones[wave],3);const e=g.enemies[0],q=g.encounter.stages[wave][0];assert(Math.hypot(e.home.x-q.x,e.home.z-q.z)<5.1);}
 });
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v16',{recursive:true});fs.writeFileSync('qa/v16/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.3';
-import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.3';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.4';
+import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.4';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -47,6 +47,16 @@ export class City{
     WORLD.record={...this.mission.source};WORLD.safe={...this.mission.destination};
     const source=this.mission.source;
     this.encounter=layout(this.mission);this.props=this.encounter.props;
+    // A new operation must not materialise furniture through a parked vehicle
+    // or the player. Preserve the authored layout except for the conflicting prop.
+    for(const o of this.props)if(contains(this.van,o,1.4)||contains(this.player,o,.7)){
+      const candidates=[];
+      for(let r=2;r<=10;r+=2)for(let i=0;i<16;i++){
+        const angle=i*Math.PI/8,q={...o,x:o.x+Math.sin(angle)*r,z:o.z+Math.cos(angle)*r};
+        if(!contains(this.van,q,1.4)&&!contains(this.player,q,.7)&&dist(q,source)>2.2&&this.valid(q.x,q.z,.7,true,o.id)&&!this.props.some(b=>b!==o&&contains(q,b,1.5)))candidates.push(q);
+      }
+      if(candidates.length){o.x=candidates[0].x;o.z=candidates[0].z;}
+    }
     this.gate={x:source.x,z:source.z-3,w:6,hp:spec.type==='rescue'?3:0,fall:spec.type==='rescue'?0:1};
     const returnRoute=roadRoute(snap(source,true),snap(this.mission.destination,true),{vehicle:true});
     this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;this.blockActivated=false;

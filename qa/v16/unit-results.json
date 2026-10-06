@@ -1,5 +1,5 @@
 {
-  "passed": 37,
+  "passed": 39,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -37,6 +37,8 @@
     "vault moves through only the selected low furniture with a valid landing",
     "screen changes its physical and sight position, checkpoint retains it",
     "guard holds its authored home instead of pursuing to an unrelated street",
-    "companion braces near a committed attack then resumes following"
+    "companion braces near a committed attack then resumes following",
+    "new encounter does not place its table through the parked van",
+    "each gathering stage has authored guard homes near its functional space"
   ]
 }
