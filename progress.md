@@ -1,5 +1,11 @@
 Original prompt: Build DISSENT: The Last Ballot as a playable 3D student-resistance runner and make it playable on mobile phones. Push work to GitHub and the public link.
 
+## At the Line rebuild
+
+Latest owner approval: rebuild one tightly directed Delhi encounter instead of continuing narrow patches to the rejected prototype. Existing campaign retained separately as campaign-v17.html; current root is the new rescue/escape encounter.
+
+QA inventory: menu/start/help/back; pause/resume/restart; quality setting and mute/resume; ordinary-time approach, short combo/shield/push/dodge, damage/capture/retry; held rescue; screen movement and sight/collision; front barricade and alternative rail vault, companion follow/brace/vault; together-only boarding, roadwork avoidance, warned patrol lane pressure, brake, collision damage, escape checkpoint retry and full win; phone actual simultaneous movement/action inputs, portrait/landscape fit; real gameplay screenshots and motion transitions; no state injection in normal-time replay. Separate staged rules check edge cases and deterministic supplied client checks rendering. No claim of physical-device or human enjoyment testing.
+
 ## Authored encounters request
 
 Replayed public v0.15.13 before edits. Reworked witness cordon/community forecourt with collision/sight props, vaults, movable screens, phase-timed skeletal strikes, guard homes, regrouping and threatened companions. First iterations failed motion binding/axes, context selection, later-stage placement and parked-van clearance; revised after play. Fresh v0.16.4 completed rescue/gathering/courier/charter in ordinary time, cycle two, no runtime state injection. Final v0.16.5 adds visible-target/barrier assistance and corrected in-game guidance. Forty isolated rules pass; final touch/deployment checks in QA.md. No districts or reward counters added. See ENCOUNTER-REVIEW.md for actual observations and remaining quality gap.

@@ -1,174 +1,23 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DISSENT | City of Accounts</title>
-<meta name="theme-color" content="#14201e">
-<meta name="description" content="An original mobile-first 3D resistance action city: explore central Delhi, choose rescue, courier and gathering operations, and build a network. Fictional encounters on OSM-derived streets.">
-<link rel="preconnect" href="https://api.fontshare.com">
-<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./breakout.css?v=0.17.2">
-<link rel="stylesheet" href="./review-art.css?v=0.17.2">
-<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script>
-</head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DISSENT · At the Line</title><meta name="theme-color" content="#172823"><meta name="description" content="One original 3D rescue-and-escape encounter in a Jantar Mantar-inspired Delhi street. Play on phone or desktop.">
+<link rel="preconnect" href="https://api.fontshare.com"><link href="https://api.fontshare.com/v2/css?f[]=clash-display@600&f[]=satoshi@400,500,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="./line.css?v=18">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/"}}</script></head>
 <body>
-<div id="viewport" aria-label="Top-down 3D action city">
-</div>
-<header>
-<a class="brand" href="./concept.html">
-<svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-<path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/>
-</svg>
-<span>DISSENT<small>CITY OF ACCOUNTS / DELHI</small>
-</span>
-</a>
-<nav>
-<button id="missions">Map &amp; Missions</button>
-<button id="sound">Sound off</button>
-<button id="view">Overview</button>
-<button id="pause" hidden>Pause</button>
-</nav>
-</header>
-<section id="menu" class="screen">
-<div class="title-copy">
-<p class="eyebrow">A resistance action city / strict-review rework</p>
-<h1>Break the line.<br>Keep the account.</h1>
-<p class="lead">Rescue. Deliver. Hold your ground.<br>Drive between CP, Jantar Mantar and India Gate. Choose missions, earn support, return stronger.</p>
-<button id="start" class="primary" disabled>Loading the city…</button>
-<button id="tutorial" class="secondary">Controls &amp; winning route</button>
-<p id="loading" role="status">Preparing the 3D engine…</p>
-<p class="quiet">Illustrated cover. The playable city is real-time 3D, not this image.</p>
-<label class="setting">Graphics <select id="quality">
-<option value="auto">Auto</option>
-<option value="low">Mobile / low</option>
-<option value="high">High / detailed shadows</option>
-</select>
-</label>
-<p class="disclosure">Original fictional game, not a reconstruction of real violence. The electoral movement context is sourced separately; allegations are disputed. Systems prototype, not finished photorealistic art.</p>
-<a class="quiet" href="./breakout-v13.html">Archive: small-world Breakout</a> · <a class="quiet" href="./concept.html">Research &amp; provenance</a>
-</div>
-</section>
-<section id="hud" hidden>
-<div class="objective">
-<span class="eyebrow">THE RECORD MUST GET THROUGH</span>
-<strong id="objective">
-</strong>
-<small>
-<span id="direction">↑</span> <span id="distance">
-</span>
-</small>
-</div>
-<div class="heat">
-<span id="phase">PURSUIT</span>
-<div id="heat-bars">
-</div>
-<small id="heat-note">
-</small>
-</div>
-<div class="vitals">
-<span id="health">
-</span>
-<div class="meter">
-<i id="stamina">
-</i>
-</div>
-<small id="vehicle-status">ON FOOT</small>
-</div>
-<div class="minimap">
-<canvas id="map" width="144" height="144">
-</canvas>
-<small>DELHI · LOCAL RADAR</small>
-</div>
-</section>
-<div id="toast" role="status" aria-live="polite">
-</div>
-<div id="controls" hidden>
-<div id="move-stick" class="stick">
-<i>
-</i>
-<span>MOVE</span>
-</div>
-<div class="centre-actions">
-<button id="strike">STRIKE</button>
-<button id="dash">DODGE</button>
-</div>
-<div id="aim-stick" class="stick">
-<i>
-</i>
-<span id="aim-label">AIM + STRIKE</span>
-</div>
-<button id="action" class="primary" hidden>ACTION</button>
-<div class="desktop-hint">WASD · Shift run · hold Space strike · Q dodge · E act · mouse aim</div>
-</div>
-<section id="pause-screen" class="modal" hidden>
-<div class="panel">
-<p class="eyebrow">Your place is held</p>
-<h2>Paused.</h2>
-<p>Follow the gold route on the radar. Map &amp; Missions shows the whole city and your active operation. Your network progress stays when you choose another job.</p>
-<button id="resume" class="primary">Resume</button>
-<button id="pause-help" class="secondary">Controls &amp; route</button>
-<button id="restart" class="secondary">Abandon &amp; choose a job</button>
-</div>
-</section>
-<section id="help-screen" class="modal" hidden>
-<div class="panel">
-<p class="eyebrow">Play before reading</p>
-<h2>Learn the city.<br>Build the network.</h2>
-<p>
-<b>Phone:</b> left stick moves and drives; its outer edge runs on foot. Hold the right stick to aim and repeatedly strike, or hold Strike for nearby aim assist. Dodge gives a short escape burst. In the van, release the left stick to slow down, or hold Brake. Corner assist slows sharp turns.</p>
-<p>
-<b>Desktop:</b> WASD/arrows move or steer. Shift runs; Space aims at the nearest visible opponent or blocking cordon and chains strikes (or brakes in a van). Q dodges, E acts; hold E to copy a dispatch or restore aid. Z switches close/overview camera, P pauses, M opens missions. Mouse aiming is optional. Teal marks Aman; gold marks Kabir. Guards carry shields: flank them or finish three strikes. Expanding red rings warn of attacks. Damage lands at the arm's contact phase; dodging or moving out of reach can make a strike miss. Strikes and dodges spend stamina: disengage to recover.</p>
-<ol>
-<li>Start near the Jantar street gathering. Your volunteer van is a short walk away; Action/E boards it, even before the mission objective is complete. Follow the gold radar route toward the operation. M or Map &amp; Missions opens the full map.</li>
-<li><b>Rescue:</b> approach the fictional witness cordon, evade or interrupt the guards, then Action/E near Kabir. Three contact hits open the yellow line; a low bench side route can bypass it. A tall banner screen blocks sight: face it and tap Action/E to move it, drawing attention to that sound. Face a low bench or table and tap Action/E to vault it when the landing is clear. Bring Kabir back to the van.</li>
-<li><b>Courier:</b> exit at Tolstoy Marg or India Gate and hold Action/E at the gold dispatch for 1.8 seconds. Damage interrupts copying; progress is retained. Protect it and reach the green destination. India Gate is a fictional relay, not a claim of a current protest there.</li>
-<li><b>Rally:</b> use the gathering screen for cover and secure the first point for eight cumulative seconds with guards outside the circle. At the aid table, clear space and hold Action/E for 2.8 seconds. At the reading area, bring both readers to the Jantar assembly on foot. They may brace when attacks pass nearby, then follow again; arriving alone does not finish the operation.</li>
-<li>For deliveries, lose sight of pursuers until heat is below one bar, then slow down at the destination. Gold medals reward keeping health and avoiding vehicle crashes, not a destruction tally.</li>
-<li>After a win, choose another job. Finish the three different operations to unlock the charter run. Repeating jobs changes guard approaches. Support credits buy strike tempo, van protection or running endurance. The next network cycle continues after the charter.</li>
-</ol>
-<p>Medkits restore health. Volunteer support restores stamina, health and van condition once per job after you break pursuit. Retry restores arrival, rescue, mission-stage or boarding checkpoints within this tab. Some repeats add a roadblock: bypass it or use an abstract arcade strike. There are no real personal records or mandatory case quizzes.</p>
-<button id="help-close" class="primary">Back</button>
-</div>
-</section>
-<section id="ending" class="modal" hidden>
-<div class="panel">
-<p class="eyebrow" id="ending-kicker">THE NETWORK HOLDS</p>
-<h2 id="ending-title">
-</h2>
-<p id="ending-copy">
-</p>
-<div id="results">
-</div>
-<button id="retry" class="primary">Retry checkpoint</button>
-<button id="again" class="secondary">Choose the next operation</button>
-<a class="quiet" href="./concept.html">Movement context &amp; limits</a>
-</div>
-</section>
-<section id="city-screen" class="modal" hidden>
-<div class="panel city-panel">
-<p class="eyebrow">A connected central-Delhi world</p>
-<h2>Choose your next move.</h2>
-<p id="network-status"></p>
-<button id="operations-jump" class="primary">Choose an operation ↓</button>
-<canvas id="city-map" width="420" height="420" aria-label="Central Delhi map with India Gate, Jantar Mantar, Connaught Place and route"></canvas>
-<p class="map-credit">© <a href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">OpenStreetMap contributors</a> · ODbL 1.0. North is up. Uniform 0.14 scale; streets widened for play. This is central Delhi, not the entire city. Monument art and encounters are fictional approximations.</p>
-<p id="board-note"></p>
-<label class="setting">Pressure <select id="difficulty"><option value="balanced">Balanced</option><option value="hard">Hard · faster guards</option></select></label>
-<div id="contracts"></div>
-<h3>Support upgrades</h3>
-<div id="upgrades"></div>
-<h3>Keep your network</h3>
-<p>Progress stays in this tab. Export a save code and keep a copy to restore on another visit or phone.</p>
-<textarea id="save-code" aria-label="Network save code" rows="3" placeholder="Paste your exported save code here"></textarea>
-<div class="save-buttons"><button id="export-save">Export code</button><button id="import-save">Restore code</button></div>
-<button id="board-close" class="primary">Return</button>
-<button id="explore" class="secondary">Free roam / abandon active job</button>
-</div>
-</section>
-<a class="osm-credit" href="https://www.openstreetmap.org/copyright/en-EN" target="_blank" rel="noopener">© OpenStreetMap contributors · ODbL</a>
-<div id="performance">3D LOADING</div>
-<script type="module" src="./breakout.js?v=0.17.2-stage">
-</script>
-</body>
-</html>
+<div id="viewport" aria-label="Real-time 3D Delhi-inspired encounter"></div>
+<header><div class="brand"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 5h16v22H6zM11 12l4 4L27 4M11 22h7" stroke="currentColor" stroke-width="2.4"/></svg><span><b>DISSENT</b><small>AT THE LINE / DELHI</small></span></div><nav><button id="sound">Sound off</button><button id="pause" hidden>Pause</button></nav></header>
+<section id="menu" class="screen"><div class="copy"><span class="eyebrow">One street. One account. Together.</span><h1>Not without<br>my friend.</h1>
+<p>The gathering has scattered. Kabir is being held beside the bus, with a recording the public needs to hear. Cross the line, get him out, and leave together.</p>
+<button id="start" class="primary" disabled>Preparing the encounter…</button><button id="help">How to play</button>
+<p id="loading" class="quiet" role="status">Loading character rigs, materials and environment.</p>
+<div class="row"><label class="quiet" for="quality">Graphics</label><select id="quality"><option value="high">Detailed shadows</option><option value="low">Mobile / lighter</option></select></div>
+<p class="quiet">The scene behind this menu is actual game rendering. Fictional characters and events in an authored Jantar Mantar-inspired space, not an exact Delhi map or documentary reconstruction.</p>
+<a class="quiet" href="./campaign-v17.html">Previous city prototype</a> · <a class="quiet" href="./concept.html">Theme &amp; research</a></div></section>
+<section id="hud" hidden><div id="objective"></div><div id="health" aria-label="Health"></div><div id="stamina-wrap"><i id="stamina"></i></div><div id="vehicle" hidden></div><div id="subtitle" role="status" hidden></div></section>
+<div id="controls" hidden><div id="move-stick" class="stick" aria-label="Movement joystick"><i></i></div><div class="actions"><button id="action" hidden><span id="action-label">Action</span><i id="action-progress"></i></button><button id="attack">STRIKE</button><button id="dodge">DODGE</button></div></div>
+<div id="tip" class="desktop-tip" hidden>WASD / arrows · hold Space for short combos · Q dodge · E action · Shift run · P pause</div>
+<section id="pause-screen" class="screen" hidden><div class="copy"><span class="eyebrow">Take your time</span><h2>At the line.</h2><p>Keep your friend close. You can open the middle barricade or cross the low side rail.</p><button id="resume" class="primary">Resume</button><button id="pause-help">Controls</button><button id="restart">Restart encounter</button></div></section>
+<section id="help-screen" class="screen" hidden><div class="copy"><span class="eyebrow">Controls / winning route</span><h2>Get out together.</h2>
+<div class="controls-guide"><b>Move</b><span>WASD/arrows, or the left thumbstick. Push the stick fully to run; desktop Shift runs.</span><b>Strike</b><span>Space or Strike. Nearby opponents are faced automatically. Three strikes end in a shield-opening push; release to recover.</span><b>Dodge</b><span>Q or Dodge during the red windup. Evading contact opens a stronger counterstrike.</span><b>Interact</b><span>E or the contextual button. Hold to release Kabir. Move the screen or vault the low left rail to change your route.</span><b>Escape</b><span>Bring Kabir to the cream van beyond the line. Board together; use movement to drive. Take the left of the roadworks. Dodge becomes Brake.</span></div><p class="quiet">You do not have to defeat everyone. Kabir will brace under nearby threats; make space and keep him close. Vehicle failure retries the escape checkpoint. Restart discards this run.</p><button id="help-close" class="primary">Back</button></div></section>
+<section id="ending" class="screen" hidden><div class="copy"><span id="ending-kicker" class="eyebrow"></span><h2 id="ending-title"></h2><p id="ending-copy"></p><button id="retry" class="primary">Try again</button><button id="ending-help">Controls</button><p class="quiet">The political context is real; this escape is fictional. Protecting an account does not itself remove an official, change electoral policy or register a voter.</p></div></section>
+<div id="debug">3D / loading</div><script type="module" src="./line-game.js?v=18"></script></body></html>
