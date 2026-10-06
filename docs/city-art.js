@@ -41,7 +41,10 @@ export async function cityArt(scene,WORLD,PLACES){
   for(const p of PLACES){
     for(let j=0;j<5;j++){const x=p.x-12+j*5,z=p.z+9;bench(detail,x,z);lamp(detail,x,z+2);cylinder(detail,M.sand,x, .35,z-2,.5,.7);cylinder(detail,M.leaf,x,1.0,z-2,.7,.7);}
     tent(detail,p.x-9,p.z+7);sign(detail,'COMMUNITY SUPPORT',p.x-9,2.9,p.z+8,4,.5,'#294c45','#f0dbb4');
-    for(let j=0;j<3;j++){box(detail,M.wood,p.x+8, .65,p.z+j*2,2,1.3,1);box(detail,M.red,p.x+8,1.4,p.z+j*2,2.2,.12,1.2);}
+    // The gathering's aid desk is authored, interactive furniture. Legacy
+    // decorative stalls at these same coordinates hid its player and were
+    // not collision objects; do not stack them over the playable aid space.
+    if(p.id!=='sansad')for(let j=0;j<3;j++){box(detail,M.wood,p.x+8, .65,p.z+j*2,2,1.3,1);box(detail,M.red,p.x+8,1.4,p.z+j*2,2.2,.12,1.2);}
     // Original street props, not scans or claims about actual parked vehicles.
     for(let j=0;j<2;j++){
       const x=p.x+11+j*3,z=p.z-10;
@@ -52,7 +55,7 @@ export async function cityArt(scene,WORLD,PLACES){
       cylinder(detail,M.dark,x,.3,z-.8,.29,.16,Math.PI/2);
       box(detail,M.white,x,.9,z-1.02,.23,.15,.05);
     }
-    sign(detail,'FICTIONAL VOLUNTEER DESK',p.x+8,2.1,p.z+1,3,.5,'#24463f','#edd3a4');
+    if(p.id!=='sansad')sign(detail,'FICTIONAL VOLUNTEER DESK',p.x+8,2.1,p.z+1,3,.5,'#24463f','#edd3a4');
   }
   const named=new Set();
   for(const s of WORLD.segments){

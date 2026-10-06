@@ -1,5 +1,13 @@
 # Asset provenance
 
+## Physical readability and presentation pass
+
+The short strike step, phase-linked arm solve, pose-exit blending, shared range geometry, camera damping, body spacing and prop silhouettes are original project code. The procedural wood-grain texture, subdivided banner fabric, slats, steel frames and aid-table dressing are original runtime geometry/textures, not purchased assets or scans. The existing Rocketbox/Three.js licences remain applicable; no new character model or likeness was added.
+
+`art/anita-escort.txt` is the editable Hindi script for one fictional adult character line. `docs/assets/anita-escort.mp3` is generated speech using the Sulafat voice, then transcoded to MP3. It is not a real organiser, journalist, witness or protest recording. The accompanying English subtitle translates the line and adds the gameplay direction. The source audio measures approximately 3.89 seconds and peaks at −4.3 dBFS before runtime gain.
+
+`docs/world-audio.js` synthesizes original noise/tone Foley for contact, miss, shield, barrier, footsteps, landing, wheels and hurt, plus a low noise environmental bed. It does not contain sampled commercial effects or recorded Delhi ambience. The already credited original instrumental remains unchanged. Claims about recorded voices in historical sections below describe those earlier versions, not this generated line.
+
 ## Authored encounter/contact cycle
 
 `docs/contact-motion.js` contains original quaternion-keyframe choreography for Jab, Cross, Push, Dodge, Vault, Brace, EnemyStrike, Hurt and Help, applied to the previously licensed human skeletons. The source is editable; it is not generated video, new mocap or a third-party animation purchase. Semantic model-space offsets are converted to the imported rig's joint frames. The renderer samples the same normalized action phase used by gameplay contact.

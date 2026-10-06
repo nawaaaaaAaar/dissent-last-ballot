@@ -1,5 +1,19 @@
 # QA and limitations
 
+## Physical readability pass: current scope
+
+Fresh public v0.16.5 was explored before editing through normal-time cordon movement, held strikes, screen movement, vault and dodge. Baseline captures are `qa/v17/before-*`; this was not a full baseline campaign win. `PHYSICAL-REVIEW.md` records the comparison, revisions and limitations.
+
+Initial revised v0.17.0 completed four operations but exposed an overhead shield attachment, overlapping bodies/contact steps, aid-space occlusion and awkward vehicle departure. These were revised, rather than counted as acceptable because objectives worked. One long-lived cloud run lost WebGL context with shader validation errors; another later session timed out. Their exact underlying cause was not established. Fresh sessions rendered successfully; a context-loss recovery message was added rather than allowing blind gameplay.
+
+Fresh public v0.17.2 at source commit `3f8d8eb` completed all four operations in ordinary browser time: witness SILVER/1800, health 6, van 97.00; gathering GOLD/1757, health 5; dispatch SILVER/1724, health 6, van 94.98; charter SILVER/1398, health 5, van 98. Cycle two retained four bests and 12 credits, with no upgrades. Gameplay used actual CDP keyboard/touch input, with waypoint/controller assistance and read-only state observations. No runtime coordinates, health, progression flags or simulation clock were edited. This is agent-assisted play, not an independent human enjoyment test.
+
+The gathering screen changed the available approach; both readers reached the assembly while the final-stage opponents survived. The charter also departed with surviving guard/flanker units. The dispatch departure required steering around the physical desk because the road route did not account for it. That remaining navigation weakness is retained in the review.
+
+Forty-three isolated checks pass in `qa/v17/unit-results.json`. Added coverage includes visible short range, rail-edge contact and walking/strike advance not crossing an opponent centre. Unit tests stage state; they are not normal-time play. The supplied browser client provides separate deterministic movement/strike captures. Actual campaign captures are `qa/v17/final-*`, distinct from failed or partial attempts.
+
+After that full replay, a presentation-only patch removed legacy, non-colliding decorative stalls overlapping the authored Sansad aid point. Campaign rules remain those of the full v0.17.2 run; affected-space, final phone layout/input and recovery checks are recorded below rather than described as another complete campaign.
+
 ## Authored encounter/contact cycle
 
 Baseline before edits was fresh public v0.15.13: exploratory witness and gathering play using normal-time movement, short/held strikes, dodge and failed/partial interactions. It was not a full baseline campaign win.

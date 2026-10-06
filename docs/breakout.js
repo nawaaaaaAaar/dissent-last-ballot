@@ -6,7 +6,7 @@ import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?
 import {human,loadPeople,poseHuman,poseMotion,resetHuman} from './people.js?v=0.17.2';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
 import {WorldAudio} from './world-audio.js?v=0.17.2';
-import {cityArt} from './city-art.js?v=0.17.2';
+import {cityArt} from './city-art.js?v=0.17.2-stage';
 import {encounterArt} from './encounter-art.js?v=0.17.2';
 import {ENEMY_REACH,local} from './encounters.js?v=0.17.2';
 

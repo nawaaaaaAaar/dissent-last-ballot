@@ -8,6 +8,8 @@ Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and 
 
 ## Controls
 
+The thin forward arc shows short strike reach and locked facing. Being near an officer is not enough if they are outside that arc: close the gap, flank or dodge into their recovery. The wider rush warning shows its committed approach; its actual impact reach contracts at the strike. Barricades must be struck close to the physical rail. Overview is available for navigation, while the default camera moves closer near combat.
+
 Action now also moves nearby tall banner screens or vaults a low bench/table when you face it. Mission copying, aid restoration and rescue have priority; move away from the mission marker or van if you want to interact with furniture. A vault costs stamina and needs a clear landing. Screens block sight and moving one draws nearby unseen guards toward its sound. The minimap route does not account for every relocated prop: steer around it rather than continuously pushing into it.
 
 - **Phone:** Left stick moves or drives. Its outer edge runs on foot. The right stick aims and repeatedly strikes while held; the separate Strike button gives nearby aim assistance. Dodge makes a short burst. Action enters/exits the van or rescues Kabir. Release movement to slow the van; hold Brake or the right stick to stop faster.

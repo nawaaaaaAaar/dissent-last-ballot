@@ -1,5 +1,16 @@
 # DISSENT release notes
 
+## Physical readability and presentation
+
+- Replayed public v0.16.5 before edits, including misses, screen movement, vault and dodge; no new districts or reward systems.
+- Reworked adaptive close/portrait/vehicle framing, damped camera transitions and desktop HUD footprint.
+- Reduced strike reach, added readable range arcs, shared enemy tell/reach geometry and nearest-rail barricade contact. Walking/strike advance no longer crosses standing opponents' centres.
+- Added bounded two-bone hand targeting, vault anticipation/landing timing and blended exits to locomotion; these remain arcade animation, not full-body IK or mocap.
+- Rebuilt bench/table/screen silhouettes and surface details; removed decorative stalls that overlapped the authored aid point and concealed the player.
+- Differentiated original synthesized Foley and added a subtitled generated Hindi Anita line with provenance. Added explicit browser graphics-context-loss recovery.
+- Revised again after the full initial play exposed overhead shields, overlap-induced misses and staging occlusion. A fresh final-rules public four-operation cycle reached cycle two; `PHYSICAL-REVIEW.md` and `QA.md` distinguish full replay from subsequent presentation-only checks.
+- Still below finished-indie quality: incomplete foot planting/grips/falls, repeated avatars, generic city geometry, thin spatial audio and local routing/pursuit fairness. No claim of physical-phone certification or measured human enjoyment.
+
 ## Authored encounter and contact rework
 
 - Replayed public v0.15.13 before edits and selected the witness cordon and community forecourt as the main redesigns. No district, currency or reward counter was added.
