@@ -1,5 +1,14 @@
 # DISSENT release notes
 
+## At the Line rebuild
+
+- Replaced the default city campaign entry with one connected rescue-and-escape scene and separate rules/rendering/UI. The old city stays playable at campaign-v17.html.
+- Authored a Delhi-inspired street/gathering, guarded friend, sight-blocking screen, middle breakthrough and side crossing, together-only boarding, roadwork/patrol escape and shelter.
+- Reworked mobile input around one movement stick, nearby-facing Strike, Dodge and contextual Action. Removed the mission-board/reward setup from this encounter.
+- Rebuilt camera, HUD and scene staging, improved materials/shadows and vehicle/garden presentation; added three fictional Hindi voice lines, differentiated Foley and engine/siren layers.
+- Revised after actual play exposed companion crossing oscillation, invisible table collision, default dodge direction and exhausted escape energy. Both side and direct approaches completed through actual normal-time controls; the direct route included a deliberate driving failure and escape-checkpoint retry.
+- Sixteen isolated rules pass. Final presentation/audio checks are separate from full gameplay replay. Character assets, choreography, crowd autonomy, encounter length and unverified independent enjoyment still prevent finished-indie or final-graphics approval.
+
 ## Physical readability and presentation
 
 - Replayed public v0.16.5 before edits, including misses, screen movement, vault and dodge; no new districts or reward systems.

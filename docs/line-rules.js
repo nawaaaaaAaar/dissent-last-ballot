@@ -87,7 +87,7 @@ export class Line{
   if(c.id==='aid'){p.hp=Math.min(6,p.hp+2);this.aidUsed=true;this.say('Volunteer: Stay with your friend. The van is beyond the line.');}
   if(c.id==='van'&&len(this.friend,this.van)<4){
    this.friend.aboard=true;this.van.occupied=true;this.phase='drive';p.x=this.van.x;p.z=this.van.z;
-   this.checkpoint='drive';this.sirenTime=0;this.say('Sana: Drive. The works block the right lane. Take the left, then the shelter.',4);
+   this.checkpoint='drive';this.sirenTime=0;this.say('Sana: Go left. They’re working on the road.',4);
   }
  }
  resolve(){
@@ -116,7 +116,7 @@ export class Line{
  retry(){
   if(this.checkpoint==='drive'){
    this.p.hp=6;this.van.hp=100;this.van.x=2.5;this.van.z=-31;this.van.speed=0;this.van.yaw=Math.PI;this.van.occupied=true;
-   this.p.x=2.5;this.p.z=-31;this.phase='drive';this.sirenTime=0;this.rams=0;this.lastCrash=0;this.mode='playing';this.input={x:0,z:0,attack:false,action:false,run:false,brake:false};this.say('Sana: Left of the works. We’re still together.');return;
+   this.p.x=2.5;this.p.z=-31;this.phase='drive';this.sirenTime=0;this.rams=0;this.lastCrash=0;this.mode='playing';this.input={x:0,z:0,attack:false,action:false,run:false,brake:false};this.say('Sana: Go left. They’re working on the road.');return;
   }this.start();
  }
  update(dt){
@@ -147,7 +147,7 @@ export class Line{
    if(this.rescueHold>.65){
     this.friend.rescued=true;this.friend.state='follow';this.phase='escape';
     this.enemies.forEach(e=>e.active=true);this.event('wheel');
-    this.say('Kabir: I have the recording. They cannot erase every account. Together, to the van.',4);this.rescueHold=0;
+    this.say('Kabir: I have the recording. We leave together.',3);this.rescueHold=0;
    }
   }else this.rescueHold=Math.max(0,this.rescueHold-dt*.5);
   this.enemyUpdate(dt);this.companionUpdate(dt);

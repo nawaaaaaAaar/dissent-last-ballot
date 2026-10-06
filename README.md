@@ -1,52 +1,34 @@
-# DISSENT: City of Accounts
+# DISSENT: At the Line
 
-An original **mobile-first top-down 3D resistance action adventure** in a connected central-Delhi map. The strict-review rework changes encounter pacing, stamina-limited combos, shield and rush behaviour, held dispatch copying, staged gathering support and escort, checkpoint recovery, street rendering and character presentation. Graphics were worked on in this pass, not deferred: textured façades, roof detail, original street props, rigged uniform adaptations, revised lighting, animation timing and a coherent interface replace substantial portions of the earlier placeholder treatment.
+A rebuilt, short 3D rescue-and-escape encounter for phone and desktop. The default game no longer starts the three-operation city campaign: it follows one connected fictional scene from a scattered gathering, through Kabir's rescue and a police line, to a volunteer-van escape.
 
-The current encounter pass adds contact-timed skeletal strikes, collision-checked bench/table vaults, movable sight-blocking screens, position-holding/flanking enemies and companions who brace near committed attacks. Read [the before/after play review](ENCOUNTER-REVIEW.md) for the redesigned witness cordon and community forecourt, observed results and remaining finished-indie gap. It does not add a district or another reward counter.
+[Play the public encounter](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · At the line**. The scene behind the menu is actual game rendering, not an illustrated quality target.
 
-The latest physical-readability pass brings the camera closer, clarifies actual strike reach/contact, blends poses back to movement, improves existing prop silhouettes and adds differentiated Foley plus one subtitled fictional Hindi line. Read [the physical before/after review](PHYSICAL-REVIEW.md) for actual replay observations, additional corrections and the remaining animation/navigation gap. These are game-render changes, not promotional images or a claim of finished production art.
+## What game this is
 
-Read [the ranked review and replay findings](STRICT-REVIEW.md) before treating feature completion as quality approval. Start near the fictional Jantar street gathering rather than taking an empty opening drive from CP. The original OSM footprint data is preserved separately from display contours trimmed around arcade-width vehicle streets; this is not an exact digital twin or a real-world navigation tool.
+- **Get close:** Move, make space, use short combos and dodge committed attacks. A third strike pushes and opens a shield; attacks preserve enough stamina to dodge.
+- **Rescue:** Find Kabir beside the transport bus and hold the contextual action. He carries the recording; the objective becomes leaving together.
+- **Choose an approach:** Move the sight-blocking screen, open the middle barricade, or vault the low side rail. Kabir follows through the opened middle or uses the side crossing.
+- **Escape:** Board only when Kabir is close enough. Drive left of the roadworks to the community shelter; collisions and a visible right-lane patrol create escape pressure. Vehicle failure has an escape checkpoint.
 
-[Play the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · City of accounts**. Open **Map & Missions** for the whole map, other jobs, upgrades and a save code. The [winning guide](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md) is also available in game.
-
-## Playable loop
-
-- **Choose:** Rescue a witness around Jantar Mantar, copy a dispatch under pressure and carry it from Tolstoy Marg to the fictional India Gate relay, or secure a gathering, restore aid and escort two readers from Sansad Marg.
-- **Act:** Move freely, run with stamina, dodge warned attacks, use directional close-range strikes, break or bypass a fictional barricade, enter/exit a van, drive, hide and protect a companion.
-- **Return:** Earn a medal, best score and support credits. Continue at your current city location instead of rebuilding the world. Three distinct operations unlock the charter journey; the charter begins another network cycle.
-- **Replay:** Different guard approaches, an occasional return-route roadblock, selectable Hard pressure and capped later-cycle guard speed. Buy strike tempo, vehicle reinforcement or running endurance; no purchases or accounts are involved.
-- **Explore:** Drive/walk between CP, Jantar Mantar and India Gate in one continuous area. The local radar shows the suggested route; the full map shows landmark relationships.
-- **Keep progress:** Export/restore a code for completed jobs, credits, upgrades and scores. In-tab active checkpoints are separate and do not survive reload.
-
-This is not multiplayer, an unlimited mission generator or a GTA-scale city simulation. The hypothesis is that distinct operations, route choices and mastery offer better reasons to return than more identical pickups. Independent player enjoyment has not been established.
+There are no added districts, currencies, upgrades or farming counters in this encounter. It is a compact action-scene rebuild, not a completed campaign or proof of retention.
 
 ## Controls
 
-- **Phone:** Left stick moves/drives; its outer edge runs on foot. Hold right stick to aim/strike or use Strike with nearby aim assist. Dodge and contextual Action are separate buttons. Release the stick or hold Brake/right stick to slow the van.
-- **Desktop:** WASD/arrows move/steer, Shift runs, held Space strikes or brakes, Q dodges, E acts/boards/exits, mouse aims, P/Escape pauses, M opens the mission board.
-- **Winning:** Read [HOW-TO-WIN.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md). Hot deliveries cannot win; rescued Kabir must accompany the player. Rally ends only when both escorted readers reach the assembly.
+Phone: left joystick moves/drives; pushing fully runs. Hold Strike for a short combo, Dodge to evade, and the contextual button to rescue, move a screen, vault or board. Dodge becomes Brake in the van. Desktop: WASD/arrows, Shift to run, Space to strike, Q to dodge/brake, E to act and P/Escape to pause.
 
-## Map, movement context and fiction
+Read [the current winning guide](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md) and [the rebuild review](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/AT-THE-LINE-REVIEW.md). Pause and help freeze the encounter; explicit sound-off is retained across replay. Graphics can be chosen before starting.
 
-The OSM extraction contains 1,852 road/path ways, 785 above-ground source footprints and 124 green-space polygons from a central-Delhi bounding box. The displayed city uses 493 adapted footprint parts. The geometry database is **© OpenStreetMap contributors, ODbL 1.0**; attribution is displayed in game, following [OpenStreetMap’s copyright guidance](https://www.openstreetmap.org/copyright/en-EN). Raw source, extraction script and runtime geometry are retained.
+## Geography and theme
 
-Horizontal positions are georeferenced at a uniform compressed scale. Streets are widened, traffic/one-way restrictions and elevation are not simulated, and building heights and monument models are approximate. This is connected central Delhi, not all Delhi or a survey-grade digital twin.
+The compact scene is authored from Jantar Mantar-inspired street vocabulary, not extracted survey geometry. Bus, fences, aid tent, observatory approximation and Hindi protest placards ground it in the Delhi story without claiming an exact route or reconstruction of an actual custody incident. All characters, clashes and outcomes are fictional; the [separate movement research](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md) distinguishes reporting, allegations and institutional responses.
 
-The October 2 reference concerns Jantar Mantar and reported approaches/nearby protest-related locations, including Sansad Marg and Tolstoy Marg ([The Tribune’s dated reporting](https://www.tribuneindia.com/news/delhi/over-1k-detained-in-delhi-as-protesters-demand-cecs-exit/amp)). CP and India Gate are fictional network hubs, not unsupported claims of active vote-chori protests at every landmark.
+The previous OSM-derived connected-city prototype remains separately playable at [the campaign archive](https://nawaaaaaaaar.github.io/dissent-last-ballot/campaign-v17.html), documented in README-v17.md and HOW-TO-WIN-v17.md. Its geography and reward systems are not secretly claimed for the new scene.
 
-The story carries leadership accountability, ending contested SIR and transparent support for every eligible voter beyond a resignation-only resolution. [The movement research](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CURRENT-MOVEMENT.md) preserves claim/response distinctions. Adults, cases, clashes and outcomes are fictional; no real-person combat targets, personal voter records or realistic sabotage instructions are included.
+## Build and verify
 
-## Development and verification
+Run `npm ci`, then `npm start`. `npm test` runs sixteen isolated checks in `line-unit.mjs`; `test:city` retains the historical city checks. Current source is `docs/line-rules.js`, `line-scene.js`, `line-game.js`, `line.css` and `index.html`. Existing character meshes, locomotion, materials and licences are retained; original authored environment and vehicle geometry are editable JS.
 
-Run `npm ci`, install Chromium with `npx playwright install chromium`, then `npm start`. `npm test` runs the current city rules checks; `test:breakout` and the old campaign scripts are historical. Current source is `docs/city-rules.js`, `docs/city-data.js`, `docs/breakout.js` and `docs/index.html`. Run `npm run build:map` to reproduce both extraction and street-clearance trimming from the retained OSM data.
+`render_game_to_text()` exposes read-only observations for QA; `advanceTime(ms)` supports deterministic tests, not device-performance claims. Actual public replay uses ordinary browser time and real input, separately from staged tests. [QA.md](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) identifies exact versions, assistance and failures.
 
-`render_game_to_text()` exposes inspectable state, including mission, route, network and map provenance. `advanceTime(ms)` provides deterministic QA time, not a physical-device FPS benchmark. The supplied game client and persistent Playwright inspect actual input/rendering; cloud-browser records distinguish normal-time playing from deterministic touch tests.
-
-Read [the city design and research](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/CITY-LOOP.md), [QA scope](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/QA.md) and [asset provenance](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/ASSETS.md). The previous small-world game is retained at [the Breakout archive](https://nawaaaaaaaar.github.io/dissent-last-ballot/breakout-v13.html), with `README-v13.md`.
-
-## Art status
-
-Existing licensed human meshes, locomotion, materials, tree assets, lighting and vehicles are reused. The new footprint-based blocks, CP columns, India Gate arch and observatory are coarse original approximations, not detailed scanned monuments. Faces, clothing, combat animation, street frontage and crowd behaviour still fall short.
-
-This is a **playable gameplay/world iteration, not the requested final high-graphics or production-ready game**. Realistic graphics remain a requirement. Physical iPhone/Android performance, Safari and first-time-player enjoyment remain unverified.
+This rebuild is not finished-indie or final high-graphics approval. Reused faces/rigs, contact/fall choreography, scenery repetition, short encounter length and limited opponent variation remain substantial gaps. Physical phones, Safari and independent player enjoyment are unverified.

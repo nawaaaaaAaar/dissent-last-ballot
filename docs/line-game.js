@@ -1,25 +1,38 @@
-import {Line} from './line-rules.js?v=18-r3';
-import {buildLine} from './line-scene.js?v=18-r3';
+import {Line} from './line-rules.js?v=18-r4';
+import {buildLine} from './line-scene.js?v=18-r4';
 import {WorldAudio} from './world-audio.js?v=0.17.2';
 const $=id=>document.getElementById(id),game=new Line(),keys=new Set(),audio=new WorldAudio();
 const coarse=matchMedia('(pointer:coarse)').matches,low=new URLSearchParams(location.search).get('quality')==='low'||coarse;
 $('quality').value=low?'low':'high';$('quality').onchange=()=>{const url=new URL(location.href);url.searchParams.set('quality',$('quality').value);location.href=url;};
-let view,last=performance.now(),lastPose=0,manual=false,stick={x:0,z:0},attack=false,action=false,brake=false,helpReturn='menu',fpsFrames=0,fpsTime=performance.now(),fps=0,graphicsLost=false;
+let view,last=performance.now(),lastPose=0,manual=false,stick={x:0,z:0},attack=false,action=false,brake=false,helpReturn='menu',fpsFrames=0,fpsTime=performance.now(),fps=0,graphicsLost=false,soundChosen=false,resumeVoice=false;
+const dialogue=Object.fromEntries(['sana-intro','kabir-rescue','sana-drive'].map(n=>[n,new Audio('./assets/line-'+n+'.mp3')]));
+let motor,motorGain,siren,sirenGain;
+function vehicleAudio(){
+ if(!audio.ctx)return;
+ if(!motor){const c=audio.ctx,f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=350;motor=c.createOscillator();motor.type='sawtooth';motorGain=c.createGain();motorGain.gain.value=0;motor.connect(f).connect(motorGain).connect(c.destination);motor.start();siren=c.createOscillator();siren.type='sine';sirenGain=c.createGain();sirenGain.gain.value=0;siren.connect(sirenGain).connect(c.destination);siren.start();}
+ const c=audio.ctx,active=audio.enabled&&game.van.occupied&&game.mode==='playing';
+ motor.frequency.setTargetAtTime(42+game.van.speed*11,c.currentTime,.1);motorGain.gain.setTargetAtTime(active?.009+game.van.speed*.001:0,c.currentTime,.1);
+ siren.frequency.setTargetAtTime(580+Math.sin(game.sirenTime*5)*170,c.currentTime,.08);sirenGain.gain.setTargetAtTime(active?.007:0,c.currentTime,.1);
+}
+function speak(name){if(!audio.enabled)return;audio.voice?.pause();audio.voice=dialogue[name];audio.voice.currentTime=0;audio.voice.volume=.72;audio.voice.play().catch(()=>{});}
+function suspendVoice(){resumeVoice=!!audio.voice&&!audio.voice.paused;audio.voice?.pause();}
+function continueVoice(){if(resumeVoice&&audio.enabled)audio.voice?.play().catch(()=>{});resumeVoice=false;}
+function interact(){const phase=game.phase;game.action();if(phase!==game.phase&&game.phase==='drive')speak('sana-drive');}
 function clear(){keys.clear();stick={x:0,z:0};attack=action=brake=false;game.input.attack=game.input.action=false;$('move-stick').querySelector('i').style.transform='';}
 function panels(){
  $('menu').hidden=game.mode!=='menu';$('pause-screen').hidden=game.mode!=='paused';$('help-screen').hidden=game.mode!=='help';$('ending').hidden=!['failed','won'].includes(game.mode);
- $('hud').hidden=game.mode==='menu'||game.mode==='help';$('controls').hidden=game.mode!=='playing';$('tip').hidden=game.mode!=='playing';$('pause').hidden=!['playing','paused'].includes(game.mode);$('pause').textContent=game.mode==='paused'?'Resume':'Pause';
+ $('hud').hidden=['menu','help','failed','won'].includes(game.mode);$('controls').hidden=game.mode!=='playing';$('tip').hidden=game.mode!=='playing';$('pause').hidden=!['playing','paused'].includes(game.mode);$('pause').textContent=game.mode==='paused'?'Resume':'Pause';
 }
-function start(){clear();game.start();view.reset();if(!audio.enabled)toggleSound();panels();}
-function pause(){if(game.mode==='playing'){clear();game.mode='paused';}else if(game.mode==='paused')game.mode='playing';panels();}
-function toggleSound(){$('sound').textContent=audio.toggle()?'Sound on':'Sound off';}
-function help(){helpReturn=game.mode;clear();game.mode='help';panels();}
-$('start').onclick=start;$('sound').onclick=toggleSound;$('pause').onclick=pause;$('resume').onclick=()=>graphicsLost?location.reload():pause();$('help').onclick=help;$('pause-help').onclick=help;$('ending-help').onclick=help;
-$('help-close').onclick=()=>{game.mode=helpReturn;panels();};$('restart').onclick=start;
-$('retry').onclick=()=>{clear();if(game.mode==='won')start();else{game.retry();view.reset();panels();}};
+function start(){clear();game.start();view.reset();if(!audio.enabled&&!soundChosen)toggleSound();speak('sana-intro');panels();}
+function pause(){if(game.mode==='playing'){clear();suspendVoice();game.mode='paused';}else if(game.mode==='paused'){game.mode='playing';continueVoice();}panels();}
+function toggleSound(user=false){if(user)soundChosen=true;$('sound').textContent=audio.toggle()?'Sound on':'Sound off';}
+function help(){helpReturn=game.mode;clear();if(game.mode==='playing')suspendVoice();game.mode='help';panels();}
+$('start').onclick=start;$('sound').onclick=()=>toggleSound(true);$('pause').onclick=pause;$('resume').onclick=()=>graphicsLost?location.reload():pause();$('help').onclick=help;$('pause-help').onclick=help;$('ending-help').onclick=help;
+$('help-close').onclick=()=>{game.mode=helpReturn;if(game.mode==='playing')continueVoice();panels();};$('restart').onclick=start;
+$('retry').onclick=()=>{clear();if(game.mode==='won')start();else{game.retry();view.reset();speak(game.phase==='drive'?'sana-drive':'sana-intro');panels();}};
 $('dodge').onclick=()=>{if(!game.van.occupied)game.dodge();};
 for(const [id,set]of[['attack',v=>attack=v],['action',v=>action=v],['dodge',v=>brake=v]]){
- const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);set(true);if(id==='attack')game.strike();if(id==='action'&&game.context()?.id!=='rescue')game.action();if(id==='dodge'&&!game.van.occupied)game.dodge();});
+ const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);set(true);if(id==='attack')game.strike();if(id==='action'&&game.context()?.id!=='rescue')interact();if(id==='dodge'&&!game.van.occupied)game.dodge();});
  for(const event of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>set(false));
 }
 let stickPointer=null;
@@ -30,7 +43,7 @@ for(const event of['pointerup','pointercancel','lostpointercapture'])$('move-sti
 document.addEventListener('keydown',e=>{
  if(e.target.tagName==='SELECT')return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys.add(e.code);
  if(e.repeat)return;if(e.code==='Enter'&&game.mode==='menu'&&!$('start').disabled)start();if(e.code==='Space')game.strike();if(e.code==='KeyQ')game.dodge();
- if(e.code==='KeyE'&&game.context()?.id!=='rescue')game.action();if(e.code==='KeyP'||e.code==='Escape')pause();
+ if(e.code==='KeyE'&&game.context()?.id!=='rescue')interact();if(e.code==='KeyP'||e.code==='Escape')pause();
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 window.addEventListener('blur',()=>{if(game.mode==='playing')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&game.mode==='playing')pause();});
@@ -46,7 +59,7 @@ function hud(){
  $('subtitle').hidden=game.messageTime<=0||game.mode!=='playing';$('subtitle').textContent=game.message;
  const c=game.context();$('action').hidden=!c||game.van.occupied;$('action-label').textContent=c?.label||'Action';$('action-progress').style.width=game.rescueHold/.65*100+'%';
  $('attack').hidden=game.van.occupied;$('dodge').textContent=game.van.occupied?'BRAKE':'DODGE';
- $('vehicle').hidden=!game.van.occupied;$('vehicle').textContent=game.ramWarning?'PATROL APPROACH · KEEP LEFT':`VAN · ${Math.ceil(game.van.hp)}%`;
+ $('vehicle').hidden=!game.van.occupied;$('vehicle').textContent=game.ramWarning?'PATROL APPROACH · KEEP LEFT':`VAN · ${Math.max(0,Math.ceil(game.van.hp))}%`;
  if(game.mode==='failed'||game.mode==='won'){
   $('ending-kicker').textContent=game.mode==='won'?'THE ACCOUNT SURVIVES':'THE LINE HELD YOU';
   $('ending-title').textContent=game.mode==='won'?'Not erased. Not alone.':'Take another approach.';
@@ -56,13 +69,16 @@ function hud(){
  panels();
 }
 function step(dt){
- input();const before=game.mode,ox=game.p.x,oz=game.p.z;
+ input();const before=game.mode,phase=game.phase,ox=game.p.x,oz=game.p.z;
  game.update(dt);if(!game.van.occupied)audio.footstep(Math.hypot(game.p.x-ox,game.p.z-oz));
  for(const event of game.events){audio.foley(event.type);view.impact(event);}game.events=[];
+ if(phase!==game.phase&&game.phase==='escape')speak('kabir-rescue');
+ if(phase!==game.phase&&game.phase==='drive')speak('sana-drive');
  audio.update(game.phase==='drive'?3:game.phase==='escape'?2:1,game.mode);
+ vehicleAudio();
  if(before!==game.mode)clear();hud();view.update(game,dt);
 }
-window.render_game_to_text=()=>JSON.stringify({...game.state(),rendering:view?{calls:view.renderer.info.render.calls,triangles:view.renderer.info.render.triangles,camera:view.camera.position.toArray(),fps}:null});
+window.render_game_to_text=()=>JSON.stringify({...game.state(),audio:{enabled:audio.enabled,voice:audio.voice?.currentSrc||null,playing:!!audio.voice&&!audio.voice.paused,voiceTime:audio.voice?.currentTime||0,ready:audio.voice?.readyState||0,context:audio.ctx?.state||null},rendering:view?{calls:view.renderer.info.render.calls,triangles:view.renderer.info.render.triangles,camera:view.camera.position.toArray(),fps}:null});
 window.advanceTime=ms=>{manual=true;for(let i=0;i<Math.ceil(ms/16.667);i++)step(1/60);};
 async function init(){
  try{
@@ -70,6 +86,6 @@ async function init(){
   view.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();graphicsLost=true;clear();game.mode='paused';$('pause-screen').querySelector('h2').textContent='Graphics interrupted';$('resume').textContent='Reload game';panels();});
   $('start').disabled=false;$('start').textContent='PLAY · At the line';$('loading').textContent='Ready. One complete rescue-and-escape encounter.';view.update(game,.016);
   requestAnimationFrame(function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!manual)step(dt);fpsFrames++;if(now-fpsTime>1000){fps=fpsFrames*1000/(now-fpsTime);fpsFrames=0;fpsTime=now;}$('debug').textContent=`${Math.round(fps)} FPS · ${view.renderer.info.render.calls} draws · ${Math.round(view.renderer.info.render.triangles/1000)}k tris`;requestAnimationFrame(frame);});
- }catch(e){console.error(e);$('loading').textContent='Could not load the encounter. Please reload or use Mobile / lighter graphics.';$('start').textContent='Loading failed';}
+ }catch(e){console.error(e);window.game_load_error=String(e);$('loading').textContent='Could not load the encounter. Retry, or select Mobile / lighter graphics.';$('start').textContent='Retry loading';$('start').disabled=false;$('start').onclick=()=>location.reload();}
 }
 init();

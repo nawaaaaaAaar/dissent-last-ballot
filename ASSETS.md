@@ -1,5 +1,13 @@
 # Asset provenance
 
+## At the Line rebuild
+
+`docs/line-scene.js` contains original editable street, curb, fence, drain, sign, cloth screen, side rail, vehicle and shelter geometry. It reuses the existing licensed Rocketbox-derived human/locomotion assets, adapted police, tree model, HDR and photographic surface materials documented below. This is not a new photogrammetry capture, newly scanned Delhi street or newly authored human cast. The earlier campaign assets remain in the archive.
+
+`art/line-sana-intro.txt`, `line-kabir-rescue.txt` and `line-sana-drive.txt` are editable fictional character scripts. Sulafat voices Sana; Charon voices Kabir. The generation produced WAV data under MP3 filenames; the published `docs/assets/line-*.mp3` files are actual MP3 conversions, loudness-normalized with a −3 dB true-peak target. They are approximately 4.25, 2.33 and 3.33 seconds. No real organiser, journalist, officer or witness voice is imitated.
+
+The existing original instrumental and synthesized Foley are reused. Original synthesized engine/siren layers in `line-game.js` accompany the escape; none is a sampled real Delhi clash. Menus show actual scene rendering rather than generated cover art as proof of playable quality.
+
 ## Physical readability and presentation pass
 
 The short strike step, phase-linked arm solve, pose-exit blending, shared range geometry, camera damping, body spacing and prop silhouettes are original project code. The procedural wood-grain texture, subdivided banner fabric, slats, steel frames and aid-table dressing are original runtime geometry/textures, not purchased assets or scans. The existing Rocketbox/Three.js licences remain applicable; no new character model or likeness was added.
