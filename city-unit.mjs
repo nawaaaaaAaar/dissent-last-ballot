@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.15.3';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.16.0';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -87,7 +87,7 @@ check('vehicle route excludes pedestrian-only node links',()=>{
 check('frontal shield blocks early strikes, finisher opens it',()=>{
   const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);
   const e=g.enemies[0];Object.assign(e,{hp:4,role:'guard',x:g.player.x,z:g.player.z+1,yaw:Math.PI,guardBreak:0});g.input.aimX=0;g.input.aimZ=1;
-  g.attack();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();assert.equal(e.hp,2);assert(e.guardBreak>1);
+  g.attack();g.contact();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();g.contact();assert.equal(e.hp,4);g.player.attackCd=0;g.attack();g.contact();assert.equal(e.hp,2);assert(e.guardBreak>1);
 });
 check('volunteer service is consumed once per operation',()=>{
   const g=new City();g.start();g.accept('signal');g.enemies.forEach(e=>e.hp=0);const s=g.supports[0];Object.assign(g.player,{x:s.x,z:s.z,health:2,stamina:0});g.van.x+=100;g.van.health=40;
@@ -133,5 +133,38 @@ check('lost pursuit stands down and quiet reboarding does not restart it',()=>{
   const g=patrolScene();g.record=true;g.blockActivated=true;g.car.x=g.player.x+40;g.car.z=g.player.z+40;g.heat=.4;g.hidden=9;
   g.update(.05);assert.equal(g.car.active,false);g.van.occupied=false;g.interact();assert(g.van.occupied);assert.equal(g.car.active,false);assert(g.heat<.7);
 });
+check('strike contact waits for authored time and resolves once',()=>{
+  const g=new City();g.start();g.accept('witness');g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);
+  const e=g.enemies[0];Object.assign(e,{hp:3,role:'rush',x:g.player.x,z:g.player.z+1,cooldown:10});g.input.aimX=0;g.input.aimZ=1;
+  g.attack();assert.equal(e.hp,3);g.update(.05);g.update(.05);assert.equal(e.hp,3);g.update(.05);assert.equal(e.hp,3);g.update(.05);assert.equal(e.hp,2);
+  for(let i=0;i<5;i++)g.update(.05);assert.equal(e.hp,2);
+});
+check('a target that leaves the locked swing range is missed',()=>{
+  const g=new City();g.start();g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);const e=g.enemies[0];
+  Object.assign(e,{hp:3,x:g.player.x,z:g.player.z+1,role:'rush',cooldown:10});g.input.aimZ=1;g.attack();e.z+=10;
+  for(let i=0;i<5;i++)g.update(.05);assert.equal(e.hp,3);assert(g.player.contactSerial>0);assert.equal(g.player.contactHit,false);
+});
+check('authored props block movement and tall screens block sight',()=>{
+  const g=new City();g.start();g.accept('witness');const o=g.props.find(o=>o.kind==='screen');assert(!g.valid(o.x,o.z));assert(!g.line({x:o.x-3,z:o.z},{x:o.x+3,z:o.z}));
+  const b=g.props.find(o=>o.id==='cordon-right');assert(!g.valid(b.x,b.z));assert(g.line({x:b.x,z:b.z-2},{x:b.x,z:b.z+2}));
+});
+check('vault moves through only the selected low furniture with a valid landing',()=>{
+  const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);const b=g.props.find(o=>o.id==='cordon-right');Object.assign(g.player,{x:b.x,z:b.z-1.15});
+  assert(g.vault(b));g.update(.05);assert(g.player.height>0);assert.equal(g.player.traversal.kind,'Vault');
+  for(let i=0;i<15;i++)g.update(.05);assert.equal(g.player.traversal,null);assert.equal(g.player.height,0);assert(g.player.z>b.z);assert(g.valid(g.player.x,g.player.z));
+});
+check('screen changes its physical and sight position, checkpoint retains it',()=>{
+  const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);const o=g.props.find(o=>o.kind==='screen');const start={x:o.x,z:o.z};
+  Object.assign(g.player,{x:o.x-1.2,z:o.z});assert.equal(g.nearby().id,'screen');g.interact();assert(g.noise);for(let i=0;i<20;i++)g.update(.05);
+  assert(Math.hypot(o.x-start.x,o.z-start.z)>3);g.saveCheckpoint();g.mode='caught';g.retry();assert.equal(g.props.find(p=>p.id===o.id).z,o.z);
+});
+check('guard holds its authored home instead of pursuing to an unrelated street',()=>{
+  const g=new City();g.start();g.accept('witness');const e=g.enemies[0];Object.assign(g.player,{x:e.home.x+15,z:e.home.z});const before={x:e.x,z:e.z};g.update(.05);assert.equal(e.state,'hold');assert.equal(e.x,before.x);assert.equal(e.z,before.z);
+});
+check('companion braces near a committed attack then resumes following',()=>{
+  const g=new City();g.start();g.accept('witness');g.props=[];g.gate.hp=0;g.enemies.forEach(e=>e.hp=0);g.friend.rescued=true;
+  Object.assign(g.friend,{x:g.player.x+3,z:g.player.z});const e=g.enemies[0];Object.assign(e,{hp:3,x:g.friend.x+1,z:g.friend.z,windup:.6,cooldown:10});g.companion(g.friend,g.player,.05,6.5);assert.equal(g.friend.state,'shelter');
+  e.hp=0;for(let i=0;i<25;i++)g.companion(g.friend,g.player,.05,6.5);assert(['follow','wait'].includes(g.friend.state));
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
-fs.mkdirSync('qa/v15',{recursive:true});fs.writeFileSync('qa/v15/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));
+fs.mkdirSync('qa/v16',{recursive:true});fs.writeFileSync('qa/v16/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

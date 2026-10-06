@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
+import {installMotion,clearMotion,poseMotion} from './contact-motion.js';
+export {poseMotion};
 
 let male,female,maleDelhi,femaleDelhi,officer;
 const wardrobe=new Map(),knitColors=[[113,137,124],[132,113,99],[100,118,141]];
@@ -45,10 +47,11 @@ export function human(color,police=false,options={}){
   const mixer=new THREE.AnimationMixer(model),actions={};
   for(const clip of source.animations)actions[clip.name]=mixer.clipAction(clip).play().setEffectiveWeight(clip.name==='Idle'?1:0);
   const p={group,model,mixer,actions,rocket:true,rigged:true,wardrobe:options.localWardrobe?'kurta / long tunic':'contemporary casual',lastTime:null,blend:{Idle:1,Walk:0,Run:0}};
-  poseHuman(p,0,0);return p;
+  installMotion(p);poseHuman(p,0,0);return p;
 }
 export function poseHuman(p,t,running=0,gesture=0){
   if(!p.rocket)return legacyPose(p,t,running,gesture);
+  clearMotion(p);
   const drive=typeof running==='number'?running:running?1:0;
   const divisor=p.poseTimeDivisor||(drive>.85?10.5:drive>.1?7.5:.75);
   const dt=p.lastTime===null?.016:Math.min(.1,Math.max(0,Math.abs(t-p.lastTime)/divisor));p.lastTime=t;

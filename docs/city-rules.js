@@ -1,4 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.15.13';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.0';
+import {layout,contains,crossing,local,STRIKES} from './encounters.js';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -24,7 +25,7 @@ export class City{
     this.heat=0;this.hidden=0;this.seen=false;this.lastSeen={...p};this.phase='clear';this.roadblock=false;
     this.supplies=WORLD.medkits.map(p=>({...p,taken:false}));this.score=0;this.hits=0;this.crashes=0;this.helped=0;this.message='';this.messageTime=0;this.particles=[];this.checkpoint=null;
     this.input={x:0,z:0,aimX:0,aimZ:-1,sprint:false,attack:false,brake:false};
-    this.mission=null;this.hold=0;this.wave=0;this.elapsed=0;this.result=null;this.visited=[];this.discoveries=0;this.readers=[];this.copy=0;this.hitStop=0;
+    this.mission=null;this.hold=0;this.wave=0;this.elapsed=0;this.result=null;this.visited=[];this.discoveries=0;this.readers=[];this.copy=0;this.hitStop=0;this.encounter=layout(null);this.props=[];this.noise=null;
     this.supports=[{id:'cp',...PLACES[1],used:false},{id:'jantar',x:PLACES[0].x-7,z:PLACES[0].z+8,used:false},{id:'gate',x:PLACES[2].x+7,z:PLACES[2].z-8,used:false}];
   }
   start(){
@@ -45,34 +46,43 @@ export class City{
     this.friend.x=this.mission.source.x;this.friend.z=this.mission.source.z;
     WORLD.record={...this.mission.source};WORLD.safe={...this.mission.destination};
     const source=this.mission.source;
-    this.gate={x:source.x,z:source.z+8,w:8,hp:spec.type==='rescue'?4:0,fall:spec.type==='rescue'?0:1};
+    this.encounter=layout(this.mission);this.props=this.encounter.props;
+    this.gate={x:source.x,z:source.z-3,w:6,hp:spec.type==='rescue'?3:0,fall:spec.type==='rescue'?0:1};
     const returnRoute=roadRoute(snap(source,true),snap(this.mission.destination,true),{vehicle:true});
     this.block={...returnRoute[Math.floor(returnRoute.length*.45)]};this.roadblock=false;this.blockActivated=false;
-    this.mission.zones=[source,snap({x:source.x+14,z:source.z-6}),snap({x:source.x-14,z:source.z+9})];
+    this.mission.zones=this.encounter.zones||[source,snap({x:source.x+14,z:source.z-6}),snap({x:source.x-14,z:source.z+9})];
     this.spawn(source,spec.type==='rally'?3:spec.type==='rescue'?this.network.total?4:3:3);
     Object.assign(this.car,{active:false,windup:0,ram:0,cooldown:1.5,contactCooldown:0,recoil:0});this.heat=0;this.checkpoint=null;this.mode='playing';
-    this.say(spec.story,7);return true;
+    this.say(this.encounter.hint,7);return true;
   }
   spawn(p,count){
     this.enemies.forEach((e,i)=>{
       const angle=(i+.5)*Math.PI*2/count+this.serial*.7,q=snap({x:p.x+Math.sin(angle)*10,z:p.z+Math.cos(angle)*10});
-      const role=['guard','rush','flank','brawler','rush'][i],hp=role==='guard'?4:3;
-      Object.assign(e,{x:q.x,z:q.z,hp:i<count?hp:0,maxHp:hp,role,active:i<count,stun:0,windup:0,windupTotal:0,guardBreak:0,lunge:0,attackYaw:0,cooldown:1.8+i*.15,route:[],routeAge:0,home:{...q},last:{...q},down:0});
+      const authored=this.wave===0?this.encounter.guards?.[i]:null;
+      const role=authored?.role||['guard','rush','flank','brawler','rush'][i],hp=role==='guard'?4:3;
+      let home=authored?{x:authored.x,z:authored.z}:q;
+      if(!this.valid(home.x,home.z,.4)){
+        const options=[];for(let x=-5;x<=5;x++)for(let z=-5;z<=5;z++)if(this.valid(home.x+x,home.z+z,.4))options.push({x:home.x+x,z:home.z+z});
+        home=options.sort((a,b)=>dist(a,home)-dist(b,home))[0]||home;
+      }
+      Object.assign(e,{...home,hp:i<count?hp:0,maxHp:hp,role,active:i<count,stun:0,windup:0,windupTotal:0,guardBreak:0,lunge:0,attackYaw:0,cooldown:1.8+i*.15,route:[],routeAge:0,home:{...home},last:{...home},down:0,recovery:0,strikeTime:0,strikeDuration:0,strikeHit:false,state:role==='guard'?'hold':'patrol',regroup:0});
     });
   }
   say(t,seconds=3){this.message=t;this.messageTime=seconds;}
-  valid(x,z,r=.38,ignoreGate=false){
+  valid(x,z,r=.38,ignoreGate=false,ignoreProp=null){
     if(x<-124+r||x>138-r||z<-174+r||z>207-r)return false;
     const p={x,z};
     // Road widths are expanded for mobile play. OSM footprints still block off-road movement.
     if(!WORLD.segments.some(s=>(r<=1||!s.walkOnly)&&segmentDistance(p,s.a,s.b)<s.width/2-r*.3)){
       for(const b of WORLD.buildings)if(Math.abs(b.x-x)<30&&Math.abs(b.z-z)<30&&(solid(p,b)||[b.poly,...b.holes].some(h=>h.some((a,i)=>segmentDistance(p,a,h[(i+1)%h.length])<r))))return false;
     }
-    if(!ignoreGate&&this.gate.hp>0&&Math.abs(x-this.gate.x)<4+r&&Math.abs(z-this.gate.z)<.45+r)return false;
+    if(this.props.some(o=>o.id!==ignoreProp&&contains(p,o,r)))return false;
+    if(!ignoreGate&&this.gate.hp>0&&Math.abs(x-this.gate.x)<this.gate.w/2+r&&Math.abs(z-this.gate.z)<.45+r)return false;
     if(!ignoreGate&&this.roadblock&&Math.abs(x-this.block.x)<4+r&&Math.abs(z-this.block.z)<.5+r)return false;
     return true;
   }
   line(a,b,opaqueOnly=true){
+    if(this.props.some(o=>(!opaqueOnly||o.height>1.2)&&crossing(a,b,o)))return false;
     // Buildings occlude vision, including when arcade-width streets overlap a footprint.
     for(const house of WORLD.buildings){
       if(Math.min(dist(a,house),dist(b,house))>60)continue;
@@ -95,44 +105,61 @@ export class City{
     if(!direct&&(!e.route?.length||e.routeAge<=0)){e.route=this.route(e,target,r>1);e.routeAge=2;}
     const n=direct?target:e.route?.[0];if(!n)return 0;
     const d=dist(e,n),step=Math.min(d,speed*dt);e.yaw=Math.atan2(n.x-e.x,n.z-e.z);
-    const travel=this.move(e,(n.x-e.x)/Math.max(d,.001)*step,(n.z-e.z)/Math.max(d,.001)*step,r);
+    let travel=this.move(e,(n.x-e.x)/Math.max(d,.001)*step,(n.z-e.z)/Math.max(d,.001)*step,r);
+    // A local obstacle is not a graph edge. Try a consistent side around it.
+    if(travel<step*.25&&d>1){
+      for(const angle of [e.id%2===0?.9:-.9,e.id%2===0?-.9:.9,1.7,-1.7]){
+        const yaw=e.yaw+angle,dx=Math.sin(yaw)*step,dz=Math.cos(yaw)*step;
+        if(this.valid(e.x+dx*4,e.z+dz*4,r)){travel+=this.move(e,dx,dz,r);break;}
+      }
+    }
     if(d<1)e.route?.shift();return travel;
   }
   burst(x,z,color='gold',count=8){for(let i=0;i<count;i++)this.particles.push({x,z,y:.8,vx:Math.sin(i*2.399)*2.5,vz:Math.cos(i*2.399)*2.5,vy:2+i%3,life:.55,color});}
   attack(){
-    const p=this.player;if(this.mode!=='playing'||p.attackCd>0||this.van.occupied||p.dash>0)return false;
-    const combo=p.comboClock>0?p.combo%3+1:1,cost=combo===3?10:8;
+    const p=this.player;if(this.mode!=='playing'||p.attackCd>0||p.traversal||this.van.occupied||p.dash>0)return false;
+    const combo=p.comboClock>0?p.combo%3+1:1,move=STRIKES[combo-1],cost=move.cost;
     if(p.stamina<cost+18){if(this.message!=='Dodge energy reserved. Release Strike and reposition to recover.')this.say('Dodge energy reserved. Release Strike and reposition to recover.',1.6);return false;}
-    p.combo=combo;p.comboClock=.95;p.stamina-=cost;
-    p.attack=p.combo===3?.38:.26;p.attackCd=(p.combo===3?.66:.34)*(this.network.upgrades.includes('tempo')?.85:1);p.yaw=Math.atan2(this.input.aimX,this.input.aimZ);this.hits++;
+    p.combo=combo;p.comboClock=1.2;p.stamina-=cost;
+    const tempo=this.network.upgrades.includes('tempo')?.9:1;
+    p.swing={clip:move.clip,time:0,duration:move.duration*tempo,contact:move.contact*tempo,hit:false,combo};
+    p.attack=p.swing.duration;p.attackCd=p.swing.duration+.06;p.yaw=p.attackYaw=Math.atan2(this.input.aimX,this.input.aimZ);this.hits++;
+    return true;
+  }
+  contact(){
+    const p=this.player,swing=p.swing;if(!swing||swing.hit)return;
+    swing.hit=true;
     let hit=false;
-    for(const e of this.enemies)if(e.hp>0&&dist(p,e)<2.6&&Math.abs(turn(p.yaw,Math.atan2(e.x-p.x,e.z-p.z)))<1.25){
+    for(const e of this.enemies)if(e.hp>0&&dist(p,e)<2.55&&this.line(p,e,false)&&Math.abs(turn(p.attackYaw,Math.atan2(e.x-p.x,e.z-p.z)))<1.05){
       const frontal=Math.abs(turn(e.yaw,Math.atan2(p.x-e.x,p.z-e.z)))<1;
       if(e.role==='guard'&&frontal&&p.combo<3&&e.guardBreak<=0){
         hit=true;this.burst(e.x,e.z,'gold',5);this.say('Shield facing you: flank it or finish a three-strike combo.',1.5);continue;
       }
-      e.hp=Math.max(0,e.hp-(p.combo===3?2:1));e.stun=p.combo===3?1.1:.36;e.windup=0;e.lunge=0;e.cooldown=.7;e.guardBreak=p.combo===3?1.5:e.guardBreak;
-      this.move(e,Math.sin(p.yaw)*(p.combo===3?1.7:.45),Math.cos(p.yaw)*(p.combo===3?1.7:.45));hit=true;this.hitStop=.045;this.burst(e.x,e.z,'teal',p.combo===3?12:7);this.heat=Math.max(1,this.heat+.15);
-      if(e.hp<=0)this.score+=60;
+      e.hp=Math.max(0,e.hp-(swing.combo===3?2:1));e.stun=swing.combo===3?1.1:.4;e.windup=0;e.lunge=0;e.strikeDuration=0;e.cooldown=.9;e.guardBreak=swing.combo===3?1.5:e.guardBreak;e.state='stagger';
+      this.move(e,Math.sin(p.attackYaw)*(swing.combo===3?1.3:.4),Math.cos(p.attackYaw)*(swing.combo===3?1.3:.4));hit=true;this.hitStop=.045;this.burst(e.x,e.z,'teal',swing.combo===3?12:7);this.heat=Math.max(1,this.heat+.15);
+      if(e.hp<=0){this.score+=60;for(const ally of this.enemies)if(ally!==e&&ally.hp>0&&dist(ally,e)<9){ally.regroup=1.4;ally.cooldown=Math.max(ally.cooldown,1.4);}}
     }
-    if(this.gate.hp>0&&dist(p,this.gate)<5){this.gate.hp--;hit=true;this.burst(p.x,p.z);if(!this.gate.hp){this.score+=100;this.say('Route opened. Get Kabir clear.');}}
+    if(this.gate.hp>0&&dist(p,this.gate)<3.5&&Math.abs(turn(p.attackYaw,Math.atan2(this.gate.x-p.x,this.gate.z-p.z)))<1.1){this.gate.hp--;hit=true;this.burst(p.x,p.z);if(!this.gate.hp){this.score+=100;for(const e of this.enemies)if(e.hp>0&&dist(e,this.gate)<5){e.stun=1.2;e.guardBreak=1.3;}this.say('Front line opened. The guard is off balance: get Kabir clear.');}}
     if(this.roadblock&&dist(p,this.block)<5){this.roadblock=false;hit=true;this.burst(p.x,p.z);this.say('Roadblock opened.');}
     if(!hit&&this.messageTime<=0)this.say('Close the gap. Dodge as the red tell fills.',1);
-    return true;
+    p.contactSerial=(p.contactSerial||0)+1;p.contactHit=hit;
   }
   dash(){
-    const p=this.player;if(this.mode!=='playing'||this.van.occupied||p.dashCd>0||p.stamina<18)return false;
+    const p=this.player;if(this.mode!=='playing'||p.traversal||this.van.occupied||p.dashCd>0||p.stamina<18)return false;
     const m=Math.hypot(this.input.x,this.input.z);p.dashX=m>.1?this.input.x/m:Math.sin(p.yaw);p.dashZ=m>.1?this.input.z/m:Math.cos(p.yaw);
-    p.dash=.27;p.dashCd=.95;p.stamina-=18;p.attack=0;p.attackCd=Math.min(.16,p.attackCd);
+    p.dash=.27;p.dashCd=.95;p.stamina-=18;p.attack=0;p.swing=null;p.attackCd=Math.min(.16,p.attackCd);
     for(const e of this.enemies)if(e.hp>0&&dist(e,p)<5&&e.windup>0&&e.windup<.32){e.windup=0;e.lunge=0;e.stun=1.3;e.guardBreak=1.5;e.cooldown=2;this.score+=20;this.say('Clean evasion. Their guard is open.',1.8);}
     this.burst(p.x,p.z,'teal',7);return true;
   }
   nearby(){
     if(this.van.occupied)return{id:'exit',label:'EXIT VAN'};
+    if(this.player.traversal)return null;
     if(this.mission?.type==='courier'&&!this.record&&dist(this.player,this.mission.source)<3)return{id:'copy',label:'HOLD · COPY DISPATCH'};
     if(this.mission?.type==='rally'&&this.wave===1&&dist(this.player,this.mission.zones[1])<4)return{id:'aid',label:'HOLD · RESTORE AID'};
     if(this.mission?.type==='rescue'&&!this.friend.rescued&&dist(this.player,this.friend)<3.2)return{id:'rescue',label:'RESCUE KABIR'};
     if(dist(this.player,this.van)<4.2)return{id:'van',label:'ENTER VAN'};
+    const o=this.props.filter(o=>dist(o,this.player)<Math.max(o.w,o.d)/2+1.8).sort((a,b)=>dist(a,this.player)-dist(b,this.player))[0];
+    if(o)return{id:o.kind==='screen'?'screen':'vault',prop:o.id,label:o.kind==='screen'?'MOVE BANNER SCREEN':'VAULT · SIDE ROUTE'};
     const support=this.supports.find(s=>!s.used&&dist(s,this.player)<3.5);
     if(support)return{id:'support',label:'VOLUNTEER SUPPORT',support:support.id};
     return null;
@@ -145,6 +172,14 @@ export class City{
       this.say('Move away from the wall to exit.');return;
     }
     const n=this.nearby();
+    if(n?.id==='vault'){this.vault(this.props.find(o=>o.id===n.prop));return;}
+    if(n?.id==='screen'){
+      const o=this.props.find(o=>o.id===n.prop),next={x:o.x-Math.sin(o.yaw)*3.3*(o.shift?-1:1),z:o.z-Math.cos(o.yaw)*3.3*(o.shift?-1:1)};
+      if(!this.valid(next.x,next.z,.2,true,o.id)){this.say('The screen cannot move into this wall.');return;}
+      p.yaw=Math.atan2(o.x-p.x,o.z-p.z);
+      p.traversal={kind:'Help',time:0,duration:.7,from:{x:p.x,z:p.z},to:{x:p.x,z:p.z},prop:o.id,push:{from:{x:o.x,z:o.z},to:next},shift:!o.shift};
+      p.swing=null;p.attack=0;this.noise={x:o.x,z:o.z,remaining:4};this.say('Screen moving. It blocks sight; guards investigate the sound.',3);return;
+    }
     if(n?.id==='support'){
       const s=this.supports.find(s=>s.id===n.support);if(this.seen||this.heat>=.7){this.say('Break sight first. Do not bring pursuit into this space.');return;}
       s.used=true;p.health=Math.min(6,p.health+2);p.stamina=100;this.van.health=Math.min(100,this.van.health+35);this.score+=40;this.say('Volunteers restore condition and repair your van. This stop is used for this operation.',4);return;
@@ -160,8 +195,18 @@ export class City{
       this.saveCheckpoint();this.say(this.record?'Route choice matters. Hide behind blocks to lose pursuit, then reach the green destination.':'Drive to the gold mission marker. You can exit and explore anywhere.',4);
     }
   }
-  saveCheckpoint(){this.checkpoint={x:this.player.x,z:this.player.z,van:{...this.van},record:this.record,rescued:this.friend.rescued,gate:this.gate.hp,hold:this.hold,wave:this.wave,readers:this.readers.map(r=>({...r})),roadblock:this.roadblock,blockActivated:this.blockActivated};}
-  hurt(){const p=this.player;if(p.hurt>0||p.dash>0||this.mode!=='playing')return;p.health--;p.hurt=1.2;this.burst(p.x,p.z,'red',5);if(p.health<=0){this.mode='caught';this.say('Caught. Retry the checkpoint or try a different mission.');}else this.say('Red warning: dodge, interrupt, or use another route.',2);}
+  vault(o){
+    const p=this.player;if(!o||p.traversal||p.stamina<12)return false;
+    const q=local(p,o),side=q.z<0?-1:1,c=Math.cos(o.yaw),s=Math.sin(o.yaw),depth=o.d/2+1.1;
+    const along=clamp(q.x,-o.w/2+.35,o.w/2-.35),to={x:o.x+along*c-depth*side*s,z:o.z-along*s-depth*side*c};
+    // Crossing only this low prop is allowed; buildings, gates and other props remain solid.
+    const steps=Math.ceil(dist(p,to)/.2);
+    if(!this.valid(to.x,to.z,.4,false,o.id)||dist(p,to)>4||Array.from({length:steps},(_,i)=>({x:p.x+(to.x-p.x)*(i+1)/steps,z:p.z+(to.z-p.z)*(i+1)/steps})).some(q=>!this.valid(q.x,q.z,.4,false,o.id))){this.say('No clear landing here. Approach the long side of the furniture.');return false;}
+    p.yaw=Math.atan2(to.x-p.x,to.z-p.z);p.stamina-=12;p.swing=null;p.attack=0;
+    p.traversal={kind:'Vault',time:0,duration:.62,from:{x:p.x,z:p.z},to,prop:o.id};return true;
+  }
+  saveCheckpoint(){this.checkpoint={x:this.player.x,z:this.player.z,van:{...this.van},record:this.record,rescued:this.friend.rescued,gate:this.gate.hp,hold:this.hold,wave:this.wave,readers:this.readers.map(r=>({...r})),roadblock:this.roadblock,blockActivated:this.blockActivated,props:this.props.map(o=>({...o}))};}
+  hurt(){const p=this.player;if(p.hurt>0||p.dash>0||this.mode!=='playing')return;p.health--;p.hurt=1.2;p.swing=null;p.attack=0;this.burst(p.x,p.z,'red',5);if(p.health<=0){this.mode='caught';this.say('Caught. Retry the checkpoint or try a different mission.');}else this.say('Red warning: dodge, interrupt, or use another route.',2);}
   carHit(amount){if(this.van.hurt>0)return;this.van.health=Math.max(0,this.van.health-amount*(this.network.upgrades.includes('reinforce')?.7:1));this.van.hurt=1;this.van.speed*=.3;this.crashes++;if(this.van.health<=0){this.mode='caught';this.say('Van disabled. Your earned network progress is safe.');}}
   readyWin(){
     const m=this.mission;if(!m)return false;
@@ -180,13 +225,14 @@ export class City{
     this.result={title:m.title,medal,reward:m.reward,score:this.score,seconds:Math.round(this.elapsed),type:m.type};
     this.mode='won';this.say('The network grows. Choose another operation or explore the city.');
   }
-  continue(){if(this.mode==='won'){this.mission=null;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.car.active=false;this.enemies.forEach(e=>e.hp=0);this.heat=0;this.gate.hp=0;this.player.health=6;this.van.health=100;this.supplies.forEach(s=>s.taken=false);this.mode='playing';}}
-  abandon(){const failed=this.mode==='caught'||this.player.health<=0||this.van.health<=0;this.mission=null;this.readers=[];this.result=null;this.enemies.forEach(e=>e.hp=0);this.car.active=false;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.heat=0;this.gate.hp=0;this.roadblock=false;if(failed){this.player.health=6;this.player.stamina=100;this.van.health=100;this.van.speed=0;}this.mode='playing';}
+  continue(){if(this.mode==='won'){this.mission=null;this.props=[];this.player.swing=null;this.player.traversal=null;this.player.height=0;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.car.active=false;this.enemies.forEach(e=>e.hp=0);this.heat=0;this.gate.hp=0;this.player.health=6;this.van.health=100;this.supplies.forEach(s=>s.taken=false);this.mode='playing';}}
+  abandon(){const failed=this.mode==='caught'||this.player.health<=0||this.van.health<=0;this.mission=null;this.props=[];this.player.swing=null;this.player.traversal=null;this.player.height=0;this.readers=[];this.result=null;this.enemies.forEach(e=>e.hp=0);this.car.active=false;this.record=false;this.friend.rescued=false;this.friend.aboard=false;this.heat=0;this.gate.hp=0;this.roadblock=false;if(failed){this.player.health=6;this.player.stamina=100;this.van.health=100;this.van.speed=0;}this.mode='playing';}
   retry(){
     const m=this.mission,c=this.checkpoint;if(!m){this.start();return;}
     const spec=m.id,style=m.style;this.abandon();this.serial--;this.accept(spec,style);this.mission.variant=m.variant;
     this.player.health=6;this.van.health=100;this.player.hurt=2;
-    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.wave=c.wave||0;this.readers=(c.readers||[]).map(r=>({...r}));this.roadblock=c.roadblock;this.blockActivated=!!c.blockActivated;this.checkpoint=c;if(this.wave)this.spawn(this.mission.zones[this.wave],m.style==='hard'||m.tier>1?3+this.wave:3);}
+    this.player.swing=null;this.player.traversal=null;this.player.attack=0;
+    if(c){this.player.x=c.x;this.player.z=c.z;Object.assign(this.van,c.van,{health:100,hurt:2,speed:0});this.record=c.record;this.friend.rescued=c.rescued;this.friend.aboard=c.rescued&&c.van.occupied;if(c.rescued){this.friend.x=c.x;this.friend.z=c.z;}this.gate.hp=c.gate;this.hold=c.hold;this.wave=c.wave||0;this.readers=(c.readers||[]).map(r=>({...r}));this.roadblock=c.roadblock;this.blockActivated=!!c.blockActivated;this.props=(c.props||this.props).map(o=>({...o}));this.checkpoint=c;if(this.wave)this.spawn(this.mission.zones[this.wave],m.style==='hard'||m.tier>1?3+this.wave:3);}
     if(c?.record&&c.van.occupied){
       this.car.active=true;Object.assign(this.car,snap({x:c.van.x-Math.sin(c.van.yaw)*20,z:c.van.z-Math.cos(c.van.yaw)*20}),{route:[],routeAge:0});
       this.heat=2;this.lastSeen={x:c.x,z:c.z};this.roadblock=c.roadblock;
@@ -217,6 +263,8 @@ export class City{
     if(this.mode!=='playing')return;dt=Math.min(.05,dt);this.time+=dt;if(this.mission)this.elapsed+=dt;this.messageTime=Math.max(0,this.messageTime-dt);
     const p=this.player,v=this.van,i=this.input,mag=Math.min(1,Math.hypot(i.x,i.z)),dx=i.x/Math.max(1,Math.hypot(i.x,i.z)),dz=i.z/Math.max(1,Math.hypot(i.x,i.z));
     for(const k of['hurt','dash','dashCd','attack','attackCd','comboClock'])p[k]=Math.max(0,p[k]-dt);v.hurt=Math.max(0,v.hurt-dt);this.hitStop=Math.max(0,this.hitStop-dt);
+    if(this.noise){this.noise.remaining-=dt;if(this.noise.remaining<=0)this.noise=null;}
+    if(p.swing){p.swing.time+=dt;if(!p.swing.hit&&p.swing.time>=p.swing.contact)this.contact();if(p.swing.time>=p.swing.duration)p.swing=null;}
     if(v.occupied){
       let corner=0;if(mag>.12){const desired=Math.atan2(dx,dz);corner=Math.abs(turn(v.yaw,desired));v.yaw+=turn(v.yaw,desired)*Math.min(1,dt*12);}
       const desired=i.brake?0:mag*14*(corner>.35?Math.max(.22,Math.cos(corner)):1);
@@ -224,10 +272,17 @@ export class City{
       const travel=this.move(v,Math.sin(v.yaw)*v.speed*dt,Math.cos(v.yaw)*v.speed*dt,1.05);
       if(v.speed>7&&travel<v.speed*dt*.2){this.carHit(clamp((v.speed-4)*.35,2,5));v.speed=0;v.hurt=Math.max(v.hurt,2);this.burst(v.x,v.z,'gold',6);this.say('Impact. Release to stop, then steer away from the wall.',1.6);}
       p.x=v.x;p.z=v.z;p.yaw=v.yaw;if(this.friend.aboard){this.friend.x=v.x;this.friend.z=v.z;}
+    }else if(p.traversal){
+      const t=p.traversal;t.time=Math.min(t.duration,t.time+dt);const f=t.time/t.duration,s=f*f*(3-2*f);
+      p.x=t.from.x+(t.to.x-t.from.x)*s;p.z=t.from.z+(t.to.z-t.from.z)*s;p.speed=0;p.vx=p.vz=0;
+      p.height=t.kind==='Vault'?Math.sin(Math.PI*f)*.8:0;
+      if(t.push){const o=this.props.find(o=>o.id===t.prop);o.x=t.push.from.x+(t.push.to.x-t.push.from.x)*s;o.z=t.push.from.z+(t.push.to.z-t.push.from.z)*s;}
+      if(f>=1){if(t.push)this.props.find(o=>o.id===t.prop).shift=t.shift;p.traversal=null;p.height=0;}
     }else{
       const sprint=i.sprint&&p.stamina>26&&mag>.1,speed=p.dash>0?15:sprint?6.8:4.6;
       const vx=(p.dash>0?p.dashX:dx)*speed,vz=(p.dash>0?p.dashZ:dz)*speed;
-      p.vx+=(vx-p.vx)*Math.min(1,dt*18);p.vz+=(vz-p.vz)*Math.min(1,dt*18);p.speed=this.move(p,p.vx*dt,p.vz*dt)/Math.max(.001,dt);
+      const commitment=p.swing?(p.swing.time<p.swing.contact ? .65 : .75):1;
+      p.vx+=(vx*commitment-p.vx)*Math.min(1,dt*18);p.vz+=(vz*commitment-p.vz)*Math.min(1,dt*18);p.speed=this.move(p,p.vx*dt,p.vz*dt)/Math.max(.001,dt);
       if(mag>.1&&p.attack<=0)p.yaw=Math.atan2(dx,dz);
       p.stamina=clamp(p.stamina+(sprint?-(this.network.upgrades.includes('stamina')?8:12):p.attack>0?0:26)*dt,0,100);
       if(i.attack)this.attack();
@@ -235,23 +290,35 @@ export class City{
         this.copy=Math.min(1.8,this.copy+dt);
         if(this.copy>=1.8){this.record=true;this.score+=200;this.heat=1.4;this.saveCheckpoint();this.say('Sana: the account is copied. Reach the relay with it, not just a score.',4);}
       }
-      if(this.friend.rescued&&!this.friend.aboard&&dist(p,this.friend)>1.8)this.chase(this.friend,p,dt,6.5);
-      if(this.mission?.type==='rally'&&this.wave===2)for(const r of this.readers)if(dist(p,r)>2.1)this.chase(r,p,dt,5.1);
+      if(this.friend.rescued&&!this.friend.aboard)this.companion(this.friend,p,dt,6.5);
+      if(this.mission?.type==='rally'&&this.wave===2)for(const r of this.readers)this.companion(r,p,dt,5.1);
     }
     if(this.mission&&!this.mission.arrived&&!v.occupied&&dist(p,this.mission.source)<12){this.mission.arrived=true;this.saveCheckpoint();}
     for(const s of this.supplies)if(!s.taken&&dist(p,s)<2){s.taken=true;p.health=Math.min(6,p.health+2);p.stamina=100;this.burst(p.x,p.z,'teal');this.say('Volunteer aid restored condition.');}
     for(const q of PLACES)if(!this.visited.includes(q.id)&&dist(p,q)<18){this.visited.push(q.id);this.discoveries++;this.say('Discovered '+q.name+' · '+q.role,4);}
     let visible=false;
     for(const e of this.enemies){
-      e.stun=Math.max(0,e.stun-dt);e.cooldown=Math.max(0,e.cooldown-dt);e.guardBreak=Math.max(0,e.guardBreak-dt);if(e.hp<=0){e.down=1;continue;}if(e.stun>0)continue;
+      e.stun=Math.max(0,e.stun-dt);e.cooldown=Math.max(0,e.cooldown-dt);e.guardBreak=Math.max(0,e.guardBreak-dt);e.regroup=Math.max(0,e.regroup-dt);e.recovery=Math.max(0,e.recovery-dt);
+      if(e.hp<=0){e.down=1;e.state='down';continue;}if(e.stun>0){e.state='stagger';continue;}
       const d=dist(e,p),sight=d<18&&this.line(e,p);
       if(sight){visible=true;e.last={x:p.x,z:p.z};this.lastSeen={...e.last};}
-      if(e.lunge>0){e.lunge-=dt;this.move(e,Math.sin(e.attackYaw)*8*dt,Math.cos(e.attackYaw)*8*dt);if(d<2.1&&!v.occupied)this.hurt();continue;}
-      if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.cooldown=1.7;e.lunge=e.role==='rush'?.34:0;if(d<(e.role==='guard'?3.3:2.7)&&!v.occupied&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.95)this.hurt();}continue;}
-      const reach=e.role==='rush'?4.2:e.role==='guard'?3.3:2.7,committed=this.enemies.filter(q=>q.hp>0&&(q.windup>0||q.lunge>0)).length;
-      if(!v.occupied&&d<reach&&e.cooldown<=0&&sight&&committed<(this.mission?.style==='hard'||this.network.cycle>1?2:1)){e.windup=e.windupTotal=(this.mission?.style==='hard'?.65:.95)+(e.role==='guard'?.12:0);e.attackYaw=e.yaw=Math.atan2(p.x-e.x,p.z-e.z);continue;}
-      const target=sight&&e.role==='flank'&&d>2.5?{x:p.x+Math.cos(p.yaw)*2.8,z:p.z-Math.sin(p.yaw)*2.8}:sight?p:this.hidden<6?e.last:e.home;
-      if(d<1.7&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else this.chase(e,target,dt,(e.role==='guard'?2.1:e.role==='flank'?3.5:2.8)+(this.mission?.style==='hard'?.5:0)+Math.max(0,(this.mission?.tier||1)-1)*.2);
+      if(e.strikeDuration>0){
+        e.state='strike';e.strikeTime+=dt;
+        if(e.role==='rush'&&e.strikeTime<.3)this.move(e,Math.sin(e.attackYaw)*6*dt,Math.cos(e.attackYaw)*6*dt);
+        if(!e.strikeHit&&e.strikeTime>=e.strikeDuration*.55){e.strikeHit=true;if(dist(e,p)<(e.role==='guard'?2.8:2.4)&&!v.occupied&&this.line(e,p,false)&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.8)this.hurt();}
+        if(e.strikeTime>=e.strikeDuration){e.strikeDuration=0;e.recovery=e.role==='rush'?1.2:.85;e.cooldown=1.3;e.state='recover';}
+        continue;
+      }
+      if(e.recovery>0){e.state='recover';continue;}
+      if(e.regroup>0){e.state='regroup';this.chase(e,e.home,dt,2.2);continue;}
+      if(e.windup>0){e.state='telegraph';e.windup=Math.max(0,e.windup-dt);if(e.windup<=0){e.strikeDuration=.48;e.strikeTime=0;e.strikeHit=false;}continue;}
+      const reach=e.role==='rush'?4.2:e.role==='guard'?3:2.7,committed=this.enemies.filter(q=>q.hp>0&&(q.windup>0||q.strikeDuration>0)).length;
+      if(!v.occupied&&d<reach&&e.cooldown<=0&&sight&&committed<(this.mission?.style==='hard'||this.network.cycle>1?2:1)){e.windup=e.windupTotal=(this.mission?.style==='hard'?.5:.75)+(e.role==='guard'?.12:0);e.attackYaw=e.yaw=Math.atan2(p.x-e.x,p.z-e.z);e.state='telegraph';continue;}
+      const investigating=!sight&&this.noise&&dist(e,this.noise)<18;
+      const holding=e.role==='guard'&&e.guardBreak<=0&&!investigating&&(d>4.5||dist(p,e.home)>7);
+      const target=investigating?this.noise:holding?e.home:sight&&e.role==='flank'&&d>2.5?{x:p.x+Math.cos(p.yaw)*3,z:p.z-Math.sin(p.yaw)*3}:sight?p:this.hidden<4?e.last:e.home;
+      e.state=investigating?'investigate':holding?'hold':sight&&e.role==='flank'?'flank':sight?'approach':'search';
+      if(d<1.7&&sight&&!v.occupied)e.yaw=Math.atan2(p.x-e.x,p.z-e.z);else if(dist(e,target)>.5)this.chase(e,target,dt,(e.role==='guard'?2:e.role==='flank'?3.5:2.8)+(this.mission?.style==='hard'?.5:0)+Math.max(0,(this.mission?.tier||1)-1)*.2);
     }
     for(let a=0;a<5;a++)for(let b=a+1;b<5;b++){const e=this.enemies[a],f=this.enemies[b],d=dist(e,f);if(e.hp>0&&f.hp>0&&d<.9){const dx=(e.x-f.x)/(d||1),dz=(e.z-f.z)/(d||1);this.move(e,dx*dt,dz*dt);this.move(f,-dx*dt,-dz*dt);}}
     if(this.car.active){
@@ -288,5 +355,12 @@ export class City{
     if(this.gate.hp<=0)this.gate.fall=Math.min(1,this.gate.fall+dt*2);
     for(const q of this.particles){q.life-=dt;q.x+=q.vx*dt;q.z+=q.vz*dt;q.y+=q.vy*dt;q.vy-=9*dt;}this.particles=this.particles.filter(q=>q.life>0);
   }
-  text(){return{mode:this.mode,coordinates:'x east, z south; OSM central Delhi, 0.14 game units / real metre; roads widened for play',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},record:this.record,gate:{...this.gate},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup})=>({id,x,z,hp,stun,windup})),car:{x:this.car.x,z:this.car.z,active:this.car.active,windup:this.car.windup,ram:this.car.ram,cooldown:this.car.cooldown},strikes:this.hits,score:Math.round(this.score),crashes:this.crashes,checkpoint:this.checkpoint,mission:this.mission,hold:+this.hold.toFixed(2),network:this.network,visited:this.visited,result:this.result};}
+  companion(r,p,dt,speed){
+    const threat=this.enemies.find(e=>e.hp>0&&(e.windup>0||e.strikeDuration>0)&&dist(e,r)<5);
+    r.fear=Math.max(0,(r.fear||0)-dt);
+    if(threat){r.fear=.8;const d=Math.max(.1,dist(r,threat));r.state='shelter';this.move(r,(r.x-threat.x)/d*2.8*dt,(r.z-threat.z)/d*2.8*dt);r.yaw=Math.atan2(r.x-threat.x,r.z-threat.z);return;}
+    if(r.fear>0){r.state='brace';return;}
+    r.state=dist(p,r)>2.1?'follow':'wait';if(r.state==='follow')this.chase(r,p,dt,speed);
+  }
+  text(){return{mode:this.mode,coordinates:'x east, z south; OSM central Delhi, 0.14 game units / real metre; roads widened for play',time:+this.time.toFixed(2),player:{...this.player},van:{...this.van},friend:{...this.friend},readers:this.readers,encounter:{name:this.encounter.name,props:this.props},record:this.record,gate:{...this.gate},heat:+this.heat.toFixed(2),seen:this.seen,hidden:+this.hidden.toFixed(2),phase:this.phase,roadblock:this.roadblock,objective:this.objective(),target:this.target(),near:this.nearby(),enemies:this.enemies.map(({id,x,z,hp,stun,windup,state,strikeTime,strikeDuration,recovery,regroup,role,guardBreak,yaw})=>({id,x,z,hp,stun,windup,state,strikeTime,strikeDuration,recovery,regroup,role,guardBreak,yaw})),car:{x:this.car.x,z:this.car.z,active:this.car.active,windup:this.car.windup,ram:this.car.ram,cooldown:this.car.cooldown},strikes:this.hits,score:Math.round(this.score),crashes:this.crashes,checkpoint:this.checkpoint,mission:this.mission,hold:+this.hold.toFixed(2),network:this.network,visited:this.visited,result:this.result};}
 }

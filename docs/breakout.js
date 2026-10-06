@@ -1,19 +1,20 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
-import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.15.13';
-import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?v=0.15.13';
-import {human,loadPeople,poseHuman,resetHuman} from './people.js?v=0.15.13';
+import {City as Breakout,WORLD,CONTRACTS} from './city-rules.js?v=0.16.0';
+import {installMap,PLACES,SCALE,roadRoute,segmentDistance} from './city-data.js?v=0.16.0';
+import {human,loadPeople,poseHuman,poseMotion,resetHuman} from './people.js?v=0.16.0';
 import {materials as M,box,cylinder,sign,mergeStatic,barricade,observatory,bench,lamp,tent} from './world-props.js';
-import {WorldAudio} from './world-audio.js?v=0.15.13';
-import {cityArt} from './city-art.js?v=0.15.13';
+import {WorldAudio} from './world-audio.js?v=0.16.0';
+import {cityArt} from './city-art.js?v=0.16.0';
+import {encounterArt} from './encounter-art.js';
 
 const $=id=>document.getElementById(id),coarse=matchMedia('(pointer:coarse)').matches||innerWidth<700;
-const asset=name=>'./assets/'+name+'?v=0.15.13';
+const asset=name=>'./assets/'+name+'?v=0.16.0';
 const game=new Breakout(),keys=new Set(),audio=new WorldAudio();
 const sticks={move:{x:0,z:0},aim:{x:0,z:-1}},poses=[],effects=[];
 let renderer,scene,camera,sun,player,friend,van,enemyCar,gate,block,recorder,recordRing,safeRing,arrow,treeSource,playerRing,friendRing;
-let art,actionHeld=false,actionHoldOnly=false,carTell;
+let art,encounterView,actionHeld=false,actionHoldOnly=false,carTell;
 let wideCamera=false,routeMarks=[],readerModels=[];
 let manual=false,last=0,clock=0,fps=0,frames=0,frameStart=performance.now(),mouseAim=false,helpReturn='menu',engineTone,engineGain,brakeHeld=false,aimBrake=false,crowdClock=0,mouseStrike=false,stickStrike=false,buttonStrike=false,routeClock=0,guideRoute=[];
 const particleMeshes=[],medModels=[],crowd=[],enemyModels=[];
@@ -231,7 +232,18 @@ function quality(){
 function viewSpan(){return wideCamera?36:game.van.occupied?(coarse?26:25):21;}
 function resize(){const w=innerWidth,h=innerHeight,span=viewSpan();renderer?.setSize(w,h);if(camera){camera.left=-span*w/h/2;camera.right=span*w/h/2;camera.top=span/2;camera.bottom=-span/2;camera.userData.span=span;camera.updateProjectionMatrix();}}
 window.addEventListener('resize',()=>{resize();render();});
-function pose(p,e,dt,drive=0){const speed=p.lastPosition&&dt>0?Math.min(15,Math.hypot(e.x-p.lastPosition.x,e.z-p.lastPosition.z)/dt):drive;p.lastPosition={x:e.x,z:e.z};p.poseTimeDivisor=7.5;p.group.position.set(e.x,0,e.z);p.group.rotation.y=(e.yaw||0)+Math.PI;p.worldSpeed=speed;poseHuman(p,game.time*7.5,speed>3?1:speed>.1?.6:0);}
+function pose(p,e,dt,drive=0){
+  const speed=p.lastPosition&&dt>0?Math.min(15,Math.hypot(e.x-p.lastPosition.x,e.z-p.lastPosition.z)/dt):drive;
+  p.lastPosition={x:e.x,z:e.z};p.poseTimeDivisor=7.5;p.group.position.set(e.x,e.height||0,e.z);p.group.rotation.y=(e.yaw||0)+Math.PI;p.worldSpeed=speed;
+  poseHuman(p,game.time*7.5,speed>3?1:speed>.1?.6:0);
+  if(e.traversal)poseMotion(p,e.traversal.kind,e.traversal.time/e.traversal.duration);
+  else if(e.swing)poseMotion(p,e.swing.clip,e.swing.time/e.swing.duration);
+  else if(e.strikeDuration>0)poseMotion(p,'EnemyStrike',e.strikeTime/e.strikeDuration);
+  else if(e.windup>0||e.state==='brace'||e.state==='shelter'||e.state==='hold')poseMotion(p,'Brace',.5);
+  else if(e.stun>0||e.hurt>.85)poseMotion(p,'Hurt',e.stun>0?Math.max(0,1-e.stun/1.1):Math.max(0,1-(e.hurt-.85)/.35));
+  else if(e.dash>0)poseMotion(p,'Dodge',1-e.dash/.27);
+  else if(e.recovery>0)poseMotion(p,'EnemyStrike',.9);
+}
 function drawMap(){
   const c=$('map').getContext('2d'),n=144,span=90,point=p=>[(p.x-game.player.x)/span*n+n/2,(p.z-game.player.z)/span*n+n/2];
   paintMap(c,n,point,false);
@@ -271,7 +283,8 @@ function step(dt){
     if(game.input.attack&&!mouseAim&&!stickStrike)aimNearest();
     if(!mouseAim&&!game.input.attack&&Math.hypot(game.input.x,game.input.z)>.1){game.input.aimX=game.input.x;game.input.aimZ=game.input.z;}
     game.input.brake=game.van.occupied&&(keys.has('Space')||brakeHeld||aimBrake);
-    game.update(dt);if(!game.van.occupied)audio.footstep((game.player.speed||0)*dt);if(health>game.player.health)audio.tone(90,.12);if(hits<game.hits)audio.tone(220,.05);
+    const contact=game.player.contactSerial||0;
+    game.update(dt);if(!game.van.occupied)audio.footstep((game.player.speed||0)*dt);if(health>game.player.health)audio.tone(90,.12);if(contact<(game.player.contactSerial||0))audio.tone(game.player.contactHit?160:280,.07);
     if(before!==game.mode&&['won','caught'].includes(game.mode)){finish();audio.tone(game.mode==='won'?590:100,.5);}
   }
   clock+=dt;
@@ -280,21 +293,20 @@ function step(dt){
     const moving=Math.hypot(game.input.x,game.input.z)>.1&&game.mode==='playing';
     player.group.visible=!game.van.occupied;pose(player,game.player,dt,game.mode==='playing'?game.player.speed||0:0);
     art?.hero.set(game.player.x,game.player.z);
-    if(game.player.attack>0){const f=Math.sin(Math.min(1,game.player.attack/(game.player.combo===3?.38:.26))*Math.PI),side=game.player.combo===2?'L':'R',arm=player.model.getObjectByName('Bip01 '+side+' UpperArm'),elbow=player.model.getObjectByName('Bip01 '+side+' Forearm'),spine=player.model.getObjectByName('Bip01 Spine2');if(arm){arm.rotation.x-=f*1.2;arm.rotation.z+=f*.8;}if(elbow)elbow.rotation.x-=f*.6;if(spine)spine.rotation.z+=f*(side==='L'?-.22:.22);}
-    player.group.rotation.z=game.player.dash>0?.12:0;
+    player.group.rotation.z=0;encounterView?.update(game);
     friend.group.visible=game.mission?.type==='rescue'&&!game.friend.aboard;pose(friend,game.friend,dt,game.friend.rescued&&Math.hypot(game.friend.x-game.player.x,game.friend.z-game.player.z)>2?4.5:0);
     playerRing.visible=!game.van.occupied;playerRing.position.set(game.player.x,.045,game.player.z);
     friendRing.visible=friend.group.visible;friendRing.position.set(game.friend.x,.045,game.friend.z);
     for(let i=0;i<game.enemies.length;i++){
       const e=game.enemies[i],m=enemyModels[i];m.p.group.visible=!!game.mission&&e.active&&Math.hypot(e.x-game.player.x,e.z-game.player.z)<38;
-      if(m.p.group.visible){pose(m.p,e,dt,e.hp>0&&e.stun<=0&&e.windup<=0?2.6:0);m.p.shield.visible=e.role==='guard';m.p.group.rotation.z=e.hp<=0?Math.PI/2:0;m.p.group.position.y=e.hp<=0?.15:0;if(e.windup>0){const arm=m.p.model.getObjectByName('Bip01 R UpperArm');if(arm)arm.rotation.x-=1.1;}}
-      m.ring.visible=e.windup>0;m.ring.scale.setScalar(e.role==='rush'?2:1+(1-e.windup/Math.max(.01,e.windupTotal||1))*.8);m.ring.material.color.set(e.role==='guard'?'#e0b96c':'#ed745b');m.bars.visible=e.hp>0&&Math.hypot(e.x-game.player.x,e.z-game.player.z)<10;m.bars.position.set(e.x,2.3,e.z);
-      m.tell.visible=m.p.group.visible&&e.windup>0;m.tell.position.set(e.x,.05,e.z);m.tell.rotation.set(-Math.PI/2,0,e.attackYaw-Math.PI/2);m.tell.scale.setScalar(e.role==='rush'?4.2:e.role==='guard'?3.3:2.7);m.tell.material.opacity=.12+.35*(1-e.windup/Math.max(.01,e.windupTotal||1));
+      if(m.p.group.visible){pose(m.p,e,dt,0);m.p.shield.visible=e.role==='guard';m.p.group.rotation.z=e.hp<=0?Math.PI/2:0;m.p.group.position.y=e.hp<=0?.15:0;}
+      m.ring.visible=e.hp>0&&(e.windup>0||e.recovery>0);m.ring.scale.setScalar(e.recovery>0?1:e.role==='rush'?2:1+(1-e.windup/Math.max(.01,e.windupTotal||1))*.8);m.ring.material.color.set(e.recovery>0?'#91d4ba':e.role==='guard'?'#e0b96c':'#ed745b');m.bars.visible=e.hp>0&&Math.hypot(e.x-game.player.x,e.z-game.player.z)<10;m.bars.position.set(e.x,2.3,e.z);
+      m.tell.visible=m.p.group.visible&&(e.windup>0||e.strikeDuration>0);m.tell.position.set(e.x,.05,e.z);m.tell.rotation.set(-Math.PI/2,0,e.attackYaw-Math.PI/2);m.tell.scale.setScalar(e.role==='rush'?4.2:e.role==='guard'?3:2.7);m.tell.material.opacity=e.strikeDuration>0?.55:.12+.35*(1-e.windup/Math.max(.01,e.windupTotal||1));
       m.segments.forEach((s,j)=>s.material.color.set(j<e.hp?(e.stun>0?'#a5e7ce':'#dfb279'):'#443e33'));
     }
     crowdClock+=dt;if(crowdClock>.22){crowdClock=0;crowd.forEach((p,i)=>{p.group.visible=Math.hypot(p.group.position.x-game.player.x,p.group.position.z-game.player.z)<34;if(p.group.visible){const x=p.anchor.x+Math.sin(game.time*.18+i)*1.2;if(i>=10&&game.valid(x,p.anchor.z)){p.group.position.x=x;p.worldSpeed=.2;poseHuman(p,game.time*.75+i,.3);}else poseHuman(p,game.time*.75+i,0);}});}
     readerModels.forEach((p,i)=>{const r=game.readers[i];p.group.visible=!!r&&game.mission?.type==='rally';if(p.group.visible)pose(p,r,dt,Math.hypot(r.x-game.player.x,r.z-game.player.z)>2.1?5.1:0);});
-    gate.rotation.x=game.gate.fall*Math.PI/2;gate.position.set(game.gate.x,0,game.gate.z);gate.visible=!!game.mission&&game.gate.hp>0||game.gate.fall<1;block.visible=game.roadblock;block.position.set(game.block.x,0,game.block.z);
+    gate.rotation.x=game.gate.fall*Math.PI/2;gate.scale.x=game.gate.w/10;gate.position.set(game.gate.x,0,game.gate.z);gate.visible=!!game.mission&&(game.gate.hp>0||game.gate.fall<1);block.visible=game.roadblock;block.position.set(game.block.x,0,game.block.z);
     for(const [model,e] of [[van,game.van],[enemyCar,game.car]]){model.g.position.set(e.x,0,e.z);model.g.rotation.y=e.yaw+Math.PI;model.wheels.forEach(w=>w.rotation.y+=e.speed*dt/.43);}
     enemyCar.g.visible=game.car.active;recorder.visible=recordRing.visible=game.mission?.type==='courier'&&!game.record;
     carTell.visible=game.car.active&&(game.car.windup>0||game.car.ram>0);carTell.position.set(game.car.x,.07,game.car.z);carTell.rotation.set(-Math.PI/2,0,game.car.attackYaw-Math.PI/2);carTell.material.opacity=game.car.ram>0?.5:.12+.25*(1-game.car.windup/.85);
@@ -330,12 +342,12 @@ async function init(){
     if(r[0].status!=='fulfilled'||r[1].status!=='fulfilled')throw new Error('Character or surface assets failed to load. Please reload.');
     if(r[2].status==='fulfilled')treeSource=r[2].value.scene;
     if(r[3].status==='fulfilled'){r[3].value.mapping=THREE.EquirectangularReflectionMapping;const pmrem=new THREE.PMREMGenerator(renderer);scene.environment=pmrem.fromEquirectangular(r[3].value).texture;scene.environmentIntensity=.35;pmrem.dispose();}
-    const response=await fetch('./delhi-map.json?v=0.15.13');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
-    installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
+    const response=await fetch('./delhi-map.json?v=0.16.0');if(!response.ok)throw new Error('Delhi map failed to load. Reload to retry.');
+    installMap(await response.json());game.reset();build();art=await cityArt(scene,WORLD,PLACES);encounterView=encounterArt(scene);step(0);quality();const preference=new URLSearchParams(location.search).get('quality');if(['high','low'].includes(preference)){$('quality').value=preference;quality();}
     $('start').disabled=false;$('start').textContent='PLAY · City of accounts';$('loading').textContent='Real central-Delhi street geometry. Fictional operations. Mobile controls.';syncPanels();hud();render();
     renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||game.mode!=='playing')return;const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2((e.clientX-r.x)/r.width*2-1,-(e.clientY-r.y)/r.height*2+1),camera);if(ray.ray.intersectPlane(groundPlane,v3)){const d=Math.hypot(v3.x-game.player.x,v3.z-game.player.z);game.input.aimX=(v3.x-game.player.x)/Math.max(.01,d);game.input.aimZ=(v3.z-game.player.z)/Math.max(.01,d);mouseAim=true;}});
     renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'&&e.button===0&&game.mode==='playing')mouseStrike=true;});window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')mouseStrike=false;});
-    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.15.13',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
+    window.render_game_to_text=()=>JSON.stringify({...game.text(),version:'0.16.0',quality:$('quality').value,route:guideRoute.map(p=>({x:p.x,z:p.z})),map:{roads:WORLD.roads.length,footprints:WORLD.sourceFootprints,displayParts:WORLD.buildings.length,landmarks:PLACES},rendering:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},avatarModels:5});
     window.advanceTime=ms=>{manual=true;const n=Math.max(1,Math.ceil(ms/16.667));for(let i=0;i<n;i++)step(ms/n/1000);render();$('performance').textContent=`QA STEP · CITY / 0.14 · ${renderer.info.render.calls} draws`;};
     function loop(now){if(!manual){const dt=Math.min(.05,(now-last)/1000||.016);step(dt);render();frames++;if(now-frameStart>1000){fps=frames*1000/(now-frameStart);frames=0;frameStart=now;$('performance').textContent=`${Math.round(fps)} FPS · ${renderer.info.render.calls} draws · ${Math.round(renderer.info.render.triangles/1000)}k tris`;}}last=now;requestAnimationFrame(loop);}
     requestAnimationFrame(loop);
