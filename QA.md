@@ -14,6 +14,18 @@ Forty-three isolated checks pass in `qa/v17/unit-results.json`. Added coverage i
 
 After that full replay, a presentation-only patch removed legacy, non-colliding decorative stalls overlapping the authored Sansad aid point. Campaign rules remain those of the full v0.17.2 run; affected-space, final phone layout/input and recovery checks are recorded below rather than described as another complete campaign.
 
+### Final staged public verification
+
+GitHub Pages successfully deployed runtime commit `13617b2c8b6362bed6b24c66393068d368e8ce1c` (run `37431250123`). Fresh public pages loaded `breakout.js?v=0.17.2-stage`; runtime reported v0.17.2. The same staged bundle updated the private preview.
+
+The final Sansad presentation was replayed through arrival, first-stage combat, securing the circle, second-stage combat and actual held aid restoration. The operation advanced to escort. Removal of the decorative stalls left the player visible above the aid area, with the authored screen, bench and stocked table still present. The player lost health during these approaches; this was not a no-damage showcase. Captures `final-stage-*`, `final-aid-staging.jpg` and `final-aid-clear.jpg` show the final scene.
+
+At 390×844, simultaneous real CDP movement/aim touch pointers moved the player 1.57 units and produced two contact events over the checked interval. Both portrait and 844×390 landscape had zero horizontal overflow. `final-phone-portrait.jpg` was inspected; the HUD remains relatively heavy on a small phone. Sound toggled from off to on, and Overview changed to Close view; these checks establish control responses, not an acoustic mix or spatial-audio signoff. Ordinary-time exposure to nearby opponents caused capture; Retry checkpoint restored health 6 and four encounter props.
+
+A subsequent long-lived browser stopped responding to Accessibility and Runtime CDP calls. That attempt is not a passed recovery check. In a fresh public browser, deliberate `WEBGL_lose_context` fault injection displayed Graphics interrupted and Reload game while pausing the operation. Clicking Reload game returned to a rendered menu reporting v0.17.2 after module loading. This verifies the explicit fallback, not elimination of graphics/context failures.
+
+The final deterministic low-quality browser-client capture under `qa/v17-client-final/` was inspected. A separate high-quality client attempt stalled and timed out while local browser processes were active; a local Playwright recovery attempt also failed before inducing its fault. Those attempts are not performance or recovery passes. They were cleaned up; the bounded low-quality client retry succeeded. Deterministic clients are not FPS benchmarks. Physical phones, Safari, long-session device thermals and independent enjoyment remain unverified.
+
 ## Authored encounter/contact cycle
 
 Baseline before edits was fresh public v0.15.13: exploratory witness and gathering play using normal-time movement, short/held strikes, dodge and failed/partial interactions. It was not a full baseline campaign win.
