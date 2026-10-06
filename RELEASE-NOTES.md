@@ -1,5 +1,14 @@
 # DISSENT release notes
 
+## Authored encounter and contact rework
+
+- Replayed public v0.15.13 before edits and selected the witness cordon and community forecourt as the main redesigns. No district, currency or reward counter was added.
+- Added collision/sight-aware low benches, desks and movable banner screens, validated vaults, screen investigation noise and checkpoint-persistent prop positions.
+- Replaced input-instant damage with locked-facing, once-per-swing contact phases shared with original authored skeletal keyframes. Enemy committed strikes and recovery use the same phase-based approach.
+- Added position-holding guards, flanking, regrouping and companion brace/shelter/follow reactions. Authored all gathering stage guard homes rather than reverting to circular respawns.
+- Iterated after actual play exposed incorrect rig-track binding/axes, backward context selection, generic later stages, a parked-van obstruction and assisted aim selecting an occluded guard.
+- Completed a fresh revised four-operation cycle in ordinary time. See `ENCOUNTER-REVIEW.md` and `QA.md` for specific results, final-patch scope and limits. Arcade reach, simple scenery/props, crowd autonomy and motion polish remain below finished indie standards.
+
 ## Strict-review rework
 
 - Reviewed the live game against a finished indie action standard, ranking all fifteen requested areas in `STRICT-REVIEW.md`, before changing it.

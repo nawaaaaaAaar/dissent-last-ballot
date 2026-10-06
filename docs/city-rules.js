@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.4';
-import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.4';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.5';
+import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.16.5';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -160,6 +160,11 @@ export class City{
     p.dash=.27;p.dashCd=.95;p.stamina-=18;p.attack=0;p.swing=null;p.attackCd=Math.min(.16,p.attackCd);
     for(const e of this.enemies)if(e.hp>0&&dist(e,p)<5&&e.windup>0&&e.windup<.32){e.windup=0;e.lunge=0;e.stun=1.3;e.guardBreak=1.5;e.cooldown=2;this.score+=20;this.say('Clean evasion. Their guard is open.',1.8);}
     this.burst(p.x,p.z,'teal',7);return true;
+  }
+  assistedTarget(){
+    const p=this.player,enemy=this.enemies.filter(e=>e.hp>0&&dist(e,p)<3.2&&this.line(p,e,false)).sort((a,b)=>dist(a,p)-dist(b,p))[0];
+    const gate=this.gate.hp>0&&dist(p,this.gate)<3.5?this.gate:null;
+    return gate&&(!enemy||dist(p,gate)<dist(p,enemy))?gate:enemy;
   }
   nearby(){
     if(this.van.occupied)return{id:'exit',label:'EXIT VAN'};

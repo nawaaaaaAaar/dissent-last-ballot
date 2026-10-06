@@ -2,6 +2,8 @@
 
 An original **mobile-first top-down 3D resistance action adventure** in a connected central-Delhi map. The strict-review rework changes encounter pacing, stamina-limited combos, shield and rush behaviour, held dispatch copying, staged gathering support and escort, checkpoint recovery, street rendering and character presentation. Graphics were worked on in this pass, not deferred: textured façades, roof detail, original street props, rigged uniform adaptations, revised lighting, animation timing and a coherent interface replace substantial portions of the earlier placeholder treatment.
 
+The current encounter pass adds contact-timed skeletal strikes, collision-checked bench/table vaults, movable sight-blocking screens, position-holding/flanking enemies and companions who brace near committed attacks. Read [the before/after play review](ENCOUNTER-REVIEW.md) for the redesigned witness cordon and community forecourt, observed results and remaining finished-indie gap. It does not add a district or another reward counter.
+
 Read [the ranked review and replay findings](STRICT-REVIEW.md) before treating feature completion as quality approval. Start near the fictional Jantar street gathering rather than taking an empty opening drive from CP. The original OSM footprint data is preserved separately from display contours trimmed around arcade-width vehicle streets; this is not an exact digital twin or a real-world navigation tool.
 
 [Play the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and choose **PLAY · City of accounts**. Open **Map & Missions** for the whole map, other jobs, upgrades and a save code. The [winning guide](https://github.com/nawaaaaaAaar/dissent-last-ballot/blob/main/HOW-TO-WIN.md) is also available in game.

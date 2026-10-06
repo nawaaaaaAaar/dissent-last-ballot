@@ -175,5 +175,10 @@ check('new encounter does not place its table through the parked van',()=>{
 check('each gathering stage has authored guard homes near its functional space',()=>{
   const g=new City();g.start();g.accept('hold');for(const wave of[1,2]){g.wave=wave;g.spawn(g.mission.zones[wave],3);const e=g.enemies[0],q=g.encounter.stages[wave][0];assert(Math.hypot(e.home.x-q.x,e.home.z-q.z)<5.1);}
 });
+check('nearby aim assist targets the blocking cordon, not an occluded guard',()=>{
+  const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);Object.assign(g.player,{x:g.gate.x,z:g.gate.z-1});
+  Object.assign(g.enemies[0],{hp:4,x:g.gate.x-.5,z:g.gate.z+1,role:'guard'});assert.equal(g.assistedTarget(),g.gate);
+  g.gate.hp=0;assert.equal(g.assistedTarget(),g.enemies[0]);
+});
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
 fs.mkdirSync('qa/v16',{recursive:true});fs.writeFileSync('qa/v16/unit-results.json',JSON.stringify({passed:checks.length,checks},null,2));

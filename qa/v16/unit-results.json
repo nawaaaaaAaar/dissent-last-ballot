@@ -1,5 +1,5 @@
 {
-  "passed": 39,
+  "passed": 40,
   "checks": [
     "OSM map and georeferenced landmark relationships",
     "exit and retry never teleport an unrescued witness",
@@ -39,6 +39,7 @@
     "guard holds its authored home instead of pursuing to an unrelated street",
     "companion braces near a committed attack then resumes following",
     "new encounter does not place its table through the parked van",
-    "each gathering stage has authored guard homes near its functional space"
+    "each gathering stage has authored guard homes near its functional space",
+    "nearby aim assist targets the blocking cordon, not an occluded guard"
   ]
 }

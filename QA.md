@@ -1,5 +1,21 @@
 # QA and limitations
 
+## Authored encounter/contact cycle
+
+Baseline before edits was fresh public v0.15.13: exploratory witness and gathering play using normal-time movement, short/held strikes, dodge and failed/partial interactions. It was not a full baseline campaign win.
+
+First revised play exposed bad skeleton binding, imported-axis pose errors, backward context selection, generic gathering-stage respawns and newly accepted furniture trapping a parked van. The v0.16.2 sequence completed rescue/gathering/courier but did not complete charter; do not count it as a passed campaign. Those defects were revised.
+
+A fresh public commit-pinned v0.16.4 (`f805ecfaa0fb725eed1455b2759a20297f653a46`) completed the full cycle in ordinary browser time: rescue SILVER / 1733 / health 6 / van 96.87; gathering SILVER / 1420 / health 4; courier SILVER / 1414 / health 6 / van 94.79; charter BRONZE / 1057 / health 2 / van 100. Cycle two, four best scores and 11 credits were retained. No runtime positions, health, flags, credits or simulation clock were edited. Travel used manually selected waypoints through actual keyboard/touch controls. This is agent-assisted play, not a speedrun, first-time human study or proof of enjoyment.
+
+Normal-time observations included moved screens, bench vaults, blocked walking paths, fixed-direction missed contact, regrouping, readers bracing under nearby pressure and resuming their escort, an interrupted copy that retained progress, and surviving guards left behind. The gathering completed without defeating its final guard/flanker; a pursuing rush unit still had to be confronted near the assembly. The final input-assistance follow-up removes occluded guards from nearby targeting and includes the blocking cordon as a target; campaign rules and placement remain the v0.16.4 core.
+
+Forty isolated rule checks now cover the installed map and contact/prop/companion/stage/placement/targeting behaviours in `qa/v16/unit-results.json`. The harness dynamically imports the same versioned map module as the rules, avoiding an earlier separate-module test weakness. Rule tests stage state and do not measure fun. The supplied deterministic browser client checked rendered movement/strikes in `qa/v16-client-final/`; captures were visually inspected. Deterministic steps are not frame-rate benchmarks or normal-time play.
+
+Original runtime joint keyframes are sampled from gameplay phase. They are not mocap or full-body IK, and hit geometry remains an arcade radius/cone rather than literal fist collision. Actual game captures retain simple props, adapted footprints and repeated avatars; menu/ending illustrations are not gameplay-art proof. Physical phones, Safari and independent player enjoyment remain unverified.
+
+Final public root, mobile input/layout and deployment rechecks are appended after verification.
+
 ## Strict review rework: current scope
 
 The current source is the strict-review rework, not the historical v0.14 signoff below. Read `STRICT-REVIEW.md` for the ranked fifteen-area assessment, observed failures and design decisions.

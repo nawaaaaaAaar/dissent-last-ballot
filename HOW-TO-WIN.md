@@ -8,6 +8,8 @@ Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and 
 
 ## Controls
 
+Action now also moves nearby tall banner screens or vaults a low bench/table when you face it. Mission copying, aid restoration and rescue have priority; move away from the mission marker or van if you want to interact with furniture. A vault costs stamina and needs a clear landing. Screens block sight and moving one draws nearby unseen guards toward its sound. The minimap route does not account for every relocated prop: steer around it rather than continuously pushing into it.
+
 - **Phone:** Left stick moves or drives. Its outer edge runs on foot. The right stick aims and repeatedly strikes while held; the separate Strike button gives nearby aim assistance. Dodge makes a short burst. Action enters/exits the van or rescues Kabir. Release movement to slow the van; hold Brake or the right stick to stop faster.
 - **Desktop:** WASD/arrows move or steer, Shift runs, held Space chains nearby-assisted strikes or brakes in the van, Q dodges, E interacts. Hold E for dispatch copying and aid support. Mouse aiming is optional; hold its left button on the world to strike. P pauses, M opens missions and Z toggles close/overview view.
 - **Navigation:** Gold is the objective and suggested street route. Green is a delivery destination or the active gathering zone. Red circles warn of incoming attacks; red bars on the radar show barriers. The small radar follows you; the mission board shows the full central-Delhi area.
@@ -18,7 +20,7 @@ Open [the public game](https://nawaaaaaaaar.github.io/dissent-last-ballot/) and 
 
 Walk toward the nearby gold witness marker. There is no initial CP-to-Jantar drive. Teal identifies Aman, gold identifies Kabir, and expanding rings plus a filled attack sector indicate a committed incoming strike.
 
-Approach Kabir. Use short three-hit chains: the third hit knocks back and can break a frontal shield. Earlier frontal strikes are blocked; flanking is another option. All strikes cost stamina, so holding Strike indefinitely leaves you exhausted. A late Dodge near a committed attacker interrupts it and creates a brief opening. Rush opponents commit along a locked direction: move across that direction rather than staying in their path. If rescue is still guarded, clear or lure nearby opponents and try again. The yellow line can be opened with four abstract strikes, but bypassing it is valid.
+Approach Kabir. Use short three-hit chains: the third hit knocks back and can break a frontal shield. Earlier frontal strikes are blocked; flanking is another option. All strikes cost stamina, so holding Strike indefinitely leaves you exhausted. A late Dodge near a committed attacker interrupts it and creates a brief opening. Rush opponents commit along a locked direction: move across that direction rather than staying in their path. A teal recovery ring marks the post-strike opening. Damage happens at the strike's contact moment, not immediately on pressing Strike; do not turn or retreat before contact if you want the attack to connect. If rescue is still guarded, clear or lure nearby opponents and try again. The yellow line can be opened with three abstract contact hits, but a side bench vault is a valid alternate approach.
 
 Use Action/E near Kabir once it is safe. His testimony is secured as part of the rescue; there is no separate compulsory case quiz. Return to your van and wait for him to catch up before boarding.
 
