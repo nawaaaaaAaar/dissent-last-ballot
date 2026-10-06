@@ -1,5 +1,5 @@
-import {Line} from './line-rules.js?v=18-r4';
-import {buildLine} from './line-scene.js?v=18-r4';
+import {Line} from './line-rules.js?v=18-r5';
+import {buildLine} from './line-scene.js?v=18-r5';
 import {WorldAudio} from './world-audio.js?v=0.17.2';
 const $=id=>document.getElementById(id),game=new Line(),keys=new Set(),audio=new WorldAudio();
 const coarse=matchMedia('(pointer:coarse)').matches,low=new URLSearchParams(location.search).get('quality')==='low'||coarse;
