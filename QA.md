@@ -24,11 +24,19 @@ The required supplied browser client initially attempted input before the model-
 
 ## Assets, sound and loading
 
-Three fictional generated Hindi lines were transcoded to genuine MP3 and reviewed as source audio. The evaluator transcribed the intended lines without spoken tags, cutoffs or clipping; its report is `qa/line-dialogue-evaluation.txt`. Runtime playback, muting, pause/resume, explicit mute retention on replay and the rescue/boarding triggers are final checks, not inferred from file existence.
+Three fictional generated Hindi lines were transcoded to genuine MP3 and reviewed as source audio. The evaluator transcribed the intended lines without spoken tags, cutoffs or clipping; its report is `qa/line-dialogue-evaluation.txt`. Runtime playback and the separate trigger checks are recorded below rather than inferred from file existence.
 
 A long-lived cloud session failed to load after repeated scene reloads; a fresh cloud browser loaded and rendered successfully. The precise cause was not established. A visible Retry loading path and graphics-context-loss reload fallback exist, but failed loading attempts are retained as limitations rather than silently counted as passes.
 
-Final presentation/audio-only checks and public deployment confirmation are appended after the final bundle is verified.
+## Final public presentation checks
+
+Public runtime `23bf869` (`18-r5` assets) loaded successfully in a fresh cloud browser. Its GitHub workflow [37462459256](https://github.com/nawaaaaaAaar/dissent-last-ballot/actions/runs/37462459256) completed successfully. Later documentation-only commits do not change this runtime.
+
+The intro played with audio readyState 4; pause froze game time and voice playback, and resume continued it. Explicit mute survived encounter restart. Testing exposed the sound button being covered by menu/pause panels; the final header-layer revision made it reachable, and re-enabling sound then restarting played the intro again. Actual held rescue played Kabir's recording line. The driving dialogue's source audio and code trigger were checked, but its final-r5 in-game playback was not reached in this attempt and is not counted as verified.
+
+Portrait 390×844 had no horizontal overflow, and its pause/help/restart controls were reachable. The final failed result hid the gameplay HUD. High-setting scene captures and the final audio browser-client movement/strike capture were visually inspected. Earlier 844×390 touch completion remains the landscape gameplay evidence; this is not physical-phone testing.
+
+The final-r5 portrait attempt is a failure, not a third win. Rescue holds under pressure were interrupted until the first four opponents were defeated. Kabir was rescued, his voice played, and both characters crossed the intact side rail. The player reached the van with 1 health, but was struck before boarding and captured at active time 84.65 seconds; both final opponents remained standing. There was no health, position, time or outcome injection. Input batches and read-only observations assisted the attempt, with pauses between batches. This exposes a fragile low-health rescue-to-boarding transition; the earlier two completed routes do not erase it. Captures include `line-final-portrait-rescue-clear.jpg`, `line-final-portrait-crossing.jpg` and `line-final-portrait-failure.jpg`.
 
 ## Unverified quality
 

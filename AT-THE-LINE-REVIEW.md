@@ -37,6 +37,8 @@ The second replay proves checkpoint recovery, not a flawless first attempt. Keyb
 
 The story now passes through actions rather than a sequence of mission-board choices. The alternative crossing changed the companion's route and allowed surviving opponents to remain behind. However, the scene is short, and escaping can be more effective than prolonged combat; this is a design trade-off to judge, not an established retention system.
 
+The final portrait replay did not win. Pressure repeatedly interrupted rescue until four opponents were defeated; Kabir then crossed the side rail successfully, but the player, down to 1 health, was caught at the van before boarding. This is a meaningful remaining weakness: the transition from escort to boarding can become fragile precisely when the player is already struggling. It does not invalidate the earlier route completions, but it prevents treating those completions as a general quality signoff.
+
 ## Final verification and quality gap
 
 Sixteen isolated rules pass. The supplied browser client was rerun and its actual-render captures inspected; it needed a longer ready-button timeout for local asset decoding. An extended software-rendered client attempt timed out, then a shorter bounded retry succeeded. Deterministic stepping is not an FPS benchmark.
@@ -47,6 +49,8 @@ One long-lived public browser failed to load the new scene; a fresh browser rend
 
 This is not finished-indie approval. The reused face/clothing rigs still limit identity and performance; falls are procedural, foot planting and hand grips are incomplete, the environment repeats simple forms, civilian autonomy is thin and the escape is brief. The rebuild removes the rejected campaign structure, but does not demonstrate the user's final high-graphics standard or long-term replay value.
 
+Only the explicitly modeled gameplay blockers have physical collision. Some dressing, including ordinary benches and tent details, remains decorative. The authored street is Jantar Mantar-inspired fiction, not an exact Delhi reconstruction. Final sound-control layering and portrait results were checked separately from the two full completed routes; the final driving dialogue trigger remains unverified in play.
+
 ## Next highest-impact work
 
-Keep this encounter, but make its close-range action genuinely authored: guard/impact/fall/recovery choreography, distinctive Indian character assets and reactions, and stronger transitions between evasion, rescue and escort. The largest gameplay question is whether the fight-and-rescue beat is enjoyable without controller assistance; the largest visual gap is still character performance and repeated asset detail. More city area or reward counters would not answer either question.
+Keep this encounter, but make its rescue-to-boarding transition fair under pressure and its close-range action genuinely authored: guard/impact/fall/recovery choreography, distinctive Indian character assets and reactions, and stronger transitions between evasion, rescue and escort. The largest gameplay question is whether the fight-and-rescue beat is enjoyable without controller assistance; the largest visual gap is still character performance and repeated asset detail. More city area or reward counters would not answer either question.
