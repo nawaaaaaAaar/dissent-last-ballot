@@ -22,13 +22,19 @@ const frames={
 };
 export function installMotion(person){
   person.motionActions={};
+  person.actions.Idle.time=0;person.mixer.update(0);person.group.updateMatrixWorld(true);
+  const modelRotation=person.model.getWorldQuaternion(new THREE.Quaternion());
   for(const [name,keys] of Object.entries(frames)){
     const tracks=[];
     for(const [short,boneName]of Object.entries(joint)){
       const bone=person.model.getObjectByName(boneName);if(!bone)continue;
-      const values=[],base=bone.quaternion.clone();
+      const values=[],base=bone.quaternion.clone(),worldRotation=bone.getWorldQuaternion(new THREE.Quaternion());
       for(const [,pose]of keys){
-        const e=pose[short]||[0,0,0],q=base.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...e)));
+        const e=pose[short]||[0,0,0];
+        const semantic=new THREE.Quaternion().setFromEuler(new THREE.Euler(...e));
+        const worldDelta=modelRotation.clone().multiply(semantic).multiply(modelRotation.clone().invert());
+        const localDelta=worldRotation.clone().invert().multiply(worldDelta).multiply(worldRotation);
+        const q=base.clone().multiply(localDelta);
         values.push(q.x,q.y,q.z,q.w);
       }
       tracks.push(new THREE.QuaternionKeyframeTrack(boneName+'.quaternion',keys.map(k=>k[0]),values));

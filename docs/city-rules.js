@@ -1,4 +1,4 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.0';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.16.1';
 import {layout,contains,crossing,local,STRIKES} from './encounters.js';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -158,7 +158,7 @@ export class City{
     if(this.mission?.type==='rally'&&this.wave===1&&dist(this.player,this.mission.zones[1])<4)return{id:'aid',label:'HOLD · RESTORE AID'};
     if(this.mission?.type==='rescue'&&!this.friend.rescued&&dist(this.player,this.friend)<3.2)return{id:'rescue',label:'RESCUE KABIR'};
     if(dist(this.player,this.van)<4.2)return{id:'van',label:'ENTER VAN'};
-    const o=this.props.filter(o=>dist(o,this.player)<Math.max(o.w,o.d)/2+1.8).sort((a,b)=>dist(a,this.player)-dist(b,this.player))[0];
+    const o=this.props.filter(o=>contains(this.player,o,1.4)&&Math.abs(turn(this.player.yaw,Math.atan2(o.x-this.player.x,o.z-this.player.z)))<1.4).sort((a,b)=>dist(a,this.player)-dist(b,this.player))[0];
     if(o)return{id:o.kind==='screen'?'screen':'vault',prop:o.id,label:o.kind==='screen'?'MOVE BANNER SCREEN':'VAULT · SIDE ROUTE'};
     const support=this.supports.find(s=>!s.used&&dist(s,this.player)<3.5);
     if(support)return{id:'support',label:'VOLUNTEER SUPPORT',support:support.id};

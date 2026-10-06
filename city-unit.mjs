@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.16.0';
+import {installMap,PLACES,roadRoute,snap,WORLD} from './docs/city-data.js?v=0.16.1';
 import {City} from './docs/city-rules.js';
 installMap(JSON.parse(fs.readFileSync('docs/delhi-map.json')));
 const checks=[];
@@ -155,7 +155,7 @@ check('vault moves through only the selected low furniture with a valid landing'
 });
 check('screen changes its physical and sight position, checkpoint retains it',()=>{
   const g=new City();g.start();g.accept('witness');g.enemies.forEach(e=>e.hp=0);const o=g.props.find(o=>o.kind==='screen');const start={x:o.x,z:o.z};
-  Object.assign(g.player,{x:o.x-1.2,z:o.z});assert.equal(g.nearby().id,'screen');g.interact();assert(g.noise);for(let i=0;i<20;i++)g.update(.05);
+  Object.assign(g.player,{x:o.x-1.2,z:o.z,yaw:Math.PI/2});assert.equal(g.nearby().id,'screen');g.interact();assert(g.noise);for(let i=0;i<20;i++)g.update(.05);
   assert(Math.hypot(o.x-start.x,o.z-start.z)>3);g.saveCheckpoint();g.mode='caught';g.retry();assert.equal(g.props.find(p=>p.id===o.id).z,o.z);
 });
 check('guard holds its authored home instead of pursuing to an unrelated street',()=>{
