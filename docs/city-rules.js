@@ -1,5 +1,5 @@
-import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.17.0';
-import {layout,contains,crossing,local,STRIKES} from './encounters.js?v=0.17.0';
+import {WORLD,PLACES,SCALE,distance as dist,inside,segmentDistance,roadRoute,snap} from './city-data.js?v=0.17.1';
+import {layout,contains,crossing,local,STRIKES,ENEMY_REACH} from './encounters.js?v=0.17.1';
 export {WORLD};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
@@ -328,7 +328,7 @@ export class City{
       if(e.strikeDuration>0){
         e.state='strike';e.strikeTime+=dt;
         if(e.role==='rush'&&e.strikeTime<.3){const step=Math.min(7*dt,Math.max(0,dist(e,p)-1.05));this.move(e,Math.sin(e.attackYaw)*step,Math.cos(e.attackYaw)*step);}
-        if(!e.strikeHit&&e.strikeTime>=e.strikeDuration*.55){e.strikeHit=true;if(dist(e,p)<(e.role==='guard'?1.65:1.55)&&!v.occupied&&this.line(e,p,false)&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.8)this.hurt();}
+        if(!e.strikeHit&&e.strikeTime>=e.strikeDuration*.55){e.strikeHit=true;if(dist(e,p)<ENEMY_REACH[e.role]&&!v.occupied&&this.line(e,p,false)&&Math.abs(turn(e.attackYaw,Math.atan2(p.x-e.x,p.z-e.z)))<.8)this.hurt();}
         if(e.strikeTime>=e.strikeDuration){e.strikeDuration=0;e.recovery=e.role==='rush'?1.2:.85;e.cooldown=1.3;e.state='recover';}
         continue;
       }

@@ -7,10 +7,13 @@ export function encounterArt(scene){
   const cloth=new THREE.MeshStandardMaterial({color:'#35665b',roughness:.95,side:THREE.DoubleSide});
   const wood=new THREE.MeshStandardMaterial({color:'#8c6240',roughness:.92});
   const metal=new THREE.MeshStandardMaterial({color:'#65706a',roughness:.62,metalness:.25});
+  const canvas=document.createElement('canvas');canvas.width=256;canvas.height=128;const ctx=canvas.getContext('2d');ctx.fillStyle='#b0875e';ctx.fillRect(0,0,256,128);
+  for(let y=0;y<128;y+=2){ctx.strokeStyle=y%6?'#a17b55':'#775535';ctx.globalAlpha=.25;ctx.beginPath();for(let x=0;x<256;x+=8){const yy=y+Math.sin(x*.06+y)*1.8;x?ctx.lineTo(x,yy):ctx.moveTo(x,yy);}ctx.stroke();}
+  ctx.globalAlpha=1;const grain=new THREE.CanvasTexture(canvas);grain.colorSpace=THREE.SRGBColorSpace;wood.map=grain;
   const models=new Map();let key='';
   function rounded(g,m,x,y,z,w,h,d){const p=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,2,.025),m);p.position.set(x,y,z);g.add(p);return p;}
   function clear(){
-    group.traverse(o=>{if(o.material?.map){o.material.map.dispose();o.material.dispose();}});
+    group.traverse(o=>{if(o.material?.map&&o.material!==wood){o.material.map.dispose();o.material.dispose();}});
     group.clear();models.clear();
   }
   function create(o){

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {clone} from 'three/addons/utils/SkeletonUtils.js';
 import {human as legacyHuman,loadHuman,poseHuman as legacyPose} from './visuals.js?v=0.6.1';
-import {installMotion,clearMotion,poseMotion,blendReturn} from './contact-motion.js?v=0.17.0';
+import {installMotion,clearMotion,poseMotion,blendReturn} from './contact-motion.js?v=0.17.1';
 export {poseMotion};
 
 let male,female,maleDelhi,femaleDelhi,officer;

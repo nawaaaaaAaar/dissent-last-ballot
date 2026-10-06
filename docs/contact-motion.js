@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // Original joint-space keyframes, sampled by the SAME normalized phase as
 // gameplay contact. No baked root motion: traversal root is collision checked.
-import {STRIKES} from './encounters.js?v=0.17.0';
+import {STRIKES} from './encounters.js?v=0.17.1';
 export {STRIKES};
 const joint={
   R:'Bip01 R UpperArm',L:'Bip01 L UpperArm',RE:'Bip01 R Forearm',LE:'Bip01 L Forearm',
