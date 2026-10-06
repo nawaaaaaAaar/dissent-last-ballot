@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // Original joint-space keyframes, sampled by the SAME normalized phase as
 // gameplay contact. No baked root motion: traversal root is collision checked.
-export {STRIKES} from './encounters.js';
+export {STRIKES} from './encounters.js?v=0.16.2';
 const joint={
   R:'Bip01 R UpperArm',L:'Bip01 L UpperArm',RE:'Bip01 R Forearm',LE:'Bip01 L Forearm',
   S:'Bip01 Spine2',P:'Bip01 Pelvis',RT:'Bip01 R Thigh',LT:'Bip01 L Thigh',
@@ -27,7 +27,7 @@ export function installMotion(person){
   for(const [name,keys] of Object.entries(frames)){
     const tracks=[];
     for(const [short,boneName]of Object.entries(joint)){
-      const bone=person.model.getObjectByName(boneName);if(!bone)continue;
+      const bone=person.model.getObjectByName(boneName)||person.model.getObjectByName(boneName.replaceAll(' ','_'));if(!bone)continue;
       const values=[],base=bone.quaternion.clone(),worldRotation=bone.getWorldQuaternion(new THREE.Quaternion());
       for(const [,pose]of keys){
         const e=pose[short]||[0,0,0];
@@ -37,8 +37,9 @@ export function installMotion(person){
         const q=base.clone().multiply(localDelta);
         values.push(q.x,q.y,q.z,q.w);
       }
-      tracks.push(new THREE.QuaternionKeyframeTrack(boneName+'.quaternion',keys.map(k=>k[0]),values));
+      tracks.push(new THREE.QuaternionKeyframeTrack(bone.name+'.quaternion',keys.map(k=>k[0]),values));
     }
+    if(!tracks.length)throw new Error('Contact motion did not bind to the human rig.');
     const a=person.mixer.clipAction(new THREE.AnimationClip(name,1,tracks));a.setLoop(THREE.LoopOnce,1);a.clampWhenFinished=true;a.paused=true;person.motionActions[name]=a;
   }
 }
